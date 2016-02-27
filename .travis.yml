@@ -1,0 +1,7 @@
+install: true
+
+language: cpp
+
+compiler:
+  - clang
+  - gcc
