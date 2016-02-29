@@ -8,9 +8,14 @@ AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
-AC_PROG_CXX
+AX_PROG_CXX_MPI
 
 # Checks for libraries.
+PKG_CHECK_MODULES([GSL], [gsl >= 1.16])
+AX_LIB_HDF5([parallel])
+if test "$with_hdf5" = "yes"; then
+	HDF5_LIBS="$HDF5_LIBS -lhdf5_cpp"
+fi
 
 # Checks for header files.
 
