@@ -1,6 +1,9 @@
-#ifndef __CLASSES_H_INCLUDED__
-#define __CLASSES_H_INCLUDED__
+#ifndef __CONSTS_H_INCLUDED__
+#define __CONSTS_H_INCLUDED__
 
-const int INT_TAG = 1;
+extern const float SPEED_OF_LIGHT;
+extern const float AMU;
+extern const float E_CHARGE;
+extern const float E_MASS;
 
 #endif
