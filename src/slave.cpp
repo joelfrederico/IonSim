@@ -58,7 +58,6 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	double cov[2][2];
 	x_beam.cov(cov);
 	printf("Cov:\n[[ %.6e, %.6e ],\n [ %.6e, %.6e ]]\n", cov[0][0], cov[0][1], cov[1][0], cov[1][1]);
-	/* printf("Id: %d, n_e: %d, n_ion: %d, x_win: %.3e, y_win: %.3e, E: %.3e\n", id, n_e, n_ion, x_window, y_window, E); */
 
 	Ebeam ebeam(n_e, q_tot, E, x_beam, y_beam, z_cov);
 	ebeam.dump("output.h5", slave_comm_id);

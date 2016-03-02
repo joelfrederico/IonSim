@@ -19,7 +19,7 @@ class Emit
 class Parts
 {
 	protected:
-		int _n_pts;
+		long _n_pts;
 		double_vec _x;
 		double_vec _xp;
 		double_vec _y;
@@ -27,7 +27,15 @@ class Parts
 		double_vec _z;
 		double_vec _zp;
 	public:
-		Parts(int n_pts);
+		Parts(long n_pts);
+
+		long n_pts();
+		const double_vec * x();
+		const double_vec * xp();
+		const double_vec * y();
+		const double_vec * yp();
+		const double_vec * z();
+		const double_vec * zp();
 };
 
 #endif
