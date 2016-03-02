@@ -9,7 +9,9 @@ class Emit
 		double _emit;
 	public:
 		Emit();
-		Emit(double emit, double E, bool emit_n);
+
+		void set_emit_n(double emit_n, double E_GeV);
+		void set_emit(double emit, double E_GeV);
 
 		double emit();
 };

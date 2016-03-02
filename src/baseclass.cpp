@@ -1,5 +1,6 @@
 #include "baseclass.h"
 #include <gsl/gsl_const_mksa.h>
+#include "support_func.h"
 
 // ==============================
 // Parts
@@ -18,16 +19,18 @@ Parts::Parts(int n_pts)
 // ==============================
 // Emit
 // ==============================
-Emit::Emit() {}
-
-Emit::Emit(double emit, double E, bool emit_n)
+Emit::Emit() 
 {
-	if ( emit_n )
-	{
-		_emit = emit / (E * 1e9 * GSL_CONST_MKSA_ELECTRON_VOLT);
-	} else {
-		_emit = emit;
-	}
+}
+
+void Emit::set_emit(double emit, double E_GeV)
+{
+	_emit = emit;
+}
+
+void Emit::set_emit_n(double emit_n, double E_GeV)
+{
+	_emit = emit_n / ionsim::GeV2gamma(E_GeV);
 }
 
 double Emit::emit()

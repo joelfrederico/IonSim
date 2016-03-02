@@ -35,7 +35,16 @@ void Beam::cov(double output[2][2])
 {
 	output[0][0] = beta();
 	output[0][1] = output[1][0] = -alpha();
-	output[1][1] = (1+pow(alpha(), 2)/beta()) * _emit.emit();
+	output[1][1] = (1.0+pow(alpha(), 2))/beta();
+	double buf = _emit.emit();
+	for (int i=0; i < 2; i++) 
+	{
+		for (int j=0; j < 2; j++)
+		{
+			output[i][j] *= _emit.emit();
+		}
+	}
+	return;
 }
 
 
@@ -61,6 +70,7 @@ Ions::Ions(Plasma plasma, int n_pts, double x_window, double y_window) : Parts(n
 	gsl_rng * r;
 
 	gsl_rng_env_setup();
+	/* gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1); */
 
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
@@ -74,6 +84,7 @@ Ions::Ions(Plasma plasma, int n_pts, double x_window, double y_window) : Parts(n
 		_z[i]     = gsl_rng_uniform(r);
 		_delta[i] = gsl_rng_uniform(r);
 	}
+	/* gsl_rng_free(r); */
 }
 
 double_vec Ions::x()
@@ -83,7 +94,7 @@ double_vec Ions::x()
 
 int Ions::dump(std::string const &filename)
 {
-	printf("Will print to: %s\n", filename.c_str());
+	/* printf("Will print to: %s\n", filename.c_str()); */
 	return 0;
 }
 
@@ -105,19 +116,24 @@ Ebeam::Ebeam(int n_pts, double q_tot, double E, Beam x_beam, Beam y_beam, double
 
 	x_beam.cov(x_cov);
 	y_beam.cov(y_cov);
+	/* printf("x_cov: %.6d\n", x_cov); */
 
 	gsl_rng * r = gsl_rng_alloc(gsl_rng_default);
 
-	gsl_rng_env_setup();
+	/* gsl_rng_env_setup(); */
+	gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1);
 
 	for (int i=0; i < n_pts; i++)
 	{
 		rho_x = &x_cov[0][1];
 		rho_y = &y_cov[0][1];
-		gsl_ran_bivariate_gaussian(r, x_cov[0][0], x_cov[1][1], *rho_x, &_x[i], &_xp[i]);
-		gsl_ran_bivariate_gaussian(r, y_cov[0][0], y_cov[1][1], *rho_y, &_y[i], &_yp[i]);
-		gsl_ran_bivariate_gaussian(r, z_cov[0][0], z_cov[1][1], 0, &_z[i], &_zp[i]);
+		gsl_ran_bivariate_gaussian(r , sqrt(x_cov[0][0]) , sqrt(x_cov[1][1]) , *rho_x , &_x[i] , &_xp[i]);
+		gsl_ran_bivariate_gaussian(r , sqrt(y_cov[0][0]) , sqrt(y_cov[1][1]) , *rho_y , &_y[i] , &_yp[i]);
+		/* gsl_ran_bivariate_gaussian(r , sqrt(z_cov[0][0]) , sqrt(z_cov[1][1]) , 0      , &_z[i] , &_zp[i]); */
+		_z[i] = gsl_ran_flat(r, 0, sqrt(z_cov[0][0]));
+		_zp[i] = gsl_ran_gaussian(r, sqrt(z_cov[1][1]));
 	}
+	gsl_rng_free(r);
 }
 
 int Ebeam::dump(std::string const &filename, MPI::Intracomm &comm)
@@ -141,7 +157,6 @@ int Ebeam::dump(std::string const &filename, MPI::Intracomm &comm)
 	// ==================================
 	// Set up file access property list
 	// ==================================
-	printf("Will print to: %s\n", filename.c_str());
 	plist_file_id = H5Pcreate(H5P_FILE_ACCESS);
 	H5Pset_fapl_mpio(plist_file_id, comm, info);
 

@@ -22,7 +22,7 @@ int master(int &p, int &id)
 	// Generate beam
 	// ==============================
 	//
-	int n_e          = 100;
+	int n_e          = 1.5e5;
 	int n_ion        = 1e6;
 	double q_tot     = 2e10;
 	double x_window  = 100e-6;
@@ -45,18 +45,18 @@ int master(int &p, int &id)
 	MPI::COMM_WORLD.Bcast(&sz, 1, MPI::DOUBLE, id);
 	MPI::COMM_WORLD.Bcast(&sdelta, 1, MPI::DOUBLE, id);
 	
-	// ==============================
-	// Loop over sim steps
-	// ==============================
-	for (int i=0; i < max_sim_steps; i++)
-	{
-		// ==============================
-		// Loop over ion steps
-		// ==============================
-		for (int j=0; j < max_ion_steps; j++)
-		{
-			/* printf("Outer:\t%d; Inner:\t%d\n", i, j); */
-		}
-	}
+	// // ==============================
+	// // Loop over sim steps
+	// // ==============================
+	// for (int i=0; i < max_sim_steps; i++)
+	// {
+	// 	// ==============================
+	// 	// Loop over ion steps
+	// 	// ==============================
+	// 	for (int j=0; j < max_ion_steps; j++)
+	// 	{
+	// 		/* printf("Outer:\t%d; Inner:\t%d\n", i, j); */
+	// 	}
+	// }
 	return 0;
 }
