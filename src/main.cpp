@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
 	if (id == 0)
 	{
-		master(p, id);
+		master(p);
 	}
 	else
 	{

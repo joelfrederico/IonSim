@@ -1,14 +1,15 @@
 #include "mpi.h"
 
-int master(int &p, int &id)
+int master(int &p)
 {
+	int root = 0;
 	// ==============================
 	// Starting gun
 	// ==============================
 	MPI::Status status;
 
 	printf("I am the MASTER!\n");
-	for (int slave_id=1; id < p; id++)
+	for (int slave_id=1; slave_id < p; slave_id++)
 	{
 		MPI::COMM_WORLD.Send(&slave_id, 1, MPI::INT, slave_id, slave_id*2);
 	}
@@ -33,16 +34,16 @@ int master(int &p, int &id)
 	double sz        = 100e-6;
 	double sdelta    = 0.04;
 
-	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::LONG   , id);
-	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::LONG   , id);
-	MPI::COMM_WORLD.Bcast(&radius    , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&length    , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , id);
-	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::LONG   , root);
+	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::LONG   , root);
+	MPI::COMM_WORLD.Bcast(&radius    , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&length    , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , root);
 	
 	// // ==============================
 	// // Loop over sim steps
