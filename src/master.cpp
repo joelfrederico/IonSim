@@ -8,9 +8,9 @@ int master(int &p, int &id)
 	MPI::Status status;
 
 	printf("I am the MASTER!\n");
-	for (int id=1; id < p; id++)
+	for (int slave_id=1; id < p; id++)
 	{
-		MPI::COMM_WORLD.Send(&id, 1, MPI::INT, id, id*2);
+		MPI::COMM_WORLD.Send(&slave_id, 1, MPI::INT, slave_id, slave_id*2);
 	}
 	// ==============================
 	// Set up sim
