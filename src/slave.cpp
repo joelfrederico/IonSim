@@ -18,11 +18,11 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// Generate beam
 	// ==============================
 	int root = 0;
-	int n_e;
-	int n_ion;
+	long n_e;
+	long n_ion;
 	double q_tot;
-	double x_window;
-	double y_window;
+	double radius;
+	double length;
 	double E;
 	double emit_n;
 	double n_p_cgs;
@@ -30,10 +30,10 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	double sz;
 	double sdelta;
 
-	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::INT    , root);
-	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::INT    , root);
-	MPI::COMM_WORLD.Bcast(&x_window  , 1 , MPI::DOUBLE , root);
-	MPI::COMM_WORLD.Bcast(&y_window  , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::LONG   , root);
+	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::LONG   , root);
+	MPI::COMM_WORLD.Bcast(&radius    , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&length    , 1 , MPI::DOUBLE , root);
 	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , root);
 	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , root);
 	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , root);
@@ -53,14 +53,20 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	}
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
-	Ions ions(plas, n_ion, x_window, y_window);
 
 	double cov[2][2];
 	x_beam.cov(cov);
 	printf("Cov:\n[[ %.6e, %.6e ],\n [ %.6e, %.6e ]]\n", cov[0][0], cov[0][1], cov[1][0], cov[1][1]);
 
 	Ebeam ebeam(n_e, q_tot, E, x_beam, y_beam, z_cov);
-	ebeam.dump("output.h5", slave_comm_id);
+
+	// ==============================
+	// Generate ions
+	// ==============================
+	Ions ions(&plas, n_ion, radius, length);
+
+	ebeam.dump("e_output.h5", slave_comm_id);
+	ions.dump("ion_output.h5", slave_comm_id);
 
 	return 0;
 }

@@ -21,12 +21,11 @@ int master(int &p, int &id)
 	// ==============================
 	// Generate beam
 	// ==============================
-	//
 	int n_e          = 1e6;
 	int n_ion        = 1e6;
 	double q_tot     = 2e10;
-	double x_window  = 100e-6;
-	double y_window  = 100e-6;
+	double radius    = 100e-6;
+	double length    = 100e-6;
 	double E         = 20.35;
 	double emit_n    = 50e-6;
 	double n_p_cgs   = 1e18;
@@ -34,16 +33,16 @@ int master(int &p, int &id)
 	double sz        = 100e-6;
 	double sdelta    = 0.04;
 
-	MPI::COMM_WORLD.Bcast(&n_e, 1, MPI::INT, id);
-	MPI::COMM_WORLD.Bcast(&n_ion, 1, MPI::INT, id);
-	MPI::COMM_WORLD.Bcast(&x_window, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&y_window, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&E, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&emit_n, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&n_p_cgs, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&m_ion_amu, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&sz, 1, MPI::DOUBLE, id);
-	MPI::COMM_WORLD.Bcast(&sdelta, 1, MPI::DOUBLE, id);
+	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::LONG   , id);
+	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::LONG   , id);
+	MPI::COMM_WORLD.Bcast(&radius    , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&length    , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , id);
+	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , id);
 	
 	// // ==============================
 	// // Loop over sim steps

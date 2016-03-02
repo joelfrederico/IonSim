@@ -49,7 +49,6 @@ class Ebeam : public Parts
 	public:
 		/// Create Ebeam class.
 		Ebeam(int nparts, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]);
-		~Ebeam();
 
 		int dump(std::string const &filename, MPI::Intracomm &comm);
 };
@@ -85,24 +84,16 @@ class Match
 class Ions : public Parts
 {
 	private:
-		double _x_window;
-		double _y_window;
+		double _radius;
+		double _part_charge;
 
-		double_vec _delta;
-
-		Plasma _plasma;
+		Plasma * _plasma;
 
 	public:
 		Ions();
-		Ions(Plasma plasma, int n_pts, double x_window, double y_window);
-		double_vec x();
-		double_vec xp();
-		double_vec y();
-		double_vec yp();
-		double_vec z();
-		double_vec delta();
+		Ions(Plasma * plasma, int n_pts, double radius, double length);
 
-		int dump(std::string const &filename);
+		int dump(std::string const &filename, MPI::Intracomm &comm);
 };
 
 #endif

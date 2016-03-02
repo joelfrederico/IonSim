@@ -57,15 +57,13 @@ Ions::Ions() : Parts(0)
 {
 }
 
-Ions::Ions(Plasma plasma, int n_pts, double x_window, double y_window) : Parts(n_pts)
+Ions::Ions(Plasma * plasma, int n_pts, double radius, double length) : Parts(n_pts)
 {
-	_plasma   = plasma;
-	_x_window = x_window;
-	_y_window = y_window;
-	_n_pts    = n_pts;
+	_plasma      = plasma;
+	_radius      = radius;
+	_part_charge = (*plasma).n_p() * length * M_PI * pow(radius, 2) * GSL_CONST_MKSA_ELECTRON_CHARGE;
 
-
-	_delta.reserve(n_pts);
+	bool keep_looking;
 
 	const gsl_rng_type * T;
 	gsl_rng * r;
@@ -78,32 +76,29 @@ Ions::Ions(Plasma plasma, int n_pts, double x_window, double y_window) : Parts(n
 
 	for (int i=0; i < n_pts; i++)
 	{
-		_x[i]     = gsl_rng_uniform(r);
-		_xp[i]    = gsl_rng_uniform(r);
-		_y[i]     = gsl_rng_uniform(r);
-		_yp[i]    = gsl_rng_uniform(r);
-		_z[i]     = gsl_rng_uniform(r);
-		_delta[i] = gsl_rng_uniform(r);
+		keep_looking = true;
+		while (keep_looking)
+		{
+			_x[i]     = gsl_ran_flat(r, -radius, radius);
+			_y[i]     = gsl_ran_flat(r, -radius, radius);
+			if ((pow(_x[i], 2) + pow(_y[i], 2)) < pow(radius, 2)) keep_looking = false;
+		}
+		_z[i]  = gsl_ran_flat(r, 0, length);
+		_xp[i] = 0;
+		_yp[i] = 0;
+		_zp[i] = 0;
 	}
-	/* gsl_rng_free(r); */
 }
 
-double_vec Ions::x()
+int Ions::dump(std::string const &filename, MPI::Intracomm &comm)
 {
-	return _x;
-}
-
-int Ions::dump(std::string const &filename)
-{
-	/* printf("Will print to: %s\n", filename.c_str()); */
+	ionsim::dump(filename, comm, this);
 	return 0;
 }
 
 // ==================================
 // EBeam
 // ==================================
-Ebeam::~Ebeam() {}
-
 Ebeam::Ebeam(int n_pts, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]) : Parts(n_pts)
 {
 	_q_tot = q_tot;
@@ -119,7 +114,7 @@ Ebeam::Ebeam(int n_pts, double q_tot, double E, Beam x_beam, Beam y_beam, double
 	y_beam.cov(y_cov);
 	/* printf("x_cov: %.6d\n", x_cov); */
 
-	gsl_rng * r = gsl_rng_alloc(gsl_rng_default);
+	gsl_rng * r = gsl_rng_alloc(gsl_rng_mt19937);
 
 	/* gsl_rng_env_setup(); */
 	gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1);
@@ -128,6 +123,7 @@ Ebeam::Ebeam(int n_pts, double q_tot, double E, Beam x_beam, Beam y_beam, double
 	{
 		rho_x = &x_cov[0][1];
 		rho_y = &y_cov[0][1];
+
 		gsl_ran_bivariate_gaussian(r , sqrt(x_cov[0][0]) , sqrt(x_cov[1][1]) , *rho_x , &_x[i] , &_xp[i]);
 		gsl_ran_bivariate_gaussian(r , sqrt(y_cov[0][0]) , sqrt(y_cov[1][1]) , *rho_y , &_y[i] , &_yp[i]);
 		/* gsl_ran_bivariate_gaussian(r , sqrt(z_cov[0][0]) , sqrt(z_cov[1][1]) , 0      , &_z[i] , &_zp[i]); */

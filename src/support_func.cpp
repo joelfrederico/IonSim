@@ -18,15 +18,15 @@ namespace ionsim
 		return GeV * 1e9 * GSL_CONST_MKSA_ELECTRON_VOLT / ELECTRON_REST_ENERGY;
 	}
 
-	int dump(std::string const &filename, MPI::Intracomm &comm, Ebeam *ebeam)
+	int dump(std::string const &filename, MPI::Intracomm &comm, Parts *ebeam)
 	{
-		long n_pts = ebeam->n_pts();
-		const double_vec * _x = ebeam->x();
-		const double_vec * _xp = ebeam->xp();
-		const double_vec * _y = ebeam->y();
-		const double_vec * _yp = ebeam->yp();
-		const double_vec * _z = ebeam->z();
-		const double_vec * _zp = ebeam->zp();
+		long n_pts             = (*ebeam).n_pts();
+		const double_vec * _x  = (*ebeam).x();
+		const double_vec * _xp = (*ebeam).xp();
+		const double_vec * _y  = (*ebeam).y();
+		const double_vec * _yp = (*ebeam).yp();
+		const double_vec * _z  = (*ebeam).z();
+		const double_vec * _zp = (*ebeam).zp();
 
 		hid_t plist_file_id;
 		hid_t plist_dx_id;
@@ -84,7 +84,7 @@ namespace ionsim
 		double buf[n_write*6];
 		for (int j=0; i < n_pts; j++)
 		{
-			if (id == 0) printf("On chunk %d...\n", j+1);
+			/* if (id == 0) printf("On chunk %d...\n", j+1); */
 	
 			if (n_pts - i < n_write)
 			{

@@ -9,7 +9,7 @@ namespace ionsim
 {
 	double gamma2GeV(double gamma);
 	double GeV2gamma(double GeV);
-	int dump(std::string const &filename, MPI::Intracomm &comm, Ebeam *ebeam);
+	int dump(std::string const &filename, MPI::Intracomm &comm, Parts * ebeam);
 }
 
 #endif
