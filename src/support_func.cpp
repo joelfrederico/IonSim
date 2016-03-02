@@ -20,6 +20,10 @@ namespace ionsim
 
 	int dump(std::string const &filename, MPI::Intracomm &comm, Parts *ebeam)
 	{
+		MPI::Info info;
+		int p  = comm.Get_size();
+		int id = comm.Get_rank();
+
 		long n_pts             = (*ebeam).n_pts();
 		const double_vec * _x  = (*ebeam).x();
 		const double_vec * _xp = (*ebeam).xp();
@@ -28,6 +32,8 @@ namespace ionsim
 		const double_vec * _z  = (*ebeam).z();
 		const double_vec * _zp = (*ebeam).zp();
 
+		int n_write = 1e5;
+
 		hid_t plist_file_id;
 		hid_t plist_dx_id;
 		hid_t file_id;
@@ -35,14 +41,11 @@ namespace ionsim
 		hid_t dataspace_id;
 		hid_t dataset_id;
 		hid_t memspace_id;
-		hsize_t count[2];
+		hsize_t count[2] = {n_pts*p, 6};
 		hsize_t offset[2];
 	
 		herr_t status;
 	
-		MPI::Info info;
-		int p  = comm.Get_size();
-		int id = comm.Get_rank();
 	
 		// ==================================
 		// Set up file access property list
@@ -64,7 +67,9 @@ namespace ionsim
 		// ==================================
 		// Create dataspace collectively
 		// ==================================
-		memcpy(count, (hsize_t [2]){n_pts*comm.Get_size(), 6}, 2*sizeof(hsize_t));
+		/* memcpy(count, (hsize_t [2]){n_pts*comm.Get_size(), 6}, 2*sizeof(hsize_t)); */
+		count[0] = n_pts*p;
+		count[1] = 6;
 		dataspace_id = H5Screate_simple(2, count, NULL);
 	
 		// ==================================
@@ -78,7 +83,6 @@ namespace ionsim
 		plist_dx_id = H5Pcreate(H5P_DATASET_XFER);
 		H5Pset_dxpl_mpio(plist_dx_id, H5FD_MPIO_COLLECTIVE);
 	
-		int n_write=1e5;
 		int i=0;
 		if (n_pts < n_write) n_write = n_pts;
 		double buf[n_write*6];
@@ -93,8 +97,11 @@ namespace ionsim
 			// ==================================
 			// Write to hyperslab
 			// ==================================
-			memcpy(count, (hsize_t [2]){n_write, 6}, 2*sizeof(hsize_t));
-			memcpy(offset, (hsize_t [2]){id * n_pts + i, 0}, 2*sizeof(hsize_t));
+			count[0]  = n_write;
+			count[1]  = 6;
+			offset[0] = (id * n_pts + i);
+			offset[1] = 0;
+
 			memspace_id = H5Screate_simple(2, count, NULL);
 	
 			H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
