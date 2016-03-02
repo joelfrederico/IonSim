@@ -22,7 +22,7 @@ int master(int &p, int &id)
 	// Generate beam
 	// ==============================
 	//
-	int n_e          = 1.5e5;
+	int n_e          = 1e6;
 	int n_ion        = 1e6;
 	double q_tot     = 2e10;
 	double x_window  = 100e-6;

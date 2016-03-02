@@ -30,16 +30,16 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	double sz;
 	double sdelta;
 
-	MPI::COMM_WORLD.Bcast(&n_e, 1, MPI::INT, root);
-	MPI::COMM_WORLD.Bcast(&n_ion, 1, MPI::INT, root);
-	MPI::COMM_WORLD.Bcast(&x_window, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&y_window, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&E, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&emit_n, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&n_p_cgs, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&m_ion_amu, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&sz, 1, MPI::DOUBLE, root);
-	MPI::COMM_WORLD.Bcast(&sdelta, 1, MPI::DOUBLE, root);
+	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::INT    , root);
+	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::INT    , root);
+	MPI::COMM_WORLD.Bcast(&x_window  , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&y_window  , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , root);
+	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , root);
 
 	double z_cov[2][2] = {{pow(sz, 2), 0}, {0, pow(sdelta, 2)}};
 

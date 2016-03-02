@@ -181,37 +181,55 @@ int Ebeam::dump(std::string const &filename, MPI::Intracomm &comm)
 	// Create dataset
 	// ==================================
 	dataset_id = H5Dcreate(group_id, "particles", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	H5Gclose(group_id);
 
-	// ==================================
-	// Write to hyperslab
-	// ==================================
-	memcpy(count, (hsize_t [2]){_n_pts, 6}, 2*sizeof(hsize_t));
-	memcpy(offset, (hsize_t [2]){id * count[0], 0}, 2*sizeof(hsize_t));
-	memspace_id = H5Screate_simple(2, count, NULL);
-
-	H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
+	hsize_t offset_init[2] = {_n_pts, 0};
 
 	plist_dx_id = H5Pcreate(H5P_DATASET_XFER);
 	H5Pset_dxpl_mpio(plist_dx_id, H5FD_MPIO_COLLECTIVE);
-	double buf[_n_pts*6];
-	for (int i=0; i < _n_pts; i++)
-	{
-		buf[i*6]     = _x[i];
-		buf[i*6 + 1] = _xp[i];
-		buf[i*6 + 2] = _y[i];
-		buf[i*6 + 3] = _yp[i];
-		buf[i*6 + 4] = _z[i];
-		buf[i*6 + 5] = _zp[i];
-	}
 
-	status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf);
+	int n_write=1e5;
+	int i=0;
+	if (_n_pts < n_write) n_write = _n_pts;
+	double buf[n_write*6];
+	for (int j=0; i < _n_pts; j++)
+	{
+		if (id == 0) printf("On chunk %d...\n", j+1);
+
+		if (_n_pts - i < n_write)
+		{
+			n_write = _n_pts - i;
+		}
+		// ==================================
+		// Write to hyperslab
+		// ==================================
+		memcpy(count, (hsize_t [2]){n_write, 6}, 2*sizeof(hsize_t));
+		memcpy(offset, (hsize_t [2]){id * _n_pts + i, 0}, 2*sizeof(hsize_t));
+		memspace_id = H5Screate_simple(2, count, NULL);
+
+		H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
+
+
+		for (int k=0; k < n_write; k++)
+		{
+			buf[k*6]     = _x[i];
+			buf[k*6 + 1] = _xp[i];
+			buf[k*6 + 2] = _y[i];
+			buf[k*6 + 3] = _yp[i];
+			buf[k*6 + 4] = _z[i];
+			buf[k*6 + 5] = _zp[i];
+			i++;
+		}
+
+		status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf);
+	}
 
 	// ==================================
 	// Close file
 	// ==================================
+	H5Pclose(plist_dx_id);
 	H5Sclose(dataspace_id);
 	H5Dclose(dataset_id);
-	H5Gclose(group_id);
 	H5Fclose(file_id);
 
 	return 0;
