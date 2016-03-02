@@ -99,8 +99,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_ionsim_OBJECTS = ionsim-main.$(OBJEXT) ionsim-classes.$(OBJEXT) \
-	ionsim-consts.$(OBJEXT)
+am_ionsim_OBJECTS = ionsim-main.$(OBJEXT) ionsim-master.$(OBJEXT) \
+	ionsim-slave.$(OBJEXT) ionsim-baseclass.$(OBJEXT) \
+	ionsim-classes.$(OBJEXT) ionsim-consts.$(OBJEXT) \
+	ionsim-support_func.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -274,7 +276,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ionsim_SOURCES = main.cpp classes.cpp consts.cpp
+ionsim_SOURCES = main.cpp master.cpp slave.cpp baseclass.cpp classes.cpp consts.cpp support_func.cpp
 ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)
 ionsim_CPPFLAGS = $(GSL_CFLAGS) $(HDF5_CPPFLAGS)
 all: all-am
@@ -363,9 +365,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-baseclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-consts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-master.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-slave.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-support_func.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -395,6 +401,48 @@ ionsim-main.obj: main.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
 
+ionsim-master.o: master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-master.o -MD -MP -MF $(DEPDIR)/ionsim-master.Tpo -c -o ionsim-master.o `test -f 'master.cpp' || echo '$(srcdir)/'`master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-master.Tpo $(DEPDIR)/ionsim-master.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='master.cpp' object='ionsim-master.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-master.o `test -f 'master.cpp' || echo '$(srcdir)/'`master.cpp
+
+ionsim-master.obj: master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-master.obj -MD -MP -MF $(DEPDIR)/ionsim-master.Tpo -c -o ionsim-master.obj `if test -f 'master.cpp'; then $(CYGPATH_W) 'master.cpp'; else $(CYGPATH_W) '$(srcdir)/master.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-master.Tpo $(DEPDIR)/ionsim-master.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='master.cpp' object='ionsim-master.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-master.obj `if test -f 'master.cpp'; then $(CYGPATH_W) 'master.cpp'; else $(CYGPATH_W) '$(srcdir)/master.cpp'; fi`
+
+ionsim-slave.o: slave.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-slave.o -MD -MP -MF $(DEPDIR)/ionsim-slave.Tpo -c -o ionsim-slave.o `test -f 'slave.cpp' || echo '$(srcdir)/'`slave.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-slave.Tpo $(DEPDIR)/ionsim-slave.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='slave.cpp' object='ionsim-slave.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-slave.o `test -f 'slave.cpp' || echo '$(srcdir)/'`slave.cpp
+
+ionsim-slave.obj: slave.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-slave.obj -MD -MP -MF $(DEPDIR)/ionsim-slave.Tpo -c -o ionsim-slave.obj `if test -f 'slave.cpp'; then $(CYGPATH_W) 'slave.cpp'; else $(CYGPATH_W) '$(srcdir)/slave.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-slave.Tpo $(DEPDIR)/ionsim-slave.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='slave.cpp' object='ionsim-slave.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-slave.obj `if test -f 'slave.cpp'; then $(CYGPATH_W) 'slave.cpp'; else $(CYGPATH_W) '$(srcdir)/slave.cpp'; fi`
+
+ionsim-baseclass.o: baseclass.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-baseclass.o -MD -MP -MF $(DEPDIR)/ionsim-baseclass.Tpo -c -o ionsim-baseclass.o `test -f 'baseclass.cpp' || echo '$(srcdir)/'`baseclass.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-baseclass.Tpo $(DEPDIR)/ionsim-baseclass.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='baseclass.cpp' object='ionsim-baseclass.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-baseclass.o `test -f 'baseclass.cpp' || echo '$(srcdir)/'`baseclass.cpp
+
+ionsim-baseclass.obj: baseclass.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-baseclass.obj -MD -MP -MF $(DEPDIR)/ionsim-baseclass.Tpo -c -o ionsim-baseclass.obj `if test -f 'baseclass.cpp'; then $(CYGPATH_W) 'baseclass.cpp'; else $(CYGPATH_W) '$(srcdir)/baseclass.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-baseclass.Tpo $(DEPDIR)/ionsim-baseclass.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='baseclass.cpp' object='ionsim-baseclass.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-baseclass.obj `if test -f 'baseclass.cpp'; then $(CYGPATH_W) 'baseclass.cpp'; else $(CYGPATH_W) '$(srcdir)/baseclass.cpp'; fi`
+
 ionsim-classes.o: classes.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-classes.o -MD -MP -MF $(DEPDIR)/ionsim-classes.Tpo -c -o ionsim-classes.o `test -f 'classes.cpp' || echo '$(srcdir)/'`classes.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-classes.Tpo $(DEPDIR)/ionsim-classes.Po
@@ -422,6 +470,20 @@ ionsim-consts.obj: consts.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='consts.cpp' object='ionsim-consts.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-consts.obj `if test -f 'consts.cpp'; then $(CYGPATH_W) 'consts.cpp'; else $(CYGPATH_W) '$(srcdir)/consts.cpp'; fi`
+
+ionsim-support_func.o: support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-support_func.o -MD -MP -MF $(DEPDIR)/ionsim-support_func.Tpo -c -o ionsim-support_func.o `test -f 'support_func.cpp' || echo '$(srcdir)/'`support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-support_func.Tpo $(DEPDIR)/ionsim-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='support_func.cpp' object='ionsim-support_func.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-support_func.o `test -f 'support_func.cpp' || echo '$(srcdir)/'`support_func.cpp
+
+ionsim-support_func.obj: support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-support_func.obj -MD -MP -MF $(DEPDIR)/ionsim-support_func.Tpo -c -o ionsim-support_func.obj `if test -f 'support_func.cpp'; then $(CYGPATH_W) 'support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/support_func.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-support_func.Tpo $(DEPDIR)/ionsim-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='support_func.cpp' object='ionsim-support_func.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-support_func.obj `if test -f 'support_func.cpp'; then $(CYGPATH_W) 'support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/support_func.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
