@@ -6,9 +6,11 @@
 // ==============================
 // Parts
 // ==============================
-Parts::Parts(long n_pts)
+Parts::Parts(long n_pts, double mass)
 {
 	_n_pts = n_pts;
+	_mass  = mass;
+
 	_x.reserve(n_pts);
 	_xp.reserve(n_pts);
 	_y.reserve(n_pts);

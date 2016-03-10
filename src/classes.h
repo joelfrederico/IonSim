@@ -14,8 +14,6 @@ class Beam;
 class Ions;
 class Ebeam;
 
-
-
 class Beam
 {
 	private:
@@ -28,11 +26,10 @@ class Beam
 
 		double alpha();
 		double beta();
+		double sigma();
 		void cov(double output[2][2]);
 
 };
-
-
 
 class Ebeam : public Parts
 {
@@ -48,11 +45,10 @@ class Ebeam : public Parts
 		double z_cov[2][2];
 	public:
 		/// Create Ebeam class.
-		Ebeam(int nparts, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]);
+		Ebeam(int nparts, double mass, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]);
 
-		int dump(std::string const &filename, MPI::Intracomm &comm);
+		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
 };
-
 
 class Plasma
 {
@@ -93,7 +89,8 @@ class Ions : public Parts
 		Ions();
 		Ions(Plasma * plasma, int n_pts, double radius, double length);
 
-		int dump(std::string const &filename, MPI::Intracomm &comm);
+		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
+		int push(double dt, double nb_0, double sig_r);
 };
 
 #endif

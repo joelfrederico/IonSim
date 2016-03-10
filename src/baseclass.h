@@ -20,6 +20,7 @@ class Parts
 {
 	protected:
 		long _n_pts;
+		double _mass;
 		double_vec _x;
 		double_vec _xp;
 		double_vec _y;
@@ -27,7 +28,7 @@ class Parts
 		double_vec _z;
 		double_vec _zp;
 	public:
-		Parts(long n_pts);
+		Parts(long n_pts, double mass);
 
 		long n_pts();
 		const double_vec * x();

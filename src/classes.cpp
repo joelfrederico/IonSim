@@ -3,9 +3,11 @@
 #include "consts.h"
 #include <stdio.h>
 #include <math.h>
+#include <complex>
 #include <gsl/gsl_const_mksa.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_math.h>
 #include <string>
 #include "hdf5.h"
 #include "support_func.h"
@@ -32,6 +34,11 @@ double Beam::beta()
 	return _beta;
 }
 
+double Beam::sigma()
+{
+	return sqrt(_beta*_emit.emit());
+}
+
 void Beam::cov(double output[2][2])
 {
 	output[0][0] = beta();
@@ -53,11 +60,11 @@ void Beam::cov(double output[2][2])
 // ==============================
 // Ions
 // ==============================
-Ions::Ions() : Parts(0)
+Ions::Ions() : Parts(0, 0)
 {
 }
 
-Ions::Ions(Plasma * plasma, int n_pts, double radius, double length) : Parts(n_pts)
+Ions::Ions(Plasma * plasma, int n_pts, double radius, double length) : Parts(n_pts, (*plasma).m())
 {
 	_plasma      = plasma;
 	_radius      = radius;
@@ -90,16 +97,51 @@ Ions::Ions(Plasma * plasma, int n_pts, double radius, double length) : Parts(n_p
 	}
 }
 
-int Ions::dump(std::string const &filename, MPI::Intracomm &comm)
+int Ions::dump(std::string const &filename, int step, MPI::Intracomm &comm)
 {
-	ionsim::dump(filename, comm, this);
+	std::stringstream dataset;
+	dataset << step;
+	ionsim::dump(filename, "ions", dataset.str(), comm, this);
+	return 0;
+}
+
+std::complex<double> E_r(double x, double y, double nb_0, double sig_r)
+{
+	double r = gsl_hypot(x, y);
+	double Er_factor;
+	double Er;
+	double theta;
+
+	Er_factor = GSL_CONST_MKSA_ELECTRON_CHARGE*nb_0*sig_r*sig_r / (2*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	Er = Er_factor * gsl_expm1(-r*r / (2*sig_r*sig_r)) / r;
+
+	return std::complex<double>(Er * x/r, Er* y/r);
+}
+
+int Ions::push(double dt, double nb_0, double sig_r)
+{
+	std::complex<double> F;
+	for (int i=0; i < _n_pts; i++)
+	{
+		_x[i] += _xp[i] * dt;
+		_y[i] += _yp[i] * dt;
+
+		F = GSL_CONST_MKSA_ELECTRON_CHARGE*E_r(_x[i], _y[i], nb_0, sig_r);
+		_xp[i] += F.real() * dt / _mass;
+		_yp[i] += F.imag() * dt / _mass;
+
+		_z[i]  = std::abs(F);
+		_zp[i] = std::arg(F);
+		/* _z[i]  = nb_0; */
+		/* _zp[i] = sig_r; */
+	}
 	return 0;
 }
 
 // ==================================
 // EBeam
 // ==================================
-Ebeam::Ebeam(int n_pts, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]) : Parts(n_pts)
+Ebeam::Ebeam(int n_pts, double mass, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]) : Parts(n_pts, mass)
 {
 	_q_tot = q_tot;
 	_E     = E;
@@ -133,9 +175,11 @@ Ebeam::Ebeam(int n_pts, double q_tot, double E, Beam x_beam, Beam y_beam, double
 	gsl_rng_free(r);
 }
 
-int Ebeam::dump(std::string const &filename, MPI::Intracomm &comm)
+int Ebeam::dump(std::string const &filename, int step, MPI::Intracomm &comm)
 {
-	ionsim::dump(filename, comm, this);
+	std::stringstream dataset;
+	dataset << step;
+	ionsim::dump(filename, "ebeam", dataset.str(), comm, this);
 	return 0;
 }
 

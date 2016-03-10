@@ -1,5 +1,6 @@
 #include "main.h"
 #include "config.h"
+#include "support_func.h"
 
 #include "master.h"
 #include "slave.h"
@@ -46,6 +47,9 @@ int main(int argc, char **argv)
 	delete[] ranks;
 	slave_comm_id = MPI::COMM_WORLD.Create(slave_group_id);
 
+	// ==============================
+	// Simulate things
+	// ==============================
 	if (id == 0)
 	{
 		master(p);
@@ -53,7 +57,7 @@ int main(int argc, char **argv)
 	else
 	{
 		slave(p, id, slave_comm_id);
-		printf("Process %d finished\n", id);
+		printf("Slave %d finished\n", id);
 	}
 
 	MPI::Finalize();
