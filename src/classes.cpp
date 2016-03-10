@@ -68,6 +68,9 @@ Ions::Ions(Plasma * plasma, int n_pts, double radius, double length) : Parts(n_p
 {
 	_plasma      = plasma;
 	_radius      = radius;
+	printf("Received radius is: %0.6e\n", _radius);
+	printf("Received mass is: %0.6e\n", _mass);
+
 	_part_charge = (*plasma).n_p() * length * M_PI * pow(radius, 2) * GSL_CONST_MKSA_ELECTRON_CHARGE;
 
 	bool keep_looking;
@@ -88,7 +91,11 @@ Ions::Ions(Plasma * plasma, int n_pts, double radius, double length) : Parts(n_p
 		{
 			_x[i]     = gsl_ran_flat(r, -radius, radius);
 			_y[i]     = gsl_ran_flat(r, -radius, radius);
-			if ((pow(_x[i], 2) + pow(_y[i], 2)) < pow(radius, 2)) keep_looking = false;
+			if ((pow(_x[i], 2.0) + pow(_y[i], 2.0)) < pow(radius, 2.0))
+			{
+				keep_looking = false;
+				if (_x[i] > radius) printf("Radius: %0.6e", _x[i]);
+			}
 		}
 		_z[i]  = gsl_ran_flat(r, 0, length);
 		_xp[i] = 0;
@@ -131,7 +138,7 @@ int Ions::push(double dt, double nb_0, double sig_r)
 		_yp[i] += F.imag() * dt / _mass;
 
 		_z[i]  = std::abs(F);
-		_zp[i] = std::arg(F);
+		_zp[i] = _mass;
 		/* _z[i]  = nb_0; */
 		/* _zp[i] = sig_r; */
 	}

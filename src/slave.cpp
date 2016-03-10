@@ -28,8 +28,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	double sdelta;
 	bool loop_alive = true;
 	const double m_e = GSL_CONST_MKSA_MASS_ELECTRON;
-	double dt;
+	double t_tot;
 	int n_steps;
+	double dt;
 
 	std::string filename;
 	double nb_0, sr;
@@ -56,8 +57,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&dt        , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&t_tot     , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&n_steps   , 1 , MPI::INT    , 0);
+	MPI::COMM_WORLD.Bcast(&dt        , 1 , MPI::DOUBLE , 0);
 
 	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);
 
@@ -104,12 +106,16 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	emit.set_emit_n(emit_n, E);
 	Plasma plas(n_p_cgs, m_ion_amu);
 	Match mat(plas, E, emit);
-	if (id == 1)
-	{
-		printf("Match- beta_x: %.5e\n", mat.beta());
-	}
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
+	/* radius = x_beam.sigma()/10; */
+
+	if (id == 2)
+	{
+		printf("Match- beta_x: %.5e\n", mat.beta());
+		printf("Sigma: %.5e\n", x_beam.sigma());
+		printf("Radius: %.5e\n", radius);
+	}
 
 	double cov[2][2];
 	x_beam.cov(cov);
