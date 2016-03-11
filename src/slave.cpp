@@ -31,6 +31,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	double t_tot;
 	int n_steps;
 	double dt;
+	int runge_kutta;
 
 	std::string filename;
 	double nb_0, sr;
@@ -46,20 +47,21 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// ==============================
 	// Receive run info
 	// ==============================
-	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&q_tot     , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&radius    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&length    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&t_tot     , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&n_steps   , 1 , MPI::INT    , 0);
-	MPI::COMM_WORLD.Bcast(&dt        , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_ion       , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&radius      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&length      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&E           , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&emit_n      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&n_p_cgs     , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&m_ion_amu   , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&sz          , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&sdelta      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&t_tot       , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&n_steps     , 1 , MPI::INT    , 0);
+	MPI::COMM_WORLD.Bcast(&dt          , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&runge_kutta , 1 , MPI::INT    , 0);
 
 	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);
 
@@ -108,9 +110,8 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	Match mat(plas, E, emit);
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
-	/* radius = x_beam.sigma()/10; */
 
-	if (id == 2)
+	if (id == 1)
 	{
 		printf("Match- beta_x: %.5e\n", mat.beta());
 		printf("Sigma: %.5e\n", x_beam.sigma());
@@ -151,7 +152,11 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 				break;
 
 			case ionsim::LOOP_PUSH_IONS:
-				ions.push(dt, nb_0, sr);
+				if (runge_kutta == 1) {
+					ions.push(dt, nb_0, sr);
+				} else {
+					ions.push_simple(dt, nb_0, sr);
+				}
 				break;
 		}
 

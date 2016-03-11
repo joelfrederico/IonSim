@@ -24,9 +24,9 @@ int master(int &p)
 	// ==============================
 	
 	long n_e             = 1e6;
-	long n_ion           = 1e5;
+	long n_ion           = 1e6;
 	double q_tot         = 2e10;
-	double radius        = 2.440175e-7;
+	double radius        = 2.440175e-7*10;
 	double length        = 100e-6;
 	double E             = 20.35;
 	double emit_n        = 50e-6;
@@ -34,27 +34,29 @@ int master(int &p)
 	double m_ion_amu     = 1.00794;
 	double sz            = 30e-6;
 	double sdelta        = 0.04;
-	double t_tot         = 1.58631e-12;
+	double t_tot         = 1.58631e-12*2;
 	int n_steps          = 100;
 	double dt            = t_tot/n_steps;
 	std::string filename = "output.hdf5";
 	char *cbuf;
 	long cbuf_l;
+	int runge_kutta      = 0;
 
-	MPI::COMM_WORLD.Bcast(&n_e       , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_ion     , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&q_tot     , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&radius    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&length    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&E         , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&emit_n    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&n_p_cgs   , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&m_ion_amu , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&sz        , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&sdelta    , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&t_tot     , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&n_steps   , 1 , MPI::INT    , 0);
-	MPI::COMM_WORLD.Bcast(&dt        , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_ion       , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&radius      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&length      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&E           , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&emit_n      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&n_p_cgs     , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&m_ion_amu   , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&sz          , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&sdelta      , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&t_tot       , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&n_steps     , 1 , MPI::INT    , 0);
+	MPI::COMM_WORLD.Bcast(&dt          , 1 , MPI::DOUBLE , 0);
+	MPI::COMM_WORLD.Bcast(&runge_kutta , 1 , MPI::INT    , 0);
 
 	cbuf_l = filename.length()+1;
 	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);

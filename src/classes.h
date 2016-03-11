@@ -91,6 +91,7 @@ class Ions : public Parts
 
 		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
 		int push(double dt, double nb_0, double sig_r);
+		int push_simple(double dt, double nb_0, double sig_r);
 };
 
 #endif
