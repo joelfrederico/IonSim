@@ -1,4 +1,4 @@
-#include "classes.h"
+#include "ions.h"
 #include <complex>
 #include <sstream>
 #include <gsl/gsl_const_mksa.h>

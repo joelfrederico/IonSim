@@ -1,5 +1,5 @@
-#ifndef __CLASSES_H_INCLUDED__
-#define __CLASSES_H_INCLUDED__
+#ifndef __IONS_H_INCLUDED__
+#define __IONS_H_INCLUDED__
 
 #include "baseclass.h"
 
