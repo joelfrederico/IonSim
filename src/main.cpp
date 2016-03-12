@@ -1,6 +1,5 @@
 #include "main.h"
 #include "config.h"
-#include "support_func.h"
 
 #include "master.h"
 #include "slave.h"

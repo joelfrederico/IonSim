@@ -1,11 +1,7 @@
 #include "mpi.h"
-#include "classes.h"
 #include <math.h>
 #include "support_func.h"
 #include <gsl/gsl_const.h>
-#include <string>
-#include <sstream>
-#include <stdio.h>
 
 int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 {

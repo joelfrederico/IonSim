@@ -2,16 +2,11 @@
 #define __CLASSES_H_INCLUDED__
 
 #include "baseclass.h"
-#include "consts.h"
 
 #include "mpi.h"
-#include <gsl/gsl_rng.h>
-#include <string>
-#include <vector>
 #include "beam.h"
 
-class Plasma;
-class Ions;
+/* class Ions; */
 class Ebeam;
 
 class Ebeam : public Parts
@@ -31,33 +26,6 @@ class Ebeam : public Parts
 		Ebeam(int nparts, double mass, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]);
 
 		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
-};
-
-class Plasma
-{
-	private:
-		double _n_p;
-		double _ion_mass_amu;
-	public:
-		Plasma();
-		Plasma(double n_p_cgs, double ion_mass_amu);
-
-		double n_p();
-		double m();
-		double w_p();
-		double k_ion(double E);
-};
-
-class Match
-{
-	private:
-		Plasma _plasma;
-		double _E;
-		Emit _emit;
-	public:
-		Match(Plasma plasma, double E, Emit emit);
-		double beta();
-		double alpha();
 };
 
 class Ions : public Parts

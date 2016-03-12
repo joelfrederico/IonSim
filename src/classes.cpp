@@ -1,20 +1,11 @@
-#include "baseclass.h"
 #include "classes.h"
-#include "consts.h"
-#include <stdio.h>
-#include <math.h>
 #include <complex>
+#include <sstream>
 #include <gsl/gsl_const_mksa.h>
-#include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_odeiv2.h>
-#include <string>
-#include "hdf5.h"
 #include "support_func.h"
-
-
-
 
 // ==============================
 // Ions
@@ -215,53 +206,3 @@ int Ebeam::dump(std::string const &filename, int step, MPI::Intracomm &comm)
 	return 0;
 }
 
-// ==================================
-// Plasma
-// ==================================
-Plasma::Plasma() {}
-
-Plasma::Plasma(double n_p_cgs, double ion_mass_amu)
-{
-	_n_p          = n_p_cgs * 1e6;
-	_ion_mass_amu = ion_mass_amu;
-}
-
-double Plasma::n_p()
-{
-	return _n_p;
-}
-
-double Plasma::m()
-{
-	return _ion_mass_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS;
-}
-
-double Plasma::w_p()
-{
-	return sqrt( n_p() * pow(GSL_CONST_MKSA_ELECTRON_CHARGE, 2.0) / (GSL_CONST_MKSA_MASS_ELECTRON * GSL_CONST_MKSA_VACUUM_PERMITTIVITY) );
-}
-
-double Plasma::k_ion(double E)
-{
-	return n_p() * pow(GSL_CONST_MKSA_ELECTRON_CHARGE, 2.0) / (2.0 * E * 1e9 * GSL_CONST_MKSA_ELECTRON_VOLT * GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
-}
-
-// ==============================
-// Match
-// ==============================
-Match::Match(Plasma plasma, double E, Emit emit)
-{
-	_plasma = plasma;
-	_E = E;
-	_emit = emit;
-}
-
-double Match::beta()
-{
-	return 1.0 / sqrt( _plasma.k_ion(_E));
-}
-
-double Match::alpha()
-{
-	return 0;
-}

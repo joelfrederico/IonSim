@@ -1,7 +1,4 @@
 #include "baseclass.h"
-#include <gsl/gsl_const_mksa.h>
-#include "support_func.h"
-#include "consts.h"
 
 // ==============================
 // Parts
