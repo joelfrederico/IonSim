@@ -8,28 +8,11 @@
 #include <gsl/gsl_rng.h>
 #include <string>
 #include <vector>
+#include "beam.h"
 
 class Plasma;
-class Beam;
 class Ions;
 class Ebeam;
-
-class Beam
-{
-	private:
-		double _alpha;
-		double _beta;
-		Emit _emit;
-	public:
-		Beam();
-		Beam(double beta, double alpha, Emit emit);
-
-		double alpha();
-		double beta();
-		double sigma();
-		void cov(double output[2][2]);
-
-};
 
 class Ebeam : public Parts
 {

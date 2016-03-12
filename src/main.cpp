@@ -11,6 +11,8 @@ const int INT_TAG = 1;
 
 int main(int argc, char **argv)
 {
+	printf("%d %d %d\n", OMPI_MAJOR_VERSION, 
+OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
 	// ==============================
 	// Initialize MPI
 	// ==============================
