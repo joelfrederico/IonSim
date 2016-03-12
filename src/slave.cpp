@@ -1,7 +1,9 @@
 #include "mpi.h"
 #include <math.h>
-#include "support_func.h"
 #include <gsl/gsl_const.h>
+#include "ebeam.h"
+#include "support_func.h"
+#include "classes.h"
 
 int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 {

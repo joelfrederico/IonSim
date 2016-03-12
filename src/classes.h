@@ -6,28 +6,6 @@
 #include "mpi.h"
 #include "beam.h"
 
-/* class Ions; */
-class Ebeam;
-
-class Ebeam : public Parts
-{
-	private:
-		double _q_tot;
-		double _E;
-		
-		Beam _x_beam;
-		Beam _y_beam;
-
-		double x_cov[2][2];
-		double y_cov[2][2];
-		double z_cov[2][2];
-	public:
-		/// Create Ebeam class.
-		Ebeam(int nparts, double mass, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]);
-
-		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
-};
-
 class Ions : public Parts
 {
 	private:

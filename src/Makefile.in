@@ -103,7 +103,7 @@ am_ionsim_OBJECTS = ionsim-main.$(OBJEXT) ionsim-master.$(OBJEXT) \
 	ionsim-slave.$(OBJEXT) ionsim-baseclass.$(OBJEXT) \
 	ionsim-classes.$(OBJEXT) ionsim-consts.$(OBJEXT) \
 	ionsim-support_func.$(OBJEXT) ionsim-emit.$(OBJEXT) \
-	ionsim-beam.$(OBJEXT)
+	ionsim-beam.$(OBJEXT) ionsim-ebeam.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -277,7 +277,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ionsim_SOURCES = main.cpp master.cpp slave.cpp baseclass.cpp classes.cpp consts.cpp support_func.cpp emit.cpp beam.cpp
+ionsim_SOURCES = main.cpp master.cpp slave.cpp baseclass.cpp classes.cpp consts.cpp support_func.cpp emit.cpp beam.cpp ebeam.cpp
 ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)
 ionsim_CPPFLAGS = $(GSL_CFLAGS) $(HDF5_CPPFLAGS)
 all: all-am
@@ -370,6 +370,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-beam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-consts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-ebeam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-emit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ionsim-master.Po@am__quote@
@@ -515,6 +516,20 @@ ionsim-beam.obj: beam.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='beam.cpp' object='ionsim-beam.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-beam.obj `if test -f 'beam.cpp'; then $(CYGPATH_W) 'beam.cpp'; else $(CYGPATH_W) '$(srcdir)/beam.cpp'; fi`
+
+ionsim-ebeam.o: ebeam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-ebeam.o -MD -MP -MF $(DEPDIR)/ionsim-ebeam.Tpo -c -o ionsim-ebeam.o `test -f 'ebeam.cpp' || echo '$(srcdir)/'`ebeam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-ebeam.Tpo $(DEPDIR)/ionsim-ebeam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ebeam.cpp' object='ionsim-ebeam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-ebeam.o `test -f 'ebeam.cpp' || echo '$(srcdir)/'`ebeam.cpp
+
+ionsim-ebeam.obj: ebeam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ionsim-ebeam.obj -MD -MP -MF $(DEPDIR)/ionsim-ebeam.Tpo -c -o ionsim-ebeam.obj `if test -f 'ebeam.cpp'; then $(CYGPATH_W) 'ebeam.cpp'; else $(CYGPATH_W) '$(srcdir)/ebeam.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ionsim-ebeam.Tpo $(DEPDIR)/ionsim-ebeam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ebeam.cpp' object='ionsim-ebeam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ionsim_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ionsim-ebeam.obj `if test -f 'ebeam.cpp'; then $(CYGPATH_W) 'ebeam.cpp'; else $(CYGPATH_W) '$(srcdir)/ebeam.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

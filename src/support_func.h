@@ -3,7 +3,7 @@
 
 #include "mpi.h"
 #include <string>
-#include "classes.h"
+#include "baseclass.h"
 #include "hdf5.h"
 
 namespace ionsim
