@@ -15,8 +15,7 @@ class Ions : public Parts
 		Plasma * _plasma;
 
 	public:
-		Ions();
-		Ions(Plasma * plasma, int n_pts, double radius, double length);
+		Ions(SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length);
 
 		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
 		int push(double dt, double nb_0, double sig_r);

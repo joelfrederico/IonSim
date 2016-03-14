@@ -23,8 +23,8 @@ int master(int &p)
 	// Generate beam
 	// ==============================
 	
-	long n_e             = 1e6;
-	long n_ion           = 1e6;
+	long n_e             = 1e4;
+	long n_ion           = 1e4;
 	double q_tot         = 2e10;
 	double radius        = 2.440175e-7*10;
 	double length        = 100e-6;
@@ -38,10 +38,11 @@ int master(int &p)
 	int n_steps          = 100;
 	double dt            = t_tot/n_steps;
 	std::string filename = "output.hdf5";
-	char *cbuf;
-	long cbuf_l;
 	int runge_kutta      = 0;
+	long n_field_x       = 100;
+	long n_field_y       = 100;
 
+	// Send numerical parameters
 	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&n_ion       , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
@@ -57,6 +58,12 @@ int master(int &p)
 	MPI::COMM_WORLD.Bcast(&n_steps     , 1 , MPI::INT    , 0);
 	MPI::COMM_WORLD.Bcast(&dt          , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&runge_kutta , 1 , MPI::INT    , 0);
+	MPI::COMM_WORLD.Bcast(&n_field_x   , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_field_y   , 1 , MPI::LONG   , 0);
+
+	// Send string
+	char *cbuf;
+	long cbuf_l;
 
 	cbuf_l = filename.length()+1;
 	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);
@@ -68,6 +75,7 @@ int master(int &p)
 	/* n_steps = 400; */
 	for (int step=0; step < n_steps; step++)
 	{
+		ionsim::sendloop(&ionsim::LOOP_GET_EFIELD);
 		ionsim::sendloop(&ionsim::LOOP_PUSH_IONS);
 		ionsim::sendloop(&ionsim::LOOP_DUMP_IONS, step);
 	}

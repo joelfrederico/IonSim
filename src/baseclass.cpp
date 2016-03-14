@@ -1,53 +1,120 @@
 #include "baseclass.h"
+#include <exception>
+#include "consts.h"
+#include "support_func.h"
+#include <gsl/gsl_const_mksa.h>
+
+SimParams::SimParams(
+	double _E,
+	double _dt,
+	double _emit_n,
+	double _length,
+	double _m_ion_amu,
+	double _n_p_cgs,
+	double _q_tot,
+	double _radius,
+	double _sdelta,
+	double _sz,
+	double _t_tot,
+	int _n_steps,
+	int _runge_kutta,
+	long _n_e,
+	long _n_field_x,
+	long _n_field_y,
+	long _n_ions,
+	std::string _filename
+	) : 
+	E(_E),
+	dt(_dt),
+	emit_n(_emit_n),
+	length(_length),
+	m_ion_amu(_m_ion_amu),
+	n_p_cgs(_n_p_cgs),
+	q_tot(_q_tot),
+	radius(_radius),
+	sdelta(_sdelta),
+	sz(_sz),
+	t_tot(_t_tot),
+	n_steps(_n_steps),
+	runge_kutta(_runge_kutta),
+	n_e(_n_e),
+	n_field_x(_n_field_x),
+	n_field_y(_n_field_y),
+	n_ions(_n_ions),
+	filename(_filename)
+{}
+
+// SimParams::SimParams(const SimParams &rhs) :
+// 	E(rhs.E),
+// 	dt(rhs.dt),
+// 	emit_n(rhs.emit_n),
+// 	length(rhs.length),
+// 	m_ion_amu(rhs.m_ion_amu),
+// 	n_p_cgs(rhs.n_p_cgs),
+// 	q_tot(rhs.q_tot),
+// 	radius(rhs.radius),
+// 	sdelta(rhs.sdelta),
+// 	sz(rhs.sz),
+// 	t_tot(rhs.t_tot),
+// 	n_steps(rhs.n_steps),
+// 	runge_kutta(rhs.runge_kutta),
+// 	n_e(rhs.n_e),
+// 	n_field_x(rhs.n_field_x),
+// 	n_field_y(rhs.n_field_y),
+// 	n_ions(rhs.n_ions),
+// 	filename(rhs.filename)
+// {
+// }
+// 
+// SimParams & SimParams::operator=(const SimParams &rhs)
+// {
+// 	if (this != &rhs)
+// 	{
+// 		
+// 	}
+// 	return *this;
+// }
+
+int SimParams::z_cov(double (&out)[2][2])
+{
+	out[0][0] = pow(sz, 2);
+	out[0][1] = out[1][0] = 0;
+	out[1][1] = pow(sdelta, 2);
+	return 0;
+}
+
+double SimParams::ion_mass()
+{
+	return m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS;
+}
 
 // ==============================
 // Parts
 // ==============================
-Parts::Parts(long n_pts, double mass)
+Parts::Parts(SimParams simparams, const parttype _type) : type(_type), mass(simparams.ion_mass())
 {
-	_n_pts = n_pts;
-	_mass  = mass;
+	_simparams = &simparams;
 
-	_x.reserve(n_pts);
-	_xp.reserve(n_pts);
-	_y.reserve(n_pts);
-	_yp.reserve(n_pts);
-	_z.reserve(n_pts);
-	_zp.reserve(n_pts);
+	switch (type)
+	{
+		case ionsim::PARTS_ION:
+			_n_pts = (*_simparams).n_e;
+			break;
+		case ionsim::PARTS_E:
+			_n_pts = (*_simparams).n_ions;
+			break;
+	}
+
+	x.reserve(_n_pts);
+	xp.reserve(_n_pts);
+	y.reserve(_n_pts);
+	yp.reserve(_n_pts);
+	z.reserve(_n_pts);
+	zp.reserve(_n_pts);
 }
 
-long Parts::n_pts()
+long Parts::n_pts() const
 {
 	return _n_pts;
-}
-
-const double_vec * Parts::x()
-{
-	return &_x;
-}
-
-const double_vec * Parts::xp()
-{
-	return &_xp;
-}
-
-const double_vec * Parts::y()
-{
-	return &_y;
-}
-
-const double_vec * Parts::yp()
-{
-	return &_yp;
-}
-
-const double_vec * Parts::z()
-{
-	return &_z;
-}
-
-const double_vec * Parts::zp()
-{
-	return &_zp;
 }
 

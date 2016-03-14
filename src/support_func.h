@@ -6,6 +6,7 @@
 #include "baseclass.h"
 #include "hdf5.h"
 
+
 namespace ionsim
 {
 	double gamma2GeV(double gamma);
@@ -71,14 +72,18 @@ namespace ionsim
 	int writeattribute(std::string const &attr_name, double attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id);
 	*/
 
-	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, Parts * ebeam);
+	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam);
 	
 	const int TAG_LOOP_INSTRUCT = 100;
-	const int LOOP_KILL         = 1;
-	const int LOOP_DUMP_IONS    = 2;
-	const int LOOP_DUMP_E       = 3;
-	const int LOOP_PUSH_E       = 4;
-	const int LOOP_PUSH_IONS    = 5;
+	const loopflag LOOP_KILL         = 1;
+	const loopflag LOOP_DUMP_IONS    = 2;
+	const loopflag LOOP_DUMP_E       = 3;
+	const loopflag LOOP_PUSH_E       = 4;
+	const loopflag LOOP_PUSH_IONS    = 5;
+	const loopflag LOOP_GET_EFIELD   = 6;
+
+	const parttype PARTS_ION = 1;
+	const parttype PARTS_E   = 2;
 }
 
 #endif

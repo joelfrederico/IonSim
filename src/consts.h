@@ -2,7 +2,10 @@
 #define __CONSTS_H_INCLUDED__
 
 #include <vector>
+#include <complex>
 
 typedef std::vector<double> double_vec;
+typedef int loopflag;
+typedef int parttype;
 
 #endif

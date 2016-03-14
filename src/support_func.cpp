@@ -6,6 +6,7 @@
 #include "support_func.h"
 #include <sstream>
 #include <iomanip>
+#include "consts.h"
 
 namespace ionsim
 {
@@ -42,19 +43,19 @@ namespace ionsim
 		return 0;
 	}
 
-	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, Parts *ebeam)
+	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam)
 	{
 		MPI::Info info;
 		int p  = comm.Get_size();
 		int id = comm.Get_rank();
 
-		long n_pts             = (*ebeam).n_pts();
-		const double_vec * _x  = (*ebeam).x();
-		const double_vec * _xp = (*ebeam).xp();
-		const double_vec * _y  = (*ebeam).y();
-		const double_vec * _yp = (*ebeam).yp();
-		const double_vec * _z  = (*ebeam).z();
-		const double_vec * _zp = (*ebeam).zp();
+		long n_pts             = ebeam.n_pts();
+		const double_vec * _x  = &ebeam.x;
+		const double_vec * _xp = &ebeam.xp;
+		const double_vec * _y  = &ebeam.y;
+		const double_vec * _yp = &ebeam.yp;
+		const double_vec * _z  = &ebeam.z;
+		const double_vec * _zp = &ebeam.zp;
 
 		int n_write = 1e5;
 

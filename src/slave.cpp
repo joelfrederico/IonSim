@@ -9,30 +9,26 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 {
 
 	int buf;
-	char *cbuf;
-	long cbuf_l;
-	int root = 0;
 
-	long n_e;
-	long n_ion;
+	double E;
+	double dt;
+	double emit_n;
+	double length;
+	double m_ion_amu;
+	double n_p_cgs;
 	double q_tot;
 	double radius;
-	double length;
-	double E;
-	double emit_n;
-	double n_p_cgs;
-	double m_ion_amu;
-	double sz;
 	double sdelta;
-	bool loop_alive = true;
-	const double m_e = GSL_CONST_MKSA_MASS_ELECTRON;
+	double sz;
 	double t_tot;
 	int n_steps;
-	double dt;
 	int runge_kutta;
-
+	long n_e;
+	long n_field_x, n_field_y;
+	long n_ions;
 	std::string filename;
-	double nb_0, sr;
+
+	const double m_e = GSL_CONST_MKSA_MASS_ELECTRON;
 
 	// ==============================
 	// Receive starting gun
@@ -45,8 +41,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// ==============================
 	// Receive run info
 	// ==============================
+	// Receive numerical parameters
 	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_ion       , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_ions       , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&radius      , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&length      , 1 , MPI::DOUBLE , 0);
@@ -60,6 +57,12 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	MPI::COMM_WORLD.Bcast(&n_steps     , 1 , MPI::INT    , 0);
 	MPI::COMM_WORLD.Bcast(&dt          , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&runge_kutta , 1 , MPI::INT    , 0);
+	MPI::COMM_WORLD.Bcast(&n_field_x   , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_field_y   , 1 , MPI::LONG   , 0);
+
+	// Receive string
+	long cbuf_l;
+	char *cbuf;
 
 	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);
 
@@ -67,6 +70,30 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	MPI::COMM_WORLD.Bcast(cbuf, cbuf_l, MPI::CHAR, 0);
 	filename = std::string(cbuf);
 	delete [] cbuf;
+
+	// ==============================
+	// Make simparams
+	// ==============================
+	SimParams simparams(
+		E,
+		dt,
+		emit_n,
+		length,
+		m_ion_amu,
+		n_p_cgs,
+		q_tot,
+		radius,
+		sdelta,
+		sz,
+		t_tot,
+		n_steps,
+		runge_kutta,
+		n_e,
+		n_field_x,
+		n_field_y,
+		n_ions,
+		filename
+		);
 
 	// ==============================
 	// Create output file
@@ -77,7 +104,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// Write attributes
 	// ==============================
 	ionsim::writeattribute("n_e"       , n_e       , filename , slave_comm_id);
-	ionsim::writeattribute("n_ion"     , n_ion     , filename , slave_comm_id);
+	ionsim::writeattribute("n_ions"    , n_ions    , filename , slave_comm_id);
 	ionsim::writeattribute("q_tot"     , q_tot     , filename , slave_comm_id);
 	ionsim::writeattribute("radius"    , radius    , filename , slave_comm_id);
 	ionsim::writeattribute("length"    , length    , filename , slave_comm_id);
@@ -89,18 +116,20 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	ionsim::writeattribute("sdelta"    , sdelta    , filename , slave_comm_id);
 	ionsim::writeattribute("dt"        , dt        , filename , slave_comm_id);
 	ionsim::writeattribute("n_steps"   , n_steps   , filename , slave_comm_id);
+	ionsim::writeattribute("n_field_x" , n_field_x , filename , slave_comm_id);
+	ionsim::writeattribute("n_field_y" , n_field_y , filename , slave_comm_id);
 
 	// ==============================
 	// Recalculate to distribute
 	// simulation across nodes
 	// ==============================
 	n_e   /= (p-1);
-	n_ion /= (p-1);
+	n_ions /= (p-1);
 
 	// ==============================
 	// Generate beam
 	// ==============================
-	double z_cov[2][2] = {{pow(sz, 2), 0}, {0, pow(sdelta, 2)}};
+	double nb_0, sr;
 
 	Emit emit;
 	emit.set_emit_n(emit_n, E);
@@ -123,13 +152,17 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	sr = x_beam.sigma();
 	nb_0 = q_tot / (pow(2*M_PI, 1.5) * sz * sr * sr);
 
-	Ebeam ebeam(n_e, m_e, q_tot, E, x_beam, y_beam, z_cov);
+	Ebeam ebeam(simparams, x_beam, y_beam);
 
 	// ==============================
 	// Generate ions
 	// ==============================
-	Ions ions(&plas, n_ion, radius, length);
+	Ions ions(simparams, plas, n_ions, radius, length);
 
+	// ==============================
+	// Generate field
+	// ==============================
+	bool loop_alive = true;
 	do
 	{
 		MPI::COMM_WORLD.Bcast(&buf, 1, MPI::INT, 0);
@@ -155,6 +188,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 				} else {
 					ions.push_simple(dt, nb_0, sr);
 				}
+				break;
+			case ionsim::LOOP_GET_EFIELD:
+				/* ebeam.get_field(*E_field); */
 				break;
 		}
 

@@ -4,12 +4,13 @@
 #include "baseclass.h"
 #include "beam.h"
 #include "mpi.h"
+#include <complex>
+#include "consts.h"
 
 class Ebeam : public Parts
 {
 	private:
-		double _q_tot;
-		double _E;
+		SimParams * _simparams;
 		
 		Beam _x_beam;
 		Beam _y_beam;
@@ -19,11 +20,13 @@ class Ebeam : public Parts
 		double z_cov[2][2];
 	public:
 		/// Create Ebeam class.
-		Ebeam(int nparts, double mass, double q_tot, double E, Beam x_beam, Beam y_beam, double z_cov[2][2]);
+		Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam);
 
 		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
 		double x_std();
 		double y_std();
+		double x_mean();
+		double y_mean();
 };
 
 #endif
