@@ -7,5 +7,6 @@
 typedef std::vector<double> double_vec;
 typedef int loopflag;
 typedef int parttype;
+typedef std::complex<double> complex_double;
 
 #endif

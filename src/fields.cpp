@@ -90,3 +90,8 @@ const Field Field::operator-(const Field &rhs)
 {
 	return Field(*this) -= rhs;
 }
+
+complex_double Field::operator()(long i, long j)
+{
+	return complex_double(_x_data[i + j*_x_pts], _y_data[i + j*_x_pts]);
+}

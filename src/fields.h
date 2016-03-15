@@ -1,6 +1,9 @@
 #ifndef __BASECLASS_H_INCLUDED__
 #define __BASECLASS_H_INCLUDED__
 
+/* #include <complex> */
+#include "consts.h"
+
 class Field;
 
 class Field
@@ -21,7 +24,7 @@ class Field
 		~Field();
 
 		Field &operator=(const Field &rhs);
-		void operator()(long i, long j);
+		complex_double operator()(long i, long j);
 		Field &operator+=(const Field &rhs);
 		Field &operator-=(const Field &rhs);
 		template <class T>
