@@ -1,6 +1,6 @@
 before_install: 
   - sudo apt-get update -qq
-  - sudo apt-get install -qq openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libgsl0ldbl gsl-bin libgsl0-dev automake
+  - sudo apt-get install -qq openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-1.8.4 libgsl0ldbl gsl-bin libgsl0-dev automake
 
 install: true
 
