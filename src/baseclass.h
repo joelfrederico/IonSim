@@ -2,6 +2,7 @@
 #define __BASECLASS_H_INCLUDED__
 
 #include "consts.h"
+#include "fields.h"
 
 class SimParams
 {
@@ -59,6 +60,7 @@ class Parts
 	protected:
 		SimParams *_simparams;
 		long _n_pts;
+		Field field;
 
 	public:
 		Parts(SimParams simparams, parttype _type);

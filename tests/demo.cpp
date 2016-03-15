@@ -10,8 +10,7 @@ int main(int argv, char **argc)
 	{
 		for (int j=0; j < 10; j++)
 		{
-			complex_double temp = field(i, j);
-			printf("%d, %d: (%0.3e, %0.3e)\n", i, j, temp.real(), temp.imag());
+			printf("%d, %d: (%0.3e, %0.3e)\n", i, j, field.x(i, j), field.x(i, j));
 		}
 	}
 

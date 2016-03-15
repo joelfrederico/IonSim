@@ -15,6 +15,4 @@ class FieldTest : public ::testing::Test
 		Field field;
 };
 
-void compare_complex(complex_double a, complex_double b);
-
 #endif

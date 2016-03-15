@@ -1,7 +1,6 @@
-#ifndef __BASECLASS_H_INCLUDED__
-#define __BASECLASS_H_INCLUDED__
+#ifndef __FIELDS_H_INCLUDED__
+#define __FIELDS_H_INCLUDED__
 
-/* #include <complex> */
 #include "consts.h"
 
 class Field;
@@ -17,14 +16,17 @@ class Field
 		int _init(long x_pts, long y_pts);
 		int _copy(const Field &rhs);
 		bool _samedim(const Field &rhs);
+		long _index(long i, long j);
 
 	public:
 		Field(long x_pts, long y_pts);
 		Field(const Field &rhs);
 		~Field();
 
+		double &x(long i, long j);
+		double &y(long i, long j);
+
 		Field &operator=(const Field &rhs);
-		complex_double operator()(long i, long j);
 		Field &operator+=(const Field &rhs);
 		Field &operator-=(const Field &rhs);
 		template <class T>

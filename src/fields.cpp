@@ -48,6 +48,22 @@ bool Field::_samedim(const Field &rhs)
 	}
 }
 
+long Field::_index(long i, long j)
+{
+	long index = i + j*_x_pts;
+	return index;
+}
+
+double &Field::x(long i, long j)
+{
+	return _x_data[_index(i, j)];
+}
+
+double &Field::y(long i, long j)
+{
+	return _y_data[_index(i, j)];
+}
+
 Field &Field::operator=(const Field &rhs)
 {
 	if (this != &rhs)
@@ -89,9 +105,4 @@ const Field Field::operator+(const Field &rhs)
 const Field Field::operator-(const Field &rhs)
 {
 	return Field(*this) -= rhs;
-}
-
-complex_double Field::operator()(long i, long j)
-{
-	return complex_double(_x_data[i + j*_x_pts], _y_data[i + j*_x_pts]);
 }

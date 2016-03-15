@@ -44,37 +44,6 @@ SimParams::SimParams(
 	filename(_filename)
 {}
 
-// SimParams::SimParams(const SimParams &rhs) :
-// 	E(rhs.E),
-// 	dt(rhs.dt),
-// 	emit_n(rhs.emit_n),
-// 	length(rhs.length),
-// 	m_ion_amu(rhs.m_ion_amu),
-// 	n_p_cgs(rhs.n_p_cgs),
-// 	q_tot(rhs.q_tot),
-// 	radius(rhs.radius),
-// 	sdelta(rhs.sdelta),
-// 	sz(rhs.sz),
-// 	t_tot(rhs.t_tot),
-// 	n_steps(rhs.n_steps),
-// 	runge_kutta(rhs.runge_kutta),
-// 	n_e(rhs.n_e),
-// 	n_field_x(rhs.n_field_x),
-// 	n_field_y(rhs.n_field_y),
-// 	n_ions(rhs.n_ions),
-// 	filename(rhs.filename)
-// {
-// }
-// 
-// SimParams & SimParams::operator=(const SimParams &rhs)
-// {
-// 	if (this != &rhs)
-// 	{
-// 		
-// 	}
-// 	return *this;
-// }
-
 int SimParams::z_cov(double (&out)[2][2])
 {
 	out[0][0] = pow(sz, 2);
@@ -91,7 +60,7 @@ double SimParams::ion_mass()
 // ==============================
 // Parts
 // ==============================
-Parts::Parts(SimParams simparams, const parttype _type) : type(_type), mass(simparams.ion_mass())
+Parts::Parts(SimParams simparams, const parttype _type) : type(_type), mass(simparams.ion_mass()), field(simparams.n_field_x, simparams.n_field_y)
 {
 	_simparams = &simparams;
 
