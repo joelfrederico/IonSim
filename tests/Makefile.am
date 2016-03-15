@@ -1,5 +1,3 @@
-noinst_PROGRAMS = gtest demo
-
 gtest_SOURCES = gtest.cpp ../src/fields.cpp
 
 gtest_LDADD = libgtest.la
@@ -15,9 +13,9 @@ gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/s
 # TESTS -- Programs run automatically by "make check"
 # check_PROGRAMS -- Programs built by "make check" but not necessarily run
 
-check_PROGRAMS = gtest
+check_PROGRAMS = gtest demo
 
-TESTS = $(check_PROGRAMS)
+TESTS = gtest
 
 demo_SOURCES = demo.cpp ../src/fields.cpp
 
