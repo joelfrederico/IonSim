@@ -1,5 +1,5 @@
-#ifndef __BASECLASS_H_INCLUDED__
-#define __BASECLASS_H_INCLUDED__
+#ifndef __PARTS_H_INCLUDED__
+#define __PARTS_H_INCLUDED__
 
 #include "simparams.h"
 #include "consts.h"

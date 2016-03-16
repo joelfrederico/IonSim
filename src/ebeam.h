@@ -1,7 +1,7 @@
 #ifndef __EBEAM_H_INCLUDED__
 #define __EBEAM_H_INCLUDED__
 
-#include "baseclass.h"
+#include "parts.h"
 #include "beam.h"
 #include "mpi.h"
 #include <complex>

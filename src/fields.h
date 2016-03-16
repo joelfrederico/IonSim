@@ -2,7 +2,7 @@
 #define __FIELDS_H_INCLUDED__
 
 #include "consts.h"
-#include "baseclass.h"
+#include "parts.h"
 
 class Field;
 

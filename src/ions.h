@@ -1,7 +1,7 @@
 #ifndef __IONS_H_INCLUDED__
 #define __IONS_H_INCLUDED__
 
-#include "baseclass.h"
+#include "parts.h"
 
 #include "mpi.h"
 #include "beam.h"

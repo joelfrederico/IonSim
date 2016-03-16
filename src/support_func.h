@@ -3,7 +3,7 @@
 
 #include "mpi.h"
 #include <string>
-#include "baseclass.h"
+#include "parts.h"
 #include "hdf5.h"
 
 
