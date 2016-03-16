@@ -2,30 +2,54 @@
 #define __FIELDS_H_INCLUDED__
 
 #include "consts.h"
+#include "baseclass.h"
 
 class Field;
 
 class Field
 {
 	private:
-		double *_x_data;
-		double *_y_data;
-		long _x_pts;
-		long _y_pts;
+		// ==================================
+		// Data members
+		// ==================================
 		long _n_pts;
-		int _init(long x_pts, long y_pts);
-		int _copy(const Field &rhs);
+
+		// ==================================
+		// Methods
+		// ==================================
 		bool _samedim(const Field &rhs);
-		long _index(long i, long j);
+		int _copy(const Field &rhs);
+		int _init(long x_pts, long y_pts, long z_pts);
+		long _index(long i, long j, long k);
 
 	public:
-		Field(long x_pts, long y_pts);
+		// ==================================
+		// Constructors, Destructor
+		// ==================================
+		Field(long _x_pts, long _y_pts, long _z_pts);
+		Field(SimParams &simparams);
 		Field(const Field &rhs);
 		~Field();
 
-		double &x(long i, long j);
-		double &y(long i, long j);
+		// ==================================
+		// Data members
+		// ==================================
+		long x_pts;
+		long y_pts;
+		long z_pts;
 
+		double *x_data;
+		double *y_data;
+
+		// ==================================
+		// Methods
+		// ==================================
+		double &x(long i, long j, long k);
+		double &y(long i, long j, long k);
+
+		// ==================================
+		// Operators
+		// ==================================
 		Field &operator=(const Field &rhs);
 		Field &operator+=(const Field &rhs);
 		Field &operator-=(const Field &rhs);
@@ -34,8 +58,8 @@ class Field
 		{
 			if ( (*this)._samedim(rhs) )
 			{
-				*(*this)._x_data *= rhs;
-				*(*this)._y_data *= rhs;
+				*(*this).x_data *= rhs;
+				*(*this).y_data *= rhs;
 			} else {
 				throw "Cannot subtract fields of different sizes";
 			}
@@ -46,8 +70,8 @@ class Field
 		{
 			if ( (*this)._samedim(rhs) )
 			{
-				*(*this)._x_data /= rhs;
-				*(*this)._y_data /= rhs;
+				*(*this).x_data /= rhs;
+				*(*this).y_data /= rhs;
 			} else {
 				throw "Cannot subtract fields of different sizes";
 			}

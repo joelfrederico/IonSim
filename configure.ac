@@ -12,7 +12,6 @@ AC_CONFIG_HEADERS([config.h])
 AX_PROG_CXX_MPI
 AM_PROG_AR
 LT_INIT
-# AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for libraries.

@@ -24,7 +24,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	int n_steps;
 	int runge_kutta;
 	long n_e;
-	long n_field_x, n_field_y;
+	long n_field_x, n_field_y, n_field_z;
 	long n_ions;
 	std::string filename;
 
@@ -59,6 +59,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	MPI::COMM_WORLD.Bcast(&runge_kutta , 1 , MPI::INT    , 0);
 	MPI::COMM_WORLD.Bcast(&n_field_x   , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&n_field_y   , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_field_z   , 1 , MPI::LONG   , 0);
 
 	// Receive string
 	long cbuf_l;
@@ -91,6 +92,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 		n_e,
 		n_field_x,
 		n_field_y,
+		n_field_z,
 		n_ions,
 		filename
 		);
@@ -118,6 +120,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	ionsim::writeattribute("n_steps"   , n_steps   , filename , slave_comm_id);
 	ionsim::writeattribute("n_field_x" , n_field_x , filename , slave_comm_id);
 	ionsim::writeattribute("n_field_y" , n_field_y , filename , slave_comm_id);
+	ionsim::writeattribute("n_field_z" , n_field_z , filename , slave_comm_id);
 
 	// ==============================
 	// Recalculate to distribute

@@ -1,24 +1,16 @@
 #include "fields.h"
 
-Field::Field(long x_pts, long y_pts)
+// ==================================
+// Constructors, Destructor
+// ==================================
+Field::Field(long x_pts, long y_pts, long z_pts)
 {
-	(*this)._init(x_pts, y_pts);
+	(*this)._init(x_pts, y_pts, z_pts);
 }
 
-Field::~Field()
+Field::Field(SimParams &simparams)
 {
-	delete[] _x_data;
-	delete[] _y_data;
-}
-
-int Field::_init(long x_pts, long y_pts)
-{
-	_x_pts = x_pts;
-	_y_pts = y_pts;
-	_n_pts = x_pts * y_pts;
-	_x_data  = new double[_n_pts];
-	_y_data  = new double[_n_pts];
-	return 0;
+	_init(simparams.n_field_x, simparams.n_field_y, simparams.n_field_z);
 }
 
 Field::Field(const Field &rhs)
@@ -26,21 +18,18 @@ Field::Field(const Field &rhs)
 	(*this)._copy(rhs);
 }
 
-int Field::_copy(const Field &rhs)
+Field::~Field()
 {
-	(*this).~Field();
-
-	(*this)._init(rhs._x_pts, rhs._y_pts);
-
-	(*this)._x_data = rhs._x_data;
-	(*this)._y_data = rhs._y_data;
-
-	return 0;
+	delete[] x_data;
+	delete[] y_data;
 }
 
+// ==================================
+// Private methods
+// ==================================
 bool Field::_samedim(const Field &rhs)
 {
-	if ( ((*this)._x_pts == rhs._x_pts) && ((*this)._y_pts == rhs._y_pts) )
+	if ( ((*this).x_pts == rhs.x_pts) && ((*this).y_pts == rhs.y_pts) && ((*this).z_pts == rhs.z_pts) )
 	{
 		return true;
 	} else {
@@ -48,22 +37,52 @@ bool Field::_samedim(const Field &rhs)
 	}
 }
 
-long Field::_index(long i, long j)
+int Field::_copy(const Field &rhs)
 {
-	long index = i + j*_x_pts;
+	(*this).~Field();
+
+	(*this)._init(rhs.x_pts, rhs.y_pts, rhs.z_pts);
+
+	(*this).x_data = rhs.x_data;
+	(*this).y_data = rhs.y_data;
+
+	return 0;
+}
+
+int Field::_init(long _x_pts, long _y_pts, long _z_pts)
+{
+	x_pts = _x_pts;
+	y_pts = _y_pts;
+	z_pts = _z_pts;
+
+	_n_pts = x_pts * y_pts * z_pts;
+	x_data  = new double[_n_pts];
+	y_data  = new double[_n_pts];
+	return 0;
+}
+
+long Field::_index(long i, long j, long k)
+{
+	long index = i + j*x_pts + k*y_pts*x_pts;
 	return index;
 }
 
-double &Field::x(long i, long j)
+// ==================================
+// Public methods
+// ==================================
+double &Field::x(long i, long j, long k)
 {
-	return _x_data[_index(i, j)];
+	return x_data[_index(i, j, k)];
 }
 
-double &Field::y(long i, long j)
+double &Field::y(long i, long j, long k)
 {
-	return _y_data[_index(i, j)];
+	return y_data[_index(i, j, k)];
 }
 
+// ==================================
+// Operators
+// ==================================
 Field &Field::operator=(const Field &rhs)
 {
 	if (this != &rhs)
@@ -77,8 +96,8 @@ Field &Field::operator+=(const Field &rhs)
 {
 	if ( (*this)._samedim(rhs) )
 	{
-		*(*this)._x_data += *rhs._x_data;
-		*(*this)._y_data += *rhs._y_data;
+		*(*this).x_data += *rhs.x_data;
+		*(*this).y_data += *rhs.y_data;
 	} else {
 		throw "Cannot add fields of different sizes";
 	}
@@ -89,8 +108,8 @@ Field &Field::operator-=(const Field &rhs)
 {
 	if ( (*this)._samedim(rhs) )
 	{
-		*(*this)._x_data -= *rhs._x_data;
-		*(*this)._y_data -= *rhs._y_data;
+		*(*this).x_data -= *rhs.x_data;
+		*(*this).y_data -= *rhs.y_data;
 	} else {
 		throw "Cannot subtract fields of different sizes";
 	}

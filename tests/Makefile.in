@@ -14,6 +14,12 @@
 
 @SET_MAKE@
 
+# Bulid rules for samples and tests. Automake's naming for some of
+# these variables isn't terribly obvious, so this is a brief
+# reference:
+#
+# TESTS -- Programs run automatically by "make check"
+# check_PROGRAMS -- Programs built by "make check" but not necessarily run
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -103,7 +109,6 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgtest_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libgtest_la_OBJECTS =  \
@@ -113,6 +118,9 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+libgtest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libgtest_la_LDFLAGS) $(LDFLAGS) -o $@
 am_demo_OBJECTS = demo-demo.$(OBJEXT) ../src/demo-fields.$(OBJEXT)
 demo_OBJECTS = $(am_demo_OBJECTS)
 demo_LDADD = $(LDADD)
@@ -526,15 +534,16 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+check_LTLIBRARIES = libgtest.la
+libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
+libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest
+libgtest_la_LDFLAGS = -pthread
 gtest_SOURCES = gtest.cpp ../src/fields.cpp
 gtest_LDADD = libgtest.la
 gtest_LDFLAGS = -pthread
 gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src
 demo_SOURCES = demo.cpp ../src/fields.cpp
 demo_CPPFLAGS = -I$(top_srcdir)/src
-noinst_LTLIBRARIES = libgtest.la
-libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
-libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest -pthread
 all: all-am
 
 .SUFFIXES:
@@ -569,9 +578,9 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; \
+clean-checkLTLIBRARIES:
+	-test -z "$(check_LTLIBRARIES)" || rm -f $(check_LTLIBRARIES)
+	@list='$(check_LTLIBRARIES)'; \
 	locs=`for p in $$list; do echo $$p; done | \
 	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
 	      sort -u`; \
@@ -590,7 +599,7 @@ clean-noinstLTLIBRARIES:
 	../googletest/googletest/src/$(DEPDIR)/$(am__dirstamp)
 
 libgtest.la: $(libgtest_la_OBJECTS) $(libgtest_la_DEPENDENCIES) $(EXTRA_libgtest_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK)  $(libgtest_la_OBJECTS) $(libgtest_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libgtest_la_LINK)  $(libgtest_la_OBJECTS) $(libgtest_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
@@ -934,7 +943,7 @@ check-TESTS:
 	log_list=`echo $$log_list`; trs_list=`echo $$trs_list`; \
 	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) TEST_LOGS="$$log_list"; \
 	exit $$?;
-recheck: all $(check_PROGRAMS)
+recheck: all $(check_LTLIBRARIES) $(check_PROGRAMS)
 	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 	@set +e; $(am__set_TESTS_bases); \
 	bases=`for i in $$bases; do echo $$i; done \
@@ -998,10 +1007,10 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) $(check_LTLIBRARIES) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -1042,8 +1051,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLTLIBRARIES mostlyclean-am
+clean-am: clean-checkLTLIBRARIES clean-checkPROGRAMS clean-generic \
+	clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ./$(DEPDIR)
@@ -1114,8 +1123,8 @@ uninstall-am:
 .MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLTLIBRARIES cscopelist-am ctags ctags-am distclean \
+	clean-checkLTLIBRARIES clean-checkPROGRAMS clean-generic \
+	clean-libtool cscopelist-am ctags ctags-am distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \

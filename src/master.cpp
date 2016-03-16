@@ -39,8 +39,9 @@ int master(int &p)
 	double dt            = t_tot/n_steps;
 	std::string filename = "output.hdf5";
 	int runge_kutta      = 0;
-	long n_field_x       = 100;
-	long n_field_y       = 100;
+	long n_field_x       = 101;
+	long n_field_y       = 101;
+	long n_field_z       = 101;
 
 	// Send numerical parameters
 	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
@@ -60,6 +61,7 @@ int master(int &p)
 	MPI::COMM_WORLD.Bcast(&runge_kutta , 1 , MPI::INT    , 0);
 	MPI::COMM_WORLD.Bcast(&n_field_x   , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&n_field_y   , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_field_z   , 1 , MPI::LONG   , 0);
 
 	// Send string
 	char *cbuf;

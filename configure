@@ -16196,7 +16196,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # Only expand once:
 
 
-# AC_PROG_LIBTOOL
 
 
 # Checks for libraries.

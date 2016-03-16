@@ -12,6 +12,8 @@ class FieldTest : public ::testing::Test
 
 		long x_size;
 		long y_size;
+		long z_size;
+
 		Field field;
 };
 
