@@ -14,6 +14,7 @@ class Ebeam : public Parts
 		// ==================================
 		// Private member data
 		// ==================================
+		SimParams _simparams;
 		Beam _x_beam;
 		Beam _y_beam;
 
@@ -27,8 +28,7 @@ class Ebeam : public Parts
 		// ==================================
 		Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam);
 		Ebeam(
-				const double qpp,
-				const double mass,
+				SimParams &simparams,
 				const double n_pts,
 				const double type,
 				double_vec x_in,

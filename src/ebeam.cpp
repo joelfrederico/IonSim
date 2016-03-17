@@ -1,18 +1,22 @@
 #include "ebeam.h"
 #include "beam.h"
+#include <gsl/gsl_const_mksa.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_statistics_double.h>
+#include <gsl/gsl_sf_exp.h>
 #include "support_func.h"
 #include <sstream>
 #include "fields.h"
 #include "consts.h"
 #include <math.h>
+#include "simparams.h"
+#include "faddeeva/Faddeeva.hh"
 
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts)
+Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	// ==================================
 	// Save things
@@ -66,8 +70,7 @@ Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, 
 }
 
 Ebeam::Ebeam(
-		const double qpp,
-		const double mass,
+		SimParams &simparams,
 		const double n_pts,
 		const double type,
 		double_vec x_in,
@@ -76,7 +79,7 @@ Ebeam::Ebeam(
  		double_vec yp_in,
  		double_vec z_in,
  		double_vec zp_in
-		) : Parts(mass, n_pts, type), qpp(qpp)
+		) : Parts(simparams.ion_mass(), n_pts, type), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	x_in.shrink_to_fit();
 	xp_in.shrink_to_fit();
@@ -193,16 +196,15 @@ Ebeam Ebeam::between(double z0, double z1)
 	// Create new ebeam from particles
 	// ==================================
 	return Ebeam(
-			(*this).qpp,
-			(*this).mass,
-			(*this).n_pts,
+			(*this)._simparams,
+			x_out.size(),
 			(*this).type,
-			x,
-			xp,
-			y,
-			yp,
-			z,
-			zp
+			x_out,
+			xp_out,
+			y_out,
+			yp_out,
+			z_out,
+			zp_out
 		    );
 }
 
@@ -211,16 +213,35 @@ int Ebeam::get_field(Field &field)
 	complex_double E;
 	double sx = x_std();
 	double sy = y_std();
+
+	bool sx_bigger = (sx > sy);
+	if (!sx_bigger)
+	{
+		std::swap(sx, sy);
+	}
+
 	double var_x = pow(sx, 2);
 	double var_y = pow(sx, 2);
-	double a, b;
+	double a, b, f;
+
+	double xx, yy, Ex, Ey;
+	double var_x_minus_var_y = var_x-var_y;
 	
 	for (int i=0; i < field.x_pts; i++)
 	{
+		xx = field.i_to_x(i);
 		for (int j=0; j < field.y_pts; j++)
 		{
-			/* a = xx / sqrt(2*(var_x-var_y)); */
-			/* E = q_tot / (2* */
+			yy = field.j_to_y(j);
+			f = sqrt(2*var_x_minus_var_y);
+			b = yy / f;
+			a = xx / f;
+			E = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)) * ( Faddeeva::w(complex_double(xx, yy)/f) - gsl_sf_exp(-pow(xx,2)/(2*var_x)+pow(yy,2)/(2*var_y))* Faddeeva::w(complex_double(xx*sy/sx, yy*sx/sy)/f) );
+			Ex = E.imag();
+			Ey = E.real();
+			if (!sx_bigger) { std::swap(Ex, Ey); }
+			field.x(i, j, 0) = Ex;
+			field.y(i, j, 0) = Ey;
 		}
 	}
 	return 0;

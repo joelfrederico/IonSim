@@ -1,29 +1,69 @@
-#include <gsl/gsl_const_mksa.h>
-#include <math.h>
-#include <string>
+#include "support_func.h"
+#include "consts.h"
 #include "hdf5.h"
 #include "mpi.h"
-#include "support_func.h"
-#include <sstream>
 #include <iomanip>
-#include "consts.h"
+#include <math.h>
+#include <sstream>
+#include <string>
 
 namespace ionsim
 {
-	const double ELECTRON_REST_ENERGY = GSL_CONST_MKSA_MASS_ELECTRON * pow(GSL_CONST_MKSA_SPEED_OF_LIGHT, 2);
+	// ==================================
+	// Methods
+	// ==================================
+	double GeV2gamma(double GeV)
+	{
+		return GeV * 1e9 * GSL_CONST_MKSA_ELECTRON_VOLT / ELECTRON_REST_ENERGY;
+	}
 
 	double gamma2GeV(double gamma)
 	{
 		return gamma * ELECTRON_REST_ENERGY / (1e9 * GSL_CONST_MKSA_ELECTRON_VOLT);
 	}
 
-	double GeV2gamma(double GeV)
-	{
-		return GeV * 1e9 * GSL_CONST_MKSA_ELECTRON_VOLT / ELECTRON_REST_ENERGY;
-	}
-
 	double gaussian()
 	{
+		return 0;
+	}
+
+	hid_t open_file(std::string const &filename, MPI::Intracomm &slave_comm_id)
+	{
+		// ==================================
+		// Set up file access property list
+		// ==================================
+		MPI::Info info;
+		hid_t file_id;
+		hid_t plist_file_id;
+
+		plist_file_id = H5Pcreate(H5P_FILE_ACCESS);
+		H5Pset_fapl_mpio(plist_file_id, slave_comm_id, info);
+	
+		// ==================================
+		// Open the file
+		// ==================================
+		file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, plist_file_id);
+		H5Pclose(plist_file_id);
+		return file_id;
+	}
+
+	double ** alloc_2d_array(long rowCount, long colCount)
+	{
+		double ** out = new double*[rowCount];
+		for (long i=0; i < rowCount; i++)
+		{
+			out[i] = new double[colCount];
+		}
+		return out;
+	}
+
+	int dealloc_2d_array(double ** (&arr), long rowCount)
+	{
+		for (long i=0; i < rowCount; i++)
+		{
+			delete [] arr[i];
+		}
+		delete [] arr;
 		return 0;
 	}
 
@@ -178,23 +218,5 @@ namespace ionsim
 		return 0;
 	}
 
-	hid_t open_file(std::string const &filename, MPI::Intracomm &slave_comm_id)
-	{
-		// ==================================
-		// Set up file access property list
-		// ==================================
-		MPI::Info info;
-		hid_t file_id;
-		hid_t plist_file_id;
 
-		plist_file_id = H5Pcreate(H5P_FILE_ACCESS);
-		H5Pset_fapl_mpio(plist_file_id, slave_comm_id, info);
-	
-		// ==================================
-		// Open the file
-		// ==================================
-		file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, plist_file_id);
-		H5Pclose(plist_file_id);
-		return file_id;
-	}
 }

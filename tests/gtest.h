@@ -10,6 +10,8 @@ class FieldTest : public ::testing::Test
 	public:
 		FieldTest();
 
+		void custom_init();
+
 		const long x_size;
 		const long y_size;
 		const long z_size;

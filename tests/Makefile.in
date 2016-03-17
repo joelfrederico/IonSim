@@ -13,13 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
-# Bulid rules for samples and tests. Automake's naming for some of
-# these variables isn't terribly obvious, so this is a brief
-# reference:
-#
-# TESTS -- Programs run automatically by "make check"
-# check_PROGRAMS -- Programs built by "make check" but not necessarily run
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -121,12 +114,15 @@ am__v_lt_1 =
 libgtest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libgtest_la_LDFLAGS) $(LDFLAGS) -o $@
-am_demo_OBJECTS = demo-demo.$(OBJEXT) ../src/demo-fields.$(OBJEXT)
+am_demo_OBJECTS = demo-demo.$(OBJEXT) ../src/demo-fields.$(OBJEXT) \
+	../src/demo-support_func.$(OBJEXT)
 demo_OBJECTS = $(am_demo_OBJECTS)
-demo_LDADD = $(LDADD)
-am_gtest_OBJECTS = gtest-gtest.$(OBJEXT) ../src/gtest-fields.$(OBJEXT)
+am__DEPENDENCIES_1 =
+demo_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_gtest_OBJECTS = gtest-gtest.$(OBJEXT) ../src/gtest-fields.$(OBJEXT) \
+	../src/gtest-support_func.$(OBJEXT)
 gtest_OBJECTS = $(am_gtest_OBJECTS)
-gtest_DEPENDENCIES = libgtest.la
+gtest_DEPENDENCIES = libgtest.la $(am__DEPENDENCIES_1)
 gtest_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(gtest_LDFLAGS) $(LDFLAGS) -o $@
@@ -458,6 +454,8 @@ MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 MPICXX = @MPICXX@
+MYAM_CPPFLAGS = @MYAM_CPPFLAGS@
+MYLDADD = @MYLDADD@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -534,16 +532,33 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+
+# Bulid rules for samples and tests. Automake's naming for some of
+# these variables isn't terribly obvious, so this is a brief
+# reference:
+#
+# TESTS -- Programs run automatically by "make check"
+# check_PROGRAMS -- Programs built by "make check" but not necessarily run
+AM_CPPFLAGS = $(MYAM_CPPFLAGS)
 check_LTLIBRARIES = libgtest.la
 libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
-libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest
+libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest $(MYAM_CPPFLAGS)
 libgtest_la_LDFLAGS = -pthread
-gtest_SOURCES = gtest.cpp ../src/fields.cpp
-gtest_LDADD = libgtest.la
-gtest_LDFLAGS = -pthread
-gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src
-demo_SOURCES = demo.cpp ../src/fields.cpp
-demo_CPPFLAGS = -I$(top_srcdir)/src
+gtest_SOURCES = gtest.cpp \
+		../src/fields.cpp \
+		../src/support_func.cpp
+
+
+# gtest_LDADD=$(MYLDADD) libgtest.la
+gtest_LDADD = libgtest.la $(HDF5_LIBS)
+gtest_LDFLAGS = -pthread -L/opt/local/lib
+gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
+demo_SOURCES = demo.cpp \
+	       ../src/fields.cpp \
+	       ../src/support_func.cpp
+
+demo_CPPFLAGS = -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
+demo_LDADD = $(MYLDADD)
 all: all-am
 
 .SUFFIXES:
@@ -617,11 +632,15 @@ clean-checkPROGRAMS:
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
 ../src/demo-fields.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
+../src/demo-support_func.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 
 demo$(EXEEXT): $(demo_OBJECTS) $(demo_DEPENDENCIES) $(EXTRA_demo_DEPENDENCIES) 
 	@rm -f demo$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(demo_OBJECTS) $(demo_LDADD) $(LIBS)
 ../src/gtest-fields.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/gtest-support_func.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 
 gtest$(EXEEXT): $(gtest_OBJECTS) $(gtest_DEPENDENCIES) $(EXTRA_gtest_DEPENDENCIES) 
@@ -639,7 +658,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@../googletest/googletest/src/$(DEPDIR)/libgtest_la-gtest-all.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-fields.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-fields.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/demo-demo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-gtest.Po@am__quote@
 
@@ -702,6 +723,20 @@ demo-demo.obj: demo.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-fields.obj `if test -f '../src/fields.cpp'; then $(CYGPATH_W) '../src/fields.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/fields.cpp'; fi`
 
+../src/demo-support_func.o: ../src/support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-support_func.o -MD -MP -MF ../src/$(DEPDIR)/demo-support_func.Tpo -c -o ../src/demo-support_func.o `test -f '../src/support_func.cpp' || echo '$(srcdir)/'`../src/support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-support_func.Tpo ../src/$(DEPDIR)/demo-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/demo-support_func.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-support_func.o `test -f '../src/support_func.cpp' || echo '$(srcdir)/'`../src/support_func.cpp
+
+../src/demo-support_func.obj: ../src/support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-support_func.obj -MD -MP -MF ../src/$(DEPDIR)/demo-support_func.Tpo -c -o ../src/demo-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-support_func.Tpo ../src/$(DEPDIR)/demo-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/demo-support_func.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
+
 gtest-gtest.o: gtest.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-gtest.o -MD -MP -MF $(DEPDIR)/gtest-gtest.Tpo -c -o gtest-gtest.o `test -f 'gtest.cpp' || echo '$(srcdir)/'`gtest.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-gtest.Tpo $(DEPDIR)/gtest-gtest.Po
@@ -729,6 +764,20 @@ gtest-gtest.obj: gtest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/fields.cpp' object='../src/gtest-fields.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-fields.obj `if test -f '../src/fields.cpp'; then $(CYGPATH_W) '../src/fields.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/fields.cpp'; fi`
+
+../src/gtest-support_func.o: ../src/support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-support_func.o -MD -MP -MF ../src/$(DEPDIR)/gtest-support_func.Tpo -c -o ../src/gtest-support_func.o `test -f '../src/support_func.cpp' || echo '$(srcdir)/'`../src/support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-support_func.Tpo ../src/$(DEPDIR)/gtest-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/gtest-support_func.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-support_func.o `test -f '../src/support_func.cpp' || echo '$(srcdir)/'`../src/support_func.cpp
+
+../src/gtest-support_func.obj: ../src/support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-support_func.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-support_func.Tpo -c -o ../src/gtest-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-support_func.Tpo ../src/$(DEPDIR)/gtest-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/gtest-support_func.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

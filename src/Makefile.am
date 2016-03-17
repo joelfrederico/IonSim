@@ -1,6 +1,9 @@
-bin_PROGRAMS = ionsim
+# AM_CPPFLAGS=$(GSL_CFLAGS) $(HDF5_CPPFLAGS)
+AM_CPPFLAGS=$(MYAM_CPPFLAGS)
 
-ionsim_SOURCES = \
+bin_PROGRAMS=ionsim
+
+ionsim_SOURCES=\
 		 beam.cpp \
 		 consts.cpp \
 		 ebeam.cpp \
@@ -15,5 +18,6 @@ ionsim_SOURCES = \
 		 slave.cpp \
 		 support_func.cpp
 
-ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)
-ionsim_CPPFLAGS = $(GSL_CFLAGS) $(HDF5_CPPFLAGS)
+ionsim_LDADD = $(MYLDADD)
+# ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)
+# ionsim_CPPFLAGS = $(GSL_CFLAGS) $(HDF5_CPPFLAGS)

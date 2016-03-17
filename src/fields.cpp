@@ -1,16 +1,17 @@
 #include "fields.h"
+#include "support_func.h"
 
 // ==================================
 // Constructors, Destructor
 // ==================================
-Field::Field(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
+Field::Field(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_length) :
 	x_pts(_x_pts),
 	y_pts(_y_pts),
 	z_pts(_z_pts),
 	n_pts(_x_pts*_y_pts*_z_pts),
 	x_edge_mag(_x_edge_mag),
 	y_edge_mag(_y_edge_mag),
-	z_edge_mag(_z_edge_mag)
+	z_length(_z_length)
 {
 	_init();
 }
@@ -22,15 +23,10 @@ Field::Field(SimParams &simparams) :
 	n_pts(simparams.n_field_x*simparams.n_field_y*simparams.n_field_z),
 	x_edge_mag(simparams.radius),
 	y_edge_mag(simparams.radius),
-	z_edge_mag(simparams.radius)
+	z_length(simparams.length)
 {
 	_init();
 }
-
-/* Field::Field(const Field &rhs) */
-/* { */
-/* 	(*this)._copy(rhs); */
-/* } */
 
 Field::~Field()
 {
@@ -51,22 +47,18 @@ bool Field::_samedim(const Field &rhs)
 	}
 }
 
-/* int Field::_copy(const Field &rhs) */
-/* { */
-/* 	(*this).~Field(); */
-
-/* 	(*this)._init(); */
-
-/* 	(*this).x_data = rhs.x_data; */
-/* 	(*this).y_data = rhs.y_data; */
-
-/* 	return 0; */
-/* } */
-
 int Field::_init()
 {
 	x_data  = new double[n_pts];
 	y_data  = new double[n_pts];
+
+	dxdi = x_edge_mag * 2 / (x_pts-1);
+	dydj = y_edge_mag * 2 / (y_pts-1);
+	dzdk = z_length / (z_pts-1);
+
+	mid_i = x_pts / 2;
+	mid_j = y_pts / 2;
+	mid_k = z_pts / 2;
 	return 0;
 }
 
@@ -74,6 +66,44 @@ long Field::_index(long i, long j, long k)
 {
 	long index = i + j*x_pts + k*y_pts*x_pts;
 	return index;
+}
+
+double Field::i_to_x(long i)
+{
+	return (i-mid_i) * dxdi;
+}
+
+double Field::j_to_y(long j)
+{
+	return (j-mid_j) * dydj;
+}
+
+double Field::k_to_z(long k)
+{
+	return k * dzdk;
+}
+
+int Field::_array_alloc(double ** (&out), long k, double* data)
+{
+	out = ionsim::alloc_2d_array(x_pts, y_pts);
+	for (int i=0; i < x_pts; i++)
+	{
+		for (int j=0; j < y_pts; j++)
+		{
+			out[i][j] = data[_index(i, j, k)];
+		}
+	}
+	return x_pts;
+}
+
+int Field::x_array_alloc(double ** (&out), long k)
+{
+	return _array_alloc(out, k, x_data);
+}
+
+int Field::y_array_alloc(double ** (&out), long k)
+{
+	return _array_alloc(out, k, y_data);
 }
 
 // ==================================
@@ -87,6 +117,16 @@ double &Field::x(long i, long j, long k)
 double &Field::y(long i, long j, long k)
 {
 	return y_data[_index(i, j, k)];
+}
+
+double Field::i(double _x, double _y)
+{
+	return _x / dxdi + mid_i;
+}
+
+double Field::j(double _x, double _y)
+{
+	return _y / dydj + mid_j;
 }
 
 // ==================================

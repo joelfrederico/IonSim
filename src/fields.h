@@ -10,23 +10,31 @@ class Field
 {
 	private:
 		// ==================================
-		// Data members
+		// Private data members
 		// ==================================
 		const long n_pts;
+		double dxdi;
+		double dydj;
+		double dzdk;
+		double mid_i;
+		double mid_j;
+		double mid_k;
 
 		// ==================================
-		// Methods
+		// Private methods
 		// ==================================
 		bool _samedim(const Field &rhs);
 		/* int _copy(const Field &rhs); */
 		int _init();
 		long _index(long i, long j, long k);
 
+		int _array_alloc(double ** (&out), long k, double *data);
+
 	public:
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
-		Field(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag);
+		Field(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_length);
 		Field(SimParams &simparams);
 		~Field();
 
@@ -39,7 +47,7 @@ class Field
 
 		const double x_edge_mag;
 		const double y_edge_mag;
-		const double z_edge_mag;
+		const double z_length;
 
 		double *x_data;
 		double *y_data;
@@ -49,6 +57,14 @@ class Field
 		// ==================================
 		double &x(long i, long j, long k);
 		double &y(long i, long j, long k);
+		double i_to_x(long i);
+		double j_to_y(long j);
+		double k_to_z(long k);
+		double i(double _x, double _y);
+		double j(double _x, double _y);
+
+		int x_array_alloc(double ** (&out), long k);
+		int y_array_alloc(double ** (&out), long k);
 
 		// ==================================
 		// Operators

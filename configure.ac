@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([IonMotion], [0.0.1], [joelfred@slac.stanford.edu])
-AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
+AM_INIT_AUTOMAKE([-Wall -Werror -Woverride subdir-objects])
 AC_CONFIG_SRCDIR([src/main.cpp])
 # AC_CONFIG_MACRO_DIRS([googletest/googletest/m4])
 AC_CONFIG_HEADERS([config.h])
@@ -20,6 +20,12 @@ AX_LIB_HDF5([parallel])
 if test "$with_hdf5" = "yes"; then
 	HDF5_LIBS="$HDF5_LIBS -lhdf5_cpp"
 fi
+
+MYLDADD="$GSL_LIBS $HDF5_LIBS"
+AC_SUBST(MYLDADD,[$MYLDADD])
+
+MYAM_CPPFLAGS="$GSL_CFLAGS $HDF5_CPPFLAGS"
+AC_SUBST(MYAM_CPPFLAGS,[$MYAM_CPPFLAGS])
 
 # AC_LANG_PUSH([C++])
 # AC_CHECK_HEADER([gtest/gtest.h], [AC_DEFINE([HAVE_GTEST_H], 1)])

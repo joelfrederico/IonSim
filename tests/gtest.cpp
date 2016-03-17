@@ -1,6 +1,7 @@
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
 #include "gtest.h"
 #include "fields.h"
+#include "support_func.h"
 
 const long X_PTS = 3;
 const long Y_PTS = 5;
@@ -20,6 +21,24 @@ FieldTest::FieldTest() :
 	z_edge_mag(Z_EDGE_MAG)
 {
 }
+
+void FieldTest::custom_init()
+{
+	int count = 0;
+	for (int k=0; k < z_size; k++)
+	{
+		for (int j=0; j < y_size; j++)
+		{
+			for (int i=0; i < x_size; i++)
+			{
+				field.x(i, j, k) = count;
+				field.y(i, j, k) = -count;
+				count++;
+			}
+		}
+	}
+}
+
 
 TEST_F(FieldTest, IsZeroInitially)
 {
@@ -68,20 +87,7 @@ TEST_F(FieldTest, AssigmentWorks)
 
 TEST_F(FieldTest, IndicesAreGood)
 {
-	int count = 0;
-	for (int k=0; k < z_size; k++)
-	{
-		for (int j=0; j < y_size; j++)
-		{
-			for (int i=0; i < x_size; i++)
-			{
-				field.x(i, j, k) = count;
-				field.y(i, j, k) = -count;
-				count++;
-			}
-		}
-	}
-
+	custom_init();
 	for (int i=0; i < x_size*y_size*z_size; i++)
 	{
 		EXPECT_EQ(field.x_data[i], i);
@@ -89,7 +95,30 @@ TEST_F(FieldTest, IndicesAreGood)
 	}
 }
 
+TEST_F(FieldTest, ArrayIsGood)
+{
+	custom_init();
+	double ** arr;
+	int rowCount;
+	rowCount = field.x_array_alloc(arr, 0);
+	for (long j=0; j < y_size; j++)
+	{
+		for (long i=0; i < x_size; i++)
+		{
+			EXPECT_EQ(field.x(i, j, 0), arr[i][j]) << "At location (" << i << ", " << j << ")";
+		}
+	}
+	ionsim::dealloc_2d_array(arr, rowCount);
+}
 
+TEST(IonsimTest, AllocThenDealloc)
+{
+	double ** arr = ionsim::alloc_2d_array(X_PTS, Y_PTS);
+	ionsim::dealloc_2d_array(arr, X_PTS);
+
+	arr = ionsim::alloc_2d_array(Y_PTS, X_PTS);
+	ionsim::dealloc_2d_array(arr, Y_PTS);
+}
 
 int main(int argc, char **argv)
 {
