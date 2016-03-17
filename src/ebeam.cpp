@@ -240,8 +240,8 @@ int Ebeam::get_field(Field &field)
 			Ex = E.imag();
 			Ey = E.real();
 			if (!sx_bigger) { std::swap(Ex, Ey); }
-			field.x(i, j, 0) = Ex;
-			field.y(i, j, 0) = Ey;
+			field.x(i, j) = Ex;
+			field.y(i, j) = Ey;
 		}
 	}
 	return 0;

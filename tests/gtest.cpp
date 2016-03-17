@@ -15,7 +15,7 @@ FieldTest::FieldTest() :
 	x_size(X_PTS),
 	y_size(Y_PTS),
 	z_size(Z_PTS),
-	field(X_PTS, Y_PTS, Z_PTS, X_EDGE_MAG, Y_EDGE_MAG, Z_EDGE_MAG),
+	field(X_PTS, Y_PTS, X_EDGE_MAG, Y_EDGE_MAG),
 	x_edge_mag(X_EDGE_MAG),
 	y_edge_mag(Y_EDGE_MAG),
 	z_edge_mag(Z_EDGE_MAG)
@@ -25,16 +25,13 @@ FieldTest::FieldTest() :
 void FieldTest::custom_init()
 {
 	int count = 0;
-	for (int k=0; k < z_size; k++)
+	for (int j=0; j < y_size; j++)
 	{
-		for (int j=0; j < y_size; j++)
+		for (int i=0; i < x_size; i++)
 		{
-			for (int i=0; i < x_size; i++)
-			{
-				field.x(i, j, k) = count;
-				field.y(i, j, k) = -count;
-				count++;
-			}
+			field.x(i, j) = count;
+			field.y(i, j) = -count;
+			count++;
 		}
 	}
 }
@@ -49,11 +46,8 @@ TEST_F(FieldTest, IsZeroInitially)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			for (long k=0; k < y_size; k++)
-			{
-				EXPECT_EQ(field.x(i, j, k), 0) << "At location (" << i << ", " << j << ", " << k <<")";
-				EXPECT_EQ(field.y(i, j, k), 0) << "At location (" << i << ", " << j << ", " << k <<")";
-			}
+			EXPECT_EQ(field.x(i, j), 0) << "At location (" << i << ", " << j <<")";
+			EXPECT_EQ(field.y(i, j), 0) << "At location (" << i << ", " << j <<")";
 		}
 	}
 }
@@ -64,11 +58,8 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (int j=0; j < y_size; j++)
 		{
-			for (int k=0; k < z_size; k++)
-			{
-				field.x(i, j, k) = i*j*k;
-				field.y(i, j, k) = i*j*k*2;
-			}
+			field.x(i, j) = i*j;
+			field.y(i, j) = i*j*2;
 		}
 	}
 
@@ -76,11 +67,8 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (int j=0; j < y_size; j++)
 		{
-			for (long k=0; k < y_size; k++)
-			{
-				EXPECT_EQ(field.x(i, j, k), i*j*k) << "At location (" << i << ", " << j << ", " << k <<")";
-				EXPECT_EQ(field.y(i, j, k), i*j*k*2) << "At location (" << i << ", " << j << ", " << k <<")";
-			}
+			EXPECT_EQ(field.x(i, j), i*j)   << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.y(i, j), i*j*2) << "At location (" << i << ", " << j << ")";
 		}
 	}
 }
@@ -88,7 +76,7 @@ TEST_F(FieldTest, AssigmentWorks)
 TEST_F(FieldTest, IndicesAreGood)
 {
 	custom_init();
-	for (int i=0; i < x_size*y_size*z_size; i++)
+	for (int i=0; i < x_size*y_size; i++)
 	{
 		EXPECT_EQ(field.x_data[i], i);
 		EXPECT_EQ(field.y_data[i], -i);
@@ -105,7 +93,7 @@ TEST_F(FieldTest, ArrayIsGood)
 	{
 		for (long i=0; i < x_size; i++)
 		{
-			EXPECT_EQ(field.x(i, j, 0), arr[i][j]) << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.x(i, j), arr[i][j]) << "At location (" << i << ", " << j << ")";
 		}
 	}
 	ionsim::dealloc_2d_array(arr, rowCount);
