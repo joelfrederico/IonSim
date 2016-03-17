@@ -98,12 +98,12 @@ int Field::y_array_alloc(double ** (&out), long k)
 // ==================================
 // Public methods
 // ==================================
-double &Field::x(long i, long j)
+double &Field::Ex(long i, long j)
 {
 	return x_data[_index(i, j)];
 }
 
-double &Field::y(long i, long j)
+double &Field::Ey(long i, long j)
 {
 	return y_data[_index(i, j)];
 }

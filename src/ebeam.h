@@ -56,7 +56,7 @@ class Ebeam : public Parts
 		double y_mean();
 
 		Ebeam between(double z0, double z1);
-		int get_field(Field &field);
+		int field(Field &field);
 };
 
 #endif

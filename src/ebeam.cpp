@@ -208,7 +208,7 @@ Ebeam Ebeam::between(double z0, double z1)
 		    );
 }
 
-int Ebeam::get_field(Field &field)
+int Ebeam::field(Field &field)
 {
 	complex_double E;
 	double sx = x_std();
@@ -224,24 +224,44 @@ int Ebeam::get_field(Field &field)
 	double var_y = pow(sx, 2);
 	double a, b, f;
 
-	double xx, yy, Ex, Ey;
+	double xx, yy, xt, yt, Ex, Ey, Et;
 	double var_x_minus_var_y = var_x-var_y;
 	
 	for (int i=0; i < field.x_pts; i++)
 	{
-		xx = field.i_to_x(i);
+		xt = field.i_to_x(i);
+		if (sx_bigger)
+		{
+			xx = xt;
+		} else {
+			yy = xt;
+		}
+
 		for (int j=0; j < field.y_pts; j++)
 		{
-			yy = field.j_to_y(j);
+			yt = field.j_to_y(j);
+			if (sx_bigger)
+			{
+				yy = yt;
+			} else {
+				xx = -yt;
+			}
+
 			f = sqrt(2*var_x_minus_var_y);
 			b = yy / f;
 			a = xx / f;
 			E = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)) * ( Faddeeva::w(complex_double(xx, yy)/f) - gsl_sf_exp(-pow(xx,2)/(2*var_x)+pow(yy,2)/(2*var_y))* Faddeeva::w(complex_double(xx*sy/sx, yy*sx/sy)/f) );
 			Ex = E.imag();
 			Ey = E.real();
-			if (!sx_bigger) { std::swap(Ex, Ey); }
-			field.x(i, j) = Ex;
-			field.y(i, j) = Ey;
+			if (!sx_bigger) 
+			{ 
+				Et = Ex;
+				Ex = Ey;
+				Ey = -Et;
+			}
+
+			field.Ex(i, j) = Ex;
+			field.Ey(i, j) = Ey;
 		}
 	}
 	return 0;

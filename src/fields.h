@@ -51,8 +51,8 @@ class Field
 		// ==================================
 		// Methods
 		// ==================================
-		double &x(long i, long j);
-		double &y(long i, long j);
+		double &Ex(long i, long j);
+		double &Ey(long i, long j);
 		double i_to_x(long i);
 		double j_to_y(long j);
 		double i(double _x, double _y);

@@ -29,8 +29,8 @@ void FieldTest::custom_init()
 	{
 		for (int i=0; i < x_size; i++)
 		{
-			field.x(i, j) = count;
-			field.y(i, j) = -count;
+			field.Ex(i, j) = count;
+			field.Ey(i, j) = -count;
 			count++;
 		}
 	}
@@ -46,8 +46,8 @@ TEST_F(FieldTest, IsZeroInitially)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			EXPECT_EQ(field.x(i, j), 0) << "At location (" << i << ", " << j <<")";
-			EXPECT_EQ(field.y(i, j), 0) << "At location (" << i << ", " << j <<")";
+			EXPECT_EQ(field.Ex(i, j), 0) << "At location (" << i << ", " << j <<")";
+			EXPECT_EQ(field.Ey(i, j), 0) << "At location (" << i << ", " << j <<")";
 		}
 	}
 }
@@ -58,8 +58,8 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (int j=0; j < y_size; j++)
 		{
-			field.x(i, j) = i*j;
-			field.y(i, j) = i*j*2;
+			field.Ex(i, j) = i*j;
+			field.Ey(i, j) = i*j*2;
 		}
 	}
 
@@ -67,8 +67,8 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (int j=0; j < y_size; j++)
 		{
-			EXPECT_EQ(field.x(i, j), i*j)   << "At location (" << i << ", " << j << ")";
-			EXPECT_EQ(field.y(i, j), i*j*2) << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ex(i, j), i*j)   << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ey(i, j), i*j*2) << "At location (" << i << ", " << j << ")";
 		}
 	}
 }
@@ -86,17 +86,21 @@ TEST_F(FieldTest, IndicesAreGood)
 TEST_F(FieldTest, ArrayIsGood)
 {
 	custom_init();
-	double ** arr;
+	double ** arrx;
+	double ** arry;
 	int rowCount;
-	rowCount = field.x_array_alloc(arr, 0);
+	rowCount = field.x_array_alloc(arrx, 0);
+	rowCount = field.y_array_alloc(arry, 0);
 	for (long j=0; j < y_size; j++)
 	{
 		for (long i=0; i < x_size; i++)
 		{
-			EXPECT_EQ(field.x(i, j), arr[i][j]) << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ex(i, j), arrx[i][j]) << "Ex at location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ey(i, j), arry[i][j]) << "Ey at location (" << i << ", " << j << ")";
 		}
 	}
-	ionsim::dealloc_2d_array(arr, rowCount);
+	ionsim::dealloc_2d_array(arrx, rowCount);
+	ionsim::dealloc_2d_array(arry, rowCount);
 }
 
 TEST(IonsimTest, AllocThenDealloc)
