@@ -1,4 +1,5 @@
 #include "ebeam.h"
+#include "beam.h"
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_statistics_double.h>
@@ -6,33 +7,47 @@
 #include <sstream>
 #include "fields.h"
 #include "consts.h"
+#include <math.h>
 
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, ionsim::PARTS_E)
+Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts)
 {
-	_simparams = &simparams;
-	q_tot      = simparams.q_tot;
-
+	// ==================================
+	// Save things
+	// ==================================
 	_x_beam = x_beam;
 	_y_beam = y_beam;
 
+	// ==================================
+	// Initialize local variables
+	// ==================================
 	double* rho_x;
 	double* rho_y;
 	double x_cov[2][2];
 	double y_cov[2][2];
 
+	// ==================================
+	// Get covariances for x and y
+	// ==================================
 	x_beam.cov(x_cov);
 	y_beam.cov(y_cov);
-	/* printf("x_cov: %.6d\n", x_cov); */
 
+	// ==================================
+	// Set random number generator
+	// ==================================
 	gsl_rng * r = gsl_rng_alloc(gsl_rng_mt19937);
-
-	/* gsl_rng_env_setup(); */
+	
+	// ==================================
+	// Set random number generator seed
+	// ==================================
 	gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1);
 
-	for (int i=0; i < n_pts(); i++)
+	// ==================================
+	// Create particles randomly
+	// ==================================
+	for (int i=0; i < n_pts; i++)
 	{
 		rho_x = &x_cov[0][1];
 		rho_y = &y_cov[0][1];
@@ -43,21 +58,26 @@ Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, 
 		z[i] = gsl_ran_flat(r, 0, sqrt(z_cov[0][0]));
 		zp[i] = gsl_ran_gaussian(r, sqrt(z_cov[1][1]));
 	}
+
+	// ==================================
+	// Free memory
+	// ==================================
 	gsl_rng_free(r);
 }
 
 Ebeam::Ebeam(
-		SimParams &simparams,
+		const double qpp,
+		const double mass,
+		const double n_pts,
+		const double type,
 		double_vec x_in,
  		double_vec xp_in,
  		double_vec y_in,
  		double_vec yp_in,
  		double_vec z_in,
  		double_vec zp_in
-		) : Parts(simparams, ionsim::PARTS_E)
+		) : Parts(mass, n_pts, type), qpp(qpp)
 {
-	_simparams = &simparams;
-
 	x_in.shrink_to_fit();
 	xp_in.shrink_to_fit();
 	y_in.shrink_to_fit();
@@ -71,24 +91,6 @@ Ebeam::Ebeam(
 	yp = yp_in;
 	z  = z_in;
 	zp = zp_in;
-}
-
-// ==================================
-// Private Methods
-// ==================================
-
-double i_to_x(long i)
-{
-	return 0;
-	/* long midpoint = */ 
-}
-
-double j_to_y(long j)
-{
-}
-
-double k_to_z(long k)
-{
 }
 
 // ==================================
@@ -106,29 +108,32 @@ int Ebeam::dump(std::string const &filename, int step, MPI::Intracomm &comm)
 double Ebeam::x_mean()
 {
 	double* x = &x[0];
-	return gsl_stats_mean(x, 1, n_pts());
+	return gsl_stats_mean(x, 1, n_pts);
 }
 
 double Ebeam::x_std()
 {
 	double* x = &x[0];
-	return gsl_stats_sd(x, 1, n_pts());
+	return gsl_stats_sd(x, 1, n_pts);
 }
 
 double Ebeam::y_mean()
 {
 	double* y = &y[0];
-	return gsl_stats_mean(y, 1, n_pts());
+	return gsl_stats_mean(y, 1, n_pts);
 }
 
 double Ebeam::y_std()
 {
 	double* y = &y[0];
-	return gsl_stats_sd(y, 1, n_pts());
+	return gsl_stats_sd(y, 1, n_pts);
 }
 
 Ebeam Ebeam::between(double z0, double z1)
 {
+	// ==================================
+	// Initialize vectors to hold coords
+	// ==================================
 	double_vec x_out;
 	double_vec xp_out;
 	double_vec y_out;
@@ -136,6 +141,10 @@ Ebeam Ebeam::between(double z0, double z1)
 	double_vec z_out;
 	double_vec zp_out;
 
+	// ==================================
+	// Reserve space for all possible 
+	// particles
+	// ==================================
 	long reserve_length = x.size();
 
 	x_out.reserve(reserve_length);
@@ -145,14 +154,19 @@ Ebeam Ebeam::between(double z0, double z1)
 	z_out.reserve(reserve_length);
 	zp_out.reserve(reserve_length);
 
+	// ==================================
+	// Check limits are correct
+	// ==================================
 	if (z0 > z1)
 	{
 		std::swap(z1, z0);
 	}
 
-	long _n_pts = n_pts();
+	// ==================================
+	// Check and xfer particles
+	// ==================================
 	long ind = 0;
-	for (long i=0; i < _n_pts; i++)
+	for (long i=0; i < n_pts; i++)
 	{
 		if ( (z0 < z[i]) && (z[i] < z1) )
 		{
@@ -165,15 +179,24 @@ Ebeam Ebeam::between(double z0, double z1)
 		}
 	}
 
-	x.shrink_to_fit();
-	xp.shrink_to_fit();
-	y.shrink_to_fit();
-	yp.shrink_to_fit();
-	z.shrink_to_fit();
-	zp.shrink_to_fit();
+	// ==================================
+	// Shrink arrays to reduce memory
+	// ==================================
+	x_out.shrink_to_fit();
+	xp_out.shrink_to_fit();
+	y_out.shrink_to_fit();
+	yp_out.shrink_to_fit();
+	z_out.shrink_to_fit();
+	zp_out.shrink_to_fit();
 
+	// ==================================
+	// Create new ebeam from particles
+	// ==================================
 	return Ebeam(
-			*(*this)._simparams,
+			(*this).qpp,
+			(*this).mass,
+			(*this).n_pts,
+			(*this).type,
 			x,
 			xp,
 			y,
@@ -188,12 +211,15 @@ int Ebeam::get_field(Field &field)
 	complex_double E;
 	double sx = x_std();
 	double sy = y_std();
+	double var_x = pow(sx, 2);
+	double var_y = pow(sx, 2);
 	double a, b;
 	
 	for (int i=0; i < field.x_pts; i++)
 	{
 		for (int j=0; j < field.y_pts; j++)
 		{
+			/* a = xx / sqrt(2*(var_x-var_y)); */
 			/* E = q_tot / (2* */
 		}
 	}

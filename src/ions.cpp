@@ -118,7 +118,7 @@ int Ions::push(double dt, double nb_0, double sig_r)
 	/* gsl_odeiv2_driver *d = gsl_odeiv2_driver_alloc_y_new(&sys, gsl_odeiv2_step_rk4, dt, sig_r/100, 1e-8); */
 
 
-	for (int i=0; i < _n_pts; i++)
+	for (int i=0; i < n_pts; i++)
 	{
 		double y[] = {x[i], y[i], xp[i], yp[i]};
 		double yerr[4];
@@ -146,7 +146,7 @@ int Ions::push(double dt, double nb_0, double sig_r)
 int Ions::push_simple(double dt, double nb_0, double sig_r)
 {
 	std::complex<double> F;
-	for (int i=0; i < _n_pts; i++)
+	for (int i=0; i < n_pts; i++)
 	{
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;

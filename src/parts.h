@@ -6,15 +6,21 @@
 
 class Parts
 {
-	protected:
-		SimParams *_simparams;
-		long _n_pts;
-
+	private:
+		int _vec_reserve();
 	public:
-		Parts(SimParams simparams, parttype _type);
+		// ==============================
+		// Constructors
+		// ==============================
+		Parts(double _mass, long _n_pts, parttype _type);
+		Parts(const SimParams &simparams, parttype _type);
 
-		const parttype type;
+		// ==============================
+		// Data members
+		// ==============================
 		const double mass;
+		const long n_pts;
+		const parttype type;
 
 		double_vec x;
 		double_vec xp;
@@ -23,7 +29,6 @@ class Parts
 		double_vec z;
 		double_vec zp;
 
-		long n_pts() const;
 };
 
 #endif

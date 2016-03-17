@@ -49,7 +49,7 @@ namespace ionsim
 		int p  = comm.Get_size();
 		int id = comm.Get_rank();
 
-		long n_pts             = ebeam.n_pts();
+		long n_pts             = ebeam.n_pts;
 		const double_vec * _x  = &ebeam.x;
 		const double_vec * _xp = &ebeam.xp;
 		const double_vec * _y  = &ebeam.y;

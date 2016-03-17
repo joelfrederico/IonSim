@@ -10,9 +10,13 @@ class FieldTest : public ::testing::Test
 	public:
 		FieldTest();
 
-		long x_size;
-		long y_size;
-		long z_size;
+		const long x_size;
+		const long y_size;
+		const long z_size;
+
+		const double x_edge_mag;
+		const double y_edge_mag;
+		const double z_edge_mag;
 
 		Field field;
 };

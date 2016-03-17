@@ -6,7 +6,6 @@
 #include "parts.h"
 #include "hdf5.h"
 
-
 namespace ionsim
 {
 	double gamma2GeV(double gamma);
@@ -19,8 +18,6 @@ namespace ionsim
 	int overwrite_file(std::string const &filename, MPI::Intracomm &slave_comm_id);
 	hid_t open_file(std::string const &filename, MPI::Intracomm &slave_comm_id);
 
-	/* template <class T> */
-	/* int writeattribute(std::string const &attr_name, T attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id); */
 	template <class T>
 	int writeattribute(std::string const &attr_name, T attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id)
 	{
@@ -66,11 +63,6 @@ namespace ionsim
 
 		return 0;
 	}
-	/*
-	int writeattribute(std::string const &attr_name, long attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id);
-	int writeattribute(std::string const &attr_name, int attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id);
-	int writeattribute(std::string const &attr_name, double attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id);
-	*/
 
 	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam);
 	

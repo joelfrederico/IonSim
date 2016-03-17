@@ -11,8 +11,9 @@
 class Ebeam : public Parts
 {
 	private:
-		SimParams * _simparams;
-		
+		// ==================================
+		// Private member data
+		// ==================================
 		Beam _x_beam;
 		Beam _y_beam;
 
@@ -20,14 +21,16 @@ class Ebeam : public Parts
 		double y_cov[2][2];
 		double z_cov[2][2];
 
-		double i_to_x(long i);
-		double j_to_y(long j);
-		double k_to_z(long k);
 	public:
-		/// Create Ebeam class.
+		// ==================================
+		// Constructors, Destructor
+		// ==================================
 		Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam);
 		Ebeam(
-				SimParams &simparams,
+				const double qpp,
+				const double mass,
+				const double n_pts,
+				const double type,
 				double_vec x_in,
  				double_vec xp_in,
  				double_vec y_in,
@@ -36,8 +39,15 @@ class Ebeam : public Parts
  				double_vec zp_in
 				);
 
-		double q_tot;
+		// ==================================
+		// Member data
+		// ==================================
+		const double qpp;
 
+
+		// ==================================
+		// Member methods
+		// ==================================
 		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
 
 		double x_std();

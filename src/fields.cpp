@@ -3,20 +3,34 @@
 // ==================================
 // Constructors, Destructor
 // ==================================
-Field::Field(long x_pts, long y_pts, long z_pts)
+Field::Field(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
+	x_pts(_x_pts),
+	y_pts(_y_pts),
+	z_pts(_z_pts),
+	n_pts(_x_pts*_y_pts*_z_pts),
+	x_edge_mag(_x_edge_mag),
+	y_edge_mag(_y_edge_mag),
+	z_edge_mag(_z_edge_mag)
 {
-	(*this)._init(x_pts, y_pts, z_pts);
+	_init();
 }
 
-Field::Field(SimParams &simparams)
+Field::Field(SimParams &simparams) :
+	x_pts(simparams.n_field_x),
+	y_pts(simparams.n_field_y),
+	z_pts(simparams.n_field_z),
+	n_pts(simparams.n_field_x*simparams.n_field_y*simparams.n_field_z),
+	x_edge_mag(simparams.radius),
+	y_edge_mag(simparams.radius),
+	z_edge_mag(simparams.radius)
 {
-	_init(simparams.n_field_x, simparams.n_field_y, simparams.n_field_z);
+	_init();
 }
 
-Field::Field(const Field &rhs)
-{
-	(*this)._copy(rhs);
-}
+/* Field::Field(const Field &rhs) */
+/* { */
+/* 	(*this)._copy(rhs); */
+/* } */
 
 Field::~Field()
 {
@@ -37,27 +51,22 @@ bool Field::_samedim(const Field &rhs)
 	}
 }
 
-int Field::_copy(const Field &rhs)
+/* int Field::_copy(const Field &rhs) */
+/* { */
+/* 	(*this).~Field(); */
+
+/* 	(*this)._init(); */
+
+/* 	(*this).x_data = rhs.x_data; */
+/* 	(*this).y_data = rhs.y_data; */
+
+/* 	return 0; */
+/* } */
+
+int Field::_init()
 {
-	(*this).~Field();
-
-	(*this)._init(rhs.x_pts, rhs.y_pts, rhs.z_pts);
-
-	(*this).x_data = rhs.x_data;
-	(*this).y_data = rhs.y_data;
-
-	return 0;
-}
-
-int Field::_init(long _x_pts, long _y_pts, long _z_pts)
-{
-	x_pts = _x_pts;
-	y_pts = _y_pts;
-	z_pts = _z_pts;
-
-	_n_pts = x_pts * y_pts * z_pts;
-	x_data  = new double[_n_pts];
-	y_data  = new double[_n_pts];
+	x_data  = new double[n_pts];
+	y_data  = new double[n_pts];
 	return 0;
 }
 
@@ -83,15 +92,6 @@ double &Field::y(long i, long j, long k)
 // ==================================
 // Operators
 // ==================================
-Field &Field::operator=(const Field &rhs)
-{
-	if (this != &rhs)
-	{
-		(*this)._copy(rhs);
-	}
-	return *this;
-}
-
 Field &Field::operator+=(const Field &rhs)
 {
 	if ( (*this)._samedim(rhs) )

@@ -6,32 +6,58 @@
 #include <gsl/gsl_const_mksa.h>
 
 // ==============================
-// Parts
+// Constructors
 // ==============================
-Parts::Parts(SimParams simparams, const parttype _type) : type(_type), mass(simparams.ion_mass())
+Parts::Parts(double _mass, long _n_pts, parttype _type) : mass(_mass), n_pts(_n_pts), type(_type)
 {
-	_simparams = &simparams;
+}
 
+long _n_pts(const SimParams &simparams, const parttype type)
+{
 	switch (type)
 	{
 		case ionsim::PARTS_ION:
-			_n_pts = (*_simparams).n_e;
+			return simparams.n_e;
 			break;
 		case ionsim::PARTS_E:
-			_n_pts = (*_simparams).n_ions;
+			return simparams.n_ions;
 			break;
 	}
-
-	x.reserve(_n_pts);
-	xp.reserve(_n_pts);
-	y.reserve(_n_pts);
-	yp.reserve(_n_pts);
-	z.reserve(_n_pts);
-	zp.reserve(_n_pts);
+	return 0;
 }
 
-long Parts::n_pts() const
+Parts::Parts(const SimParams &simparams, const parttype _type) : type(_type), mass(simparams.ion_mass()), n_pts(_n_pts(simparams, _type))
 {
-	return _n_pts;
+}
+
+// ==============================
+// Private methods
+// ==============================
+int Parts::_vec_reserve()
+{
+	// ==============================
+	// Free unneeded space
+	// ==============================
+	if (x.size() > n_pts)
+	{
+		x.resize(n_pts);
+		xp.resize(n_pts);
+		y.resize(n_pts);
+		yp.resize(n_pts);
+		z.resize(n_pts);
+		zp.resize(n_pts);
+	}
+
+	// ==============================
+	// Reserve needed space
+	// ==============================
+	x.reserve(n_pts);
+	xp.reserve(n_pts);
+	y.reserve(n_pts);
+	yp.reserve(n_pts);
+	z.reserve(n_pts);
+	zp.reserve(n_pts);
+
+	return 0;
 }
 

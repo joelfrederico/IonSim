@@ -5,8 +5,6 @@
 
 class SimParams
 {
-	protected:
-
 	public:
 		// ==================================
 		// Constructors, Destructor
@@ -33,6 +31,8 @@ class SimParams
 			std::string _filename
 			);
 
+		/* SimParams(SimParams &simparams); */
+
 		const double E;
 		const double dt;
 		const double emit_n;
@@ -57,7 +57,7 @@ class SimParams
 		// Data methods
 		// ==================================
 		int z_cov(double (&out)[2][2]);
-		double ion_mass();
+		double ion_mass() const;
 };
 
 #endif

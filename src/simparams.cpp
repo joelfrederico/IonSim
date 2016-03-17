@@ -58,8 +58,7 @@ int SimParams::z_cov(double (&out)[2][2])
 	return 0;
 }
 
-double SimParams::ion_mass()
+double SimParams::ion_mass() const
 {
 	return m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS;
 }
-

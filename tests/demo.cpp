@@ -3,15 +3,20 @@
 
 int main(int argv, char **argc)
 {
-	long x_size = 3;
-	long y_size = 5;
-	long z_size = 7;
-	Field field(x_size, y_size, z_size);
-	for (int k=0; k < z_size; k++)
+	const long X_PTS = 3;
+	const long Y_PTS = 5;
+	const long Z_PTS = 7;
+	
+	const double X_EDGE_MAG = 30e-6;
+	const double Y_EDGE_MAG = 30e-6;
+	const double Z_EDGE_MAG = 30e-6;
+
+	Field field(X_PTS, Y_PTS, Z_PTS, X_EDGE_MAG, Y_EDGE_MAG, Z_EDGE_MAG);
+	for (int k=0; k < Z_PTS; k++)
 	{
-		for (int j=0; j < y_size; j++)
+		for (int j=0; j < Y_PTS; j++)
 		{
-			for (int i=0; i < x_size; i++)
+			for (int i=0; i < X_PTS; i++)
 			{
 				printf("%d, %d: (%0.3e, %0.3e)\n", i, j, field.x(i, j, k), field.x(i, j, k));
 			}

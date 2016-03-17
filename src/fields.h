@@ -12,31 +12,34 @@ class Field
 		// ==================================
 		// Data members
 		// ==================================
-		long _n_pts;
+		const long n_pts;
 
 		// ==================================
 		// Methods
 		// ==================================
 		bool _samedim(const Field &rhs);
-		int _copy(const Field &rhs);
-		int _init(long x_pts, long y_pts, long z_pts);
+		/* int _copy(const Field &rhs); */
+		int _init();
 		long _index(long i, long j, long k);
 
 	public:
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
-		Field(long _x_pts, long _y_pts, long _z_pts);
+		Field(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag);
 		Field(SimParams &simparams);
-		Field(const Field &rhs);
 		~Field();
 
 		// ==================================
 		// Data members
 		// ==================================
-		long x_pts;
-		long y_pts;
-		long z_pts;
+		const long x_pts;
+		const long y_pts;
+		const long z_pts;
+
+		const double x_edge_mag;
+		const double y_edge_mag;
+		const double z_edge_mag;
 
 		double *x_data;
 		double *y_data;
@@ -50,7 +53,6 @@ class Field
 		// ==================================
 		// Operators
 		// ==================================
-		Field &operator=(const Field &rhs);
 		Field &operator+=(const Field &rhs);
 		Field &operator-=(const Field &rhs);
 		template <class T>
