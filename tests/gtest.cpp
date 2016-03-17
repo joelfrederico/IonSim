@@ -25,9 +25,9 @@ FieldTest::FieldTest() :
 void FieldTest::custom_init()
 {
 	int count = 0;
-	for (int j=0; j < y_size; j++)
+	for (long j=0; j < y_size; j++)
 	{
-		for (int i=0; i < x_size; i++)
+		for (long i=0; i < x_size; i++)
 		{
 			field.Ex(i, j) = count;
 			field.Ey(i, j) = -count;
@@ -54,18 +54,18 @@ TEST_F(FieldTest, IsZeroInitially)
 
 TEST_F(FieldTest, AssigmentWorks)
 {
-	for (int i=0; i < x_size; i++)
+	for (long i=0; i < x_size; i++)
 	{
-		for (int j=0; j < y_size; j++)
+		for (long j=0; j < y_size; j++)
 		{
 			field.Ex(i, j) = i*j;
 			field.Ey(i, j) = i*j*2;
 		}
 	}
 
-	for (int i=0; i < x_size; i++)
+	for (long i=0; i < x_size; i++)
 	{
-		for (int j=0; j < y_size; j++)
+		for (long j=0; j < y_size; j++)
 		{
 			EXPECT_EQ(field.Ex(i, j), i*j)   << "At location (" << i << ", " << j << ")";
 			EXPECT_EQ(field.Ey(i, j), i*j*2) << "At location (" << i << ", " << j << ")";

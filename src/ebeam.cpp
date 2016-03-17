@@ -227,7 +227,7 @@ int Ebeam::field(Field &field)
 	double xx, yy, xt, yt, Ex, Ey, Et;
 	double var_x_minus_var_y = var_x-var_y;
 	
-	for (int i=0; i < field.x_pts; i++)
+	for (long i=0; i < field.x_pts; i++)
 	{
 		xt = field.i_to_x(i);
 		if (sx_bigger)
@@ -237,7 +237,7 @@ int Ebeam::field(Field &field)
 			yy = xt;
 		}
 
-		for (int j=0; j < field.y_pts; j++)
+		for (long j=0; j < field.y_pts; j++)
 		{
 			yt = field.j_to_y(j);
 			if (sx_bigger)

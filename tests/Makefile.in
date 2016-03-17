@@ -550,7 +550,7 @@ gtest_SOURCES = gtest.cpp \
 
 
 # gtest_LDADD=$(MYLDADD) libgtest.la
-gtest_LDADD = libgtest.la $(HDF5_LIBS)
+gtest_LDADD = libgtest.la $(MYLDADD)
 gtest_LDFLAGS = -pthread -L/opt/local/lib
 gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
 demo_SOURCES = demo.cpp \

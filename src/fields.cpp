@@ -1,5 +1,6 @@
 #include "fields.h"
 #include "support_func.h"
+#include <gsl/gsl_interp2d.h>
 
 // ==================================
 // Constructors, Destructor
@@ -9,7 +10,8 @@ Field::Field(long _x_pts, long _y_pts, double _x_edge_mag, double _y_edge_mag) :
 	y_pts(_y_pts),
 	n_pts(_x_pts*_y_pts),
 	x_edge_mag(_x_edge_mag),
-	y_edge_mag(_y_edge_mag)
+	y_edge_mag(_y_edge_mag),
+	T(gsl_interp2d_bicubic)
 {
 	_init();
 }
@@ -19,7 +21,8 @@ Field::Field(SimParams &simparams) :
 	y_pts(simparams.n_field_y),
 	n_pts(simparams.n_field_x*simparams.n_field_y),
 	x_edge_mag(simparams.radius),
-	y_edge_mag(simparams.radius)
+	y_edge_mag(simparams.radius),
+	T(gsl_interp2d_bicubic)
 {
 	_init();
 }
@@ -28,6 +31,12 @@ Field::~Field()
 {
 	delete[] x_data;
 	delete[] y_data;
+	delete[] x_grid;
+	delete[] y_grid;
+	gsl_spline2d_free(splinex);
+	gsl_spline2d_free(spliney);
+	gsl_interp_accel_free(xacc);
+	gsl_interp_accel_free(yacc);
 }
 
 // ==================================
@@ -47,6 +56,13 @@ int Field::_init()
 {
 	x_data  = new double[n_pts];
 	y_data  = new double[n_pts];
+	x_grid = new double[n_pts];
+	y_grid = new double[n_pts];
+
+	splinex = gsl_spline2d_alloc(T, n_pts, n_pts);
+	spliney = gsl_spline2d_alloc(T, n_pts, n_pts);
+	xacc    = gsl_interp_accel_alloc();
+	yacc    = gsl_interp_accel_alloc();
 
 	dxdi = x_edge_mag * 2 / (x_pts-1);
 	dydj = y_edge_mag * 2 / (y_pts-1);
@@ -106,6 +122,16 @@ double &Field::Ex(long i, long j)
 double &Field::Ey(long i, long j)
 {
 	return y_data[_index(i, j)];
+}
+
+double Field::Ex(double x, double y)
+{
+	return gsl_spline2d_eval(splinex, x, y, xacc, yacc);
+}
+
+double Field::Ey(double x, double y)
+{
+	return gsl_spline2d_eval(spliney, x, y, xacc, yacc);
 }
 
 double Field::i(double _x, double _y)

@@ -3,6 +3,8 @@
 
 #include "consts.h"
 #include "parts.h"
+#include <gsl/gsl_interp2d.h>
+#include <gsl/gsl_spline2d.h>
 
 class Field;
 
@@ -28,6 +30,13 @@ class Field
 
 		int _array_alloc(double ** (&out), double *data);
 
+		const gsl_interp2d_type *T;
+		gsl_spline2d *splinex;
+		gsl_spline2d *spliney;
+		gsl_interp_accel *xacc;
+		gsl_interp_accel *yacc;
+
+		double *x_grid, *y_grid;
 	public:
 		// ==================================
 		// Constructors, Destructor
@@ -53,6 +62,9 @@ class Field
 		// ==================================
 		double &Ex(long i, long j);
 		double &Ey(long i, long j);
+		double Ex(double x, double y);
+		double Ey(double x, double y);
+
 		double i_to_x(long i);
 		double j_to_y(long j);
 		double i(double _x, double _y);
