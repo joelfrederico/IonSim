@@ -103,7 +103,7 @@ bool Field::_init_splines()
 	return true;
 }
 
-long Field::_index(long i, long j)
+long Field::_index(long i, long j) const
 {
 	long index = i + j*x_pts;
 	return index;
@@ -148,6 +148,11 @@ int Field::y_array_alloc(double ** (&out), long k)
 double &Field::Ex_ind(long i, long j)
 {
 	splines_valid = false;
+	return x_data[_index(i, j)];
+}
+
+double Field::Ex_ind(long i, long j) const
+{
 	return x_data[_index(i, j)];
 }
 

@@ -1,11 +1,12 @@
 #ifndef __SUPPORT_FUNC_H_INCLUDED__
 #define __SUPPORT_FUNC_H_INCLUDED__
 
-#include "mpi.h"
+#include <mpi.h>
 #include <string>
 #include "parts.h"
-#include "hdf5.h"
+#include <hdf5.h>
 #include <gsl/gsl_const_mksa.h>
+#include "fields.h"
 
 namespace ionsim
 {
@@ -69,6 +70,7 @@ namespace ionsim
 	}
 
 	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam);
+	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Field &field);
 	
 	// ==================================
 	// Consts

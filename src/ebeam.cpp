@@ -1,4 +1,5 @@
 #include "ebeam.h"
+#include <mpi.h>
 #include "beam.h"
 #include <gsl/gsl_const_mksa.h>
 #include <gsl/gsl_randist.h>

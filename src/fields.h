@@ -5,6 +5,7 @@
 #include "parts.h"
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
+#include <mpi.h>
 
 class Field;
 
@@ -28,7 +29,7 @@ class Field
 		bool _samedim(const Field &rhs);
 		/* int _copy(const Field &rhs); */
 		int _init();
-		long _index(long i, long j);
+		long _index(long i, long j) const;
 
 		int _array_alloc(double ** (&out), double *data);
 
@@ -65,6 +66,7 @@ class Field
 		// Methods
 		// ==================================
 		double &Ex_ind(long i, long j);
+		double Ex_ind(long i, long j) const;
 		double &Ey_ind(long i, long j);
 		double Ex(double x, double y);
 		double Ey(double x, double y);
@@ -76,6 +78,8 @@ class Field
 
 		int x_array_alloc(double ** (&out), long k);
 		int y_array_alloc(double ** (&out), long k);
+
+		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
 
 		// ==================================
 		// Operators

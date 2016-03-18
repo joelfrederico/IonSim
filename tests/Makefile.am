@@ -17,7 +17,6 @@ gtest_SOURCES = gtest.cpp \
 		../src/fields.cpp \
 		../src/support_func.cpp
 
-# gtest_LDADD=$(MYLDADD) libgtest.la
 gtest_LDADD = libgtest.la $(MYLDADD)
 
 gtest_LDFLAGS = -pthread -L/opt/local/lib

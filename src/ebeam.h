@@ -3,7 +3,7 @@
 
 #include "parts.h"
 #include "beam.h"
-#include "mpi.h"
+#include <mpi.h>
 #include <complex>
 #include "consts.h"
 #include "fields.h"

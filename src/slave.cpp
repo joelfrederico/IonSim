@@ -30,17 +30,17 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 
 	const double m_e = GSL_CONST_MKSA_MASS_ELECTRON;
 
-	// ==============================
+	// ==================================
 	// Receive starting gun
-	// ==============================
+	// ==================================
 	MPI::Status status;
 
 	MPI::COMM_WORLD.Recv(&buf, 1, MPI::INT, MPI::ANY_SOURCE, MPI::ANY_TAG, status);
 	printf("Slave %d says: **DUM DUM DUM DUM**\n", id);
 
-	// ==============================
+	// ==================================
 	// Receive run info
-	// ==============================
+	// ==================================
 	// Receive numerical parameters
 	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&n_ions       , 1 , MPI::LONG   , 0);
@@ -72,9 +72,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	filename = std::string(cbuf);
 	delete [] cbuf;
 
-	// ==============================
+	// ==================================
 	// Make simparams
-	// ==============================
+	// ==================================
 	SimParams simparams(
 		E,
 		dt,
@@ -97,14 +97,14 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 		filename
 		);
 
-	// ==============================
-	// Create output file
-	// ==============================
+	// ==================================
+	// Collectively create output file
+	// ==================================
 	ionsim::overwrite_file(filename, slave_comm_id);
 
-	// ==============================
+	// ==================================
 	// Write attributes
-	// ==============================
+	// ==================================
 	ionsim::writeattribute("n_e"       , n_e       , filename , slave_comm_id);
 	ionsim::writeattribute("n_ions"    , n_ions    , filename , slave_comm_id);
 	ionsim::writeattribute("q_tot"     , q_tot     , filename , slave_comm_id);
@@ -122,16 +122,16 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	ionsim::writeattribute("n_field_y" , n_field_y , filename , slave_comm_id);
 	ionsim::writeattribute("n_field_z" , n_field_z , filename , slave_comm_id);
 
-	// ==============================
+	// ==================================
 	// Recalculate to distribute
 	// simulation across nodes
-	// ==============================
+	// ==================================
 	n_e   /= (p-1);
 	n_ions /= (p-1);
 
-	// ==============================
+	// ==================================
 	// Generate beam
-	// ==============================
+	// ==================================
 	double nb_0, sr;
 
 	Emit emit;
@@ -157,14 +157,14 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 
 	Ebeam ebeam(simparams, x_beam, y_beam);
 
-	// ==============================
+	// ==================================
 	// Generate ions
-	// ==============================
+	// ==================================
 	Ions ions(simparams, plas, n_ions, radius, length);
 
-	// ==============================
+	// ==================================
 	// Generate field
-	// ==============================
+	// ==================================
 	bool loop_alive = true;
 	do
 	{
