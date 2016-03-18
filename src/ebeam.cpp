@@ -260,8 +260,8 @@ int Ebeam::field(Field &field)
 				Ey = -Et;
 			}
 
-			field.Ex(i, j) = Ex;
-			field.Ey(i, j) = Ey;
+			field.Ex_ind(i, j) = Ex;
+			field.Ey_ind(i, j) = Ey;
 		}
 	}
 	return 0;

@@ -20,6 +20,8 @@ class Field
 		double mid_i;
 		double mid_j;
 
+		bool splines_valid;
+
 		// ==================================
 		// Private methods
 		// ==================================
@@ -35,6 +37,8 @@ class Field
 		gsl_spline2d *spliney;
 		gsl_interp_accel *xacc;
 		gsl_interp_accel *yacc;
+
+		bool _init_splines();
 
 		double *x_grid, *y_grid;
 	public:
@@ -60,8 +64,8 @@ class Field
 		// ==================================
 		// Methods
 		// ==================================
-		double &Ex(long i, long j);
-		double &Ey(long i, long j);
+		double &Ex_ind(long i, long j);
+		double &Ey_ind(long i, long j);
 		double Ex(double x, double y);
 		double Ey(double x, double y);
 

@@ -54,13 +54,23 @@ bool Field::_samedim(const Field &rhs)
 
 int Field::_init()
 {
-	x_data  = new double[n_pts];
-	y_data  = new double[n_pts];
-	x_grid = new double[n_pts];
-	y_grid = new double[n_pts];
+	x_data = new double[n_pts];
+	y_data = new double[n_pts];
+	x_grid = new double[x_pts];
+	y_grid = new double[y_pts];
 
-	splinex = gsl_spline2d_alloc(T, n_pts, n_pts);
-	spliney = gsl_spline2d_alloc(T, n_pts, n_pts);
+	for (long i=0; i < n_pts; i++)
+	{
+		x_data[i] = double(0);
+		y_data[i] = double(0);
+	}
+
+	/* std::cout << "n_pts: " << n_pts << std::endl; */
+	/* std::cout << "x_pts: " << x_pts << std::endl; */
+	/* std::cout << "y_pts: " << y_pts << std::endl; */
+
+	splinex = gsl_spline2d_alloc(T, x_pts, y_pts);
+	spliney = gsl_spline2d_alloc(T, x_pts, y_pts);
 	xacc    = gsl_interp_accel_alloc();
 	yacc    = gsl_interp_accel_alloc();
 
@@ -69,7 +79,28 @@ int Field::_init()
 
 	mid_i = x_pts / 2;
 	mid_j = y_pts / 2;
+	for (long i=0; i < x_pts; i++)
+	{
+		x_grid[i] = i_to_x(i);
+		/* std::cout << x_grid[i] << std::endl; */
+	}
+	for (long j=0; j < y_pts; j++)
+	{
+		y_grid[j] = j_to_y(j);
+		/* std::cout << y_grid[j] << std::endl; */
+	}
+
+	splines_valid = _init_splines();
+
 	return 0;
+}
+
+bool Field::_init_splines()
+{
+	gsl_spline2d_init(splinex, x_grid, y_grid, x_data, x_pts, y_pts);
+	gsl_spline2d_init(spliney, x_grid, y_grid, y_data, x_pts, y_pts);
+	
+	return true;
 }
 
 long Field::_index(long i, long j)
@@ -114,23 +145,33 @@ int Field::y_array_alloc(double ** (&out), long k)
 // ==================================
 // Public methods
 // ==================================
-double &Field::Ex(long i, long j)
+double &Field::Ex_ind(long i, long j)
 {
+	splines_valid = false;
 	return x_data[_index(i, j)];
 }
 
-double &Field::Ey(long i, long j)
+double &Field::Ey_ind(long i, long j)
 {
+	splines_valid = false;
 	return y_data[_index(i, j)];
 }
 
 double Field::Ex(double x, double y)
 {
+	if (!splines_valid)
+	{
+		splines_valid = _init_splines();
+	}
 	return gsl_spline2d_eval(splinex, x, y, xacc, yacc);
 }
 
 double Field::Ey(double x, double y)
 {
+	if (!splines_valid)
+	{
+		splines_valid = _init_splines();
+	}
 	return gsl_spline2d_eval(spliney, x, y, xacc, yacc);
 }
 

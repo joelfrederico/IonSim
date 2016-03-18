@@ -3,9 +3,9 @@
 #include "fields.h"
 #include "support_func.h"
 
-const long X_PTS = 3;
-const long Y_PTS = 5;
-const long Z_PTS = 7;
+const long X_PTS = 13;
+const long Y_PTS = 15;
+const long Z_PTS = 17;
 
 const double X_EDGE_MAG = 30e-6;
 const double Y_EDGE_MAG = 30e-6;
@@ -29,8 +29,8 @@ void FieldTest::custom_init()
 	{
 		for (long i=0; i < x_size; i++)
 		{
-			field.Ex(i, j) = count;
-			field.Ey(i, j) = -count;
+			field.Ex_ind(i, j) = count;
+			field.Ey_ind(i, j) = -count;
 			count++;
 		}
 	}
@@ -39,15 +39,12 @@ void FieldTest::custom_init()
 
 TEST_F(FieldTest, IsZeroInitially)
 {
-	bool pass = true;
-	double re, im;
-
 	for (long i=0; i < x_size; i++)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			EXPECT_EQ(field.Ex(i, j), 0) << "At location (" << i << ", " << j <<")";
-			EXPECT_EQ(field.Ey(i, j), 0) << "At location (" << i << ", " << j <<")";
+			EXPECT_EQ(field.Ex_ind(i, j), 0) << "At location (" << i << ", " << j <<")";
+			EXPECT_EQ(field.Ey_ind(i, j), 0) << "At location (" << i << ", " << j <<")";
 		}
 	}
 }
@@ -58,8 +55,8 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			field.Ex(i, j) = i*j;
-			field.Ey(i, j) = i*j*2;
+			field.Ex_ind(i, j) = i*j;
+			field.Ey_ind(i, j) = i*j*2;
 		}
 	}
 
@@ -67,8 +64,8 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			EXPECT_EQ(field.Ex(i, j), i*j)   << "At location (" << i << ", " << j << ")";
-			EXPECT_EQ(field.Ey(i, j), i*j*2) << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ex_ind(i, j), i*j)   << "At location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ey_ind(i, j), i*j*2) << "At location (" << i << ", " << j << ")";
 		}
 	}
 }
@@ -95,8 +92,8 @@ TEST_F(FieldTest, ArrayIsGood)
 	{
 		for (long i=0; i < x_size; i++)
 		{
-			EXPECT_EQ(field.Ex(i, j), arrx[i][j]) << "Ex at location (" << i << ", " << j << ")";
-			EXPECT_EQ(field.Ey(i, j), arry[i][j]) << "Ey at location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ex_ind(i, j), arrx[i][j]) << "Ex at location (" << i << ", " << j << ")";
+			EXPECT_EQ(field.Ey_ind(i, j), arry[i][j]) << "Ey at location (" << i << ", " << j << ")";
 		}
 	}
 	ionsim::dealloc_2d_array(arrx, rowCount);
