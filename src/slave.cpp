@@ -100,7 +100,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// ==================================
 	// Collectively create output file
 	// ==================================
-	ionsim::overwrite_file(filename, slave_comm_id);
+	ionsim::overwrite_file_parallel(filename, slave_comm_id);
 
 	// ==================================
 	// Write attributes

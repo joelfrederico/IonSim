@@ -285,7 +285,7 @@ namespace ionsim
 		return 0;
 	}
 
-	int overwrite_file(std::string const &filename, MPI::Intracomm &slave_comm_id)
+	int overwrite_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id)
 	{
 		hid_t file_id;
 		hid_t plist_file_id;
@@ -302,6 +302,20 @@ namespace ionsim
 		// ==================================
 		file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_file_id);
 		H5Pclose(plist_file_id);
+		H5Fclose(file_id);
+		
+		return 0;
+	}
+
+	int overwrite_file_serial(std::string const &filename)
+	{
+		hid_t file_id;
+		MPI::Info info;
+
+		// ==================================
+		// Create a new file collectively
+		// ==================================
+		file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 		H5Fclose(file_id);
 		
 		return 0;

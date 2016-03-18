@@ -19,7 +19,8 @@ namespace ionsim
 	hid_t open_file(std::string const &filename, MPI::Intracomm &slave_comm_id);
 	double ** alloc_2d_array(long rowCount, long colCount);
 	int dealloc_2d_array(double ** (&arr), long rowCount);
-	int overwrite_file(std::string const &filename, MPI::Intracomm &slave_comm_id);
+	int overwrite_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id);
+	int overwrite_file_serial(std::string const &filename);
 	int sendloop(const int * message);
 	int sendloop(const int * message, int step);
 
