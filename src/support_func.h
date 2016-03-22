@@ -16,16 +16,19 @@ namespace ionsim
 	double GeV2gamma(double GeV);
 	double gamma2GeV(double gamma);
 	double gaussian(double mean, double sigma);
-	hid_t open_file(std::string const &filename, MPI::Intracomm &slave_comm_id);
+	hid_t open_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id);
+	hid_t open_file(std::string const &filename);
 	double ** alloc_2d_array(long rowCount, long colCount);
 	int dealloc_2d_array(double ** (&arr), long rowCount);
 	int overwrite_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id);
 	int overwrite_file_serial(std::string const &filename);
 	int sendloop(const int * message);
 	int sendloop(const int * message, int step);
+	hid_t group_access(hid_t &file_id, std::string const &group);
+	hid_t group_access(hid_t &file_id, const char *group);
 
 	template <class T>
-	int writeattribute(std::string const &attr_name, T attr_value, std::string const &filename, MPI::Intracomm &slave_comm_id)
+	int writeattribute(hid_t file_id, std::string const &attr_name, T attr_value)
 	{
 		hid_t type_id = H5T_NATIVE_DOUBLE;
 		const std::type_info &type = typeid(attr_value);
@@ -39,14 +42,14 @@ namespace ionsim
 			printf("Couldn't write attribute\n");
 		}
 
-		hid_t file_id, attr_id, dataspace_id;
+		hid_t attr_id, dataspace_id;
 		herr_t status;
 		const hsize_t mysize = 1;
 
 		// ==================================
 		// Open the file
 		// ==================================
-		file_id = ionsim::open_file(filename, slave_comm_id);
+		/* file_id = ionsim::open_file_parallel(filename, slave_comm_id); */
 
 		// ==================================
 		// Create an appropriate dataspace
@@ -65,13 +68,13 @@ namespace ionsim
 		// ==================================
 		// Clean up
 		// ==================================
-		H5Fclose(file_id);
+		/* H5Fclose(file_id); */
 
 		return 0;
 	}
 
 	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam);
-	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Field &field);
+	int dump(std::string const &filename, long step, std::string const &group, std::string const &dataset, const Field &field);
 	
 	// ==================================
 	// Consts

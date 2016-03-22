@@ -79,7 +79,7 @@ class Field
 		int x_array_alloc(double ** (&out), long k);
 		int y_array_alloc(double ** (&out), long k);
 
-		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
+		int dump_serial(std::string const &filename, long step);
 
 		// ==================================
 		// Operators

@@ -43,7 +43,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// ==================================
 	// Receive numerical parameters
 	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_ions       , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_ions      , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&radius      , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&length      , 1 , MPI::DOUBLE , 0);
@@ -105,22 +105,24 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	// ==================================
 	// Write attributes
 	// ==================================
-	ionsim::writeattribute("n_e"       , n_e       , filename , slave_comm_id);
-	ionsim::writeattribute("n_ions"    , n_ions    , filename , slave_comm_id);
-	ionsim::writeattribute("q_tot"     , q_tot     , filename , slave_comm_id);
-	ionsim::writeattribute("radius"    , radius    , filename , slave_comm_id);
-	ionsim::writeattribute("length"    , length    , filename , slave_comm_id);
-	ionsim::writeattribute("E"         , E         , filename , slave_comm_id);
-	ionsim::writeattribute("emit_n"    , emit_n    , filename , slave_comm_id);
-	ionsim::writeattribute("n_p_cgs"   , n_p_cgs   , filename , slave_comm_id);
-	ionsim::writeattribute("m_ion_amu" , m_ion_amu , filename , slave_comm_id);
-	ionsim::writeattribute("sz"        , sz        , filename , slave_comm_id);
-	ionsim::writeattribute("sdelta"    , sdelta    , filename , slave_comm_id);
-	ionsim::writeattribute("dt"        , dt        , filename , slave_comm_id);
-	ionsim::writeattribute("n_steps"   , n_steps   , filename , slave_comm_id);
-	ionsim::writeattribute("n_field_x" , n_field_x , filename , slave_comm_id);
-	ionsim::writeattribute("n_field_y" , n_field_y , filename , slave_comm_id);
-	ionsim::writeattribute("n_field_z" , n_field_z , filename , slave_comm_id);
+	hid_t file_id = ionsim::open_file_parallel(filename, slave_comm_id);
+	ionsim::writeattribute(file_id, "n_e"       , n_e      );
+	ionsim::writeattribute(file_id, "n_ions"    , n_ions   );
+	ionsim::writeattribute(file_id, "q_tot"     , q_tot    );
+	ionsim::writeattribute(file_id, "radius"    , radius   );
+	ionsim::writeattribute(file_id, "length"    , length   );
+	ionsim::writeattribute(file_id, "E"         , E        );
+	ionsim::writeattribute(file_id, "emit_n"    , emit_n   );
+	ionsim::writeattribute(file_id, "n_p_cgs"   , n_p_cgs  );
+	ionsim::writeattribute(file_id, "m_ion_amu" , m_ion_amu);
+	ionsim::writeattribute(file_id, "sz"        , sz       );
+	ionsim::writeattribute(file_id, "sdelta"    , sdelta   );
+	ionsim::writeattribute(file_id, "dt"        , dt       );
+	ionsim::writeattribute(file_id, "n_steps"   , n_steps  );
+	ionsim::writeattribute(file_id, "n_field_x" , n_field_x);
+	ionsim::writeattribute(file_id, "n_field_y" , n_field_y);
+	ionsim::writeattribute(file_id, "n_field_z" , n_field_z);
+	H5Fclose(file_id);
 
 	// ==================================
 	// Recalculate to distribute
@@ -155,7 +157,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id)
 	sr = x_beam.sigma();
 	nb_0 = q_tot / (pow(2*M_PI, 1.5) * sz * sr * sr);
 
-	Ebeam ebeam(simparams, x_beam, y_beam);
+	Ebeam ebeam(simparams, x_beam, y_beam, MPI::COMM_WORLD.Get_rank() + 1);
 
 	// ==================================
 	// Generate ions

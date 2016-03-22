@@ -10,9 +10,10 @@
 // ==============================
 Parts::Parts(double _mass, long _n_pts, parttype _type) : mass(_mass), n_pts(_n_pts), type(_type)
 {
+	_vec_reserve();
 }
 
-long _n_pts(const SimParams &simparams, const parttype type)
+long calc_n_pts(const SimParams &simparams, const parttype type)
 {
 	switch (type)
 	{
@@ -26,8 +27,9 @@ long _n_pts(const SimParams &simparams, const parttype type)
 	return 0;
 }
 
-Parts::Parts(const SimParams &simparams, const parttype _type) : type(_type), mass(simparams.ion_mass()), n_pts(_n_pts(simparams, _type))
+Parts::Parts(const SimParams &simparams, const parttype _type) : type(_type), mass(simparams.ion_mass()), n_pts(calc_n_pts(simparams, _type))
 {
+	_vec_reserve();
 }
 
 // ==============================

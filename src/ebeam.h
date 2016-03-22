@@ -26,7 +26,7 @@ class Ebeam : public Parts
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
-		Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam);
+		Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s);
 		Ebeam(
 				SimParams &simparams,
 				const double n_pts,

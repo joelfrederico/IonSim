@@ -190,6 +190,15 @@ double Field::j(double _x, double _y)
 	return _y / dydj + mid_j;
 }
 
+int Field::dump_serial(std::string const &filename, long step)
+{
+	/* ionsim::serial_dump(filename, step, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Field &field) */
+	std::string group = "field";
+	std::string dataset = "Ex";
+	ionsim::dump(filename, step, group, dataset, *this);
+	return 0;
+}
+
 // ==================================
 // Operators
 // ==================================

@@ -24,7 +24,7 @@ int master(int &p)
 	// ==============================
 	
 	long n_e             = 1e4;
-	long n_ion           = 1e4;
+	long n_ions          = 1e4;
 	double q_tot         = 2e10;
 	double radius        = 2.440175e-7*10;
 	double length        = 100e-6;
@@ -45,7 +45,7 @@ int master(int &p)
 
 	// Send numerical parameters
 	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_ion       , 1 , MPI::LONG   , 0);
+	MPI::COMM_WORLD.Bcast(&n_ions      , 1 , MPI::LONG   , 0);
 	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&radius      , 1 , MPI::DOUBLE , 0);
 	MPI::COMM_WORLD.Bcast(&length      , 1 , MPI::DOUBLE , 0);

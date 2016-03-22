@@ -24,7 +24,13 @@ gtest_LDFLAGS = -pthread -L/opt/local/lib
 gtest_CPPFLAGS =-I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
 
 demo_SOURCES = demo.cpp \
+	       ../src/faddeeva/Faddeeva.cc \
+	       ../src/beam.cpp \
+	       ../src/ebeam.cpp \
+	       ../src/emit.cpp \
 	       ../src/fields.cpp \
+	       ../src/parts.cpp \
+	       ../src/simparams.cpp \
 	       ../src/support_func.cpp
 
 demo_CPPFLAGS =-I$(top_srcdir)/src $(MYAM_CPPFLAGS)

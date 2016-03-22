@@ -1,10 +1,10 @@
-#include "support_func.h"
 #include "consts.h"
-#include <hdf5.h>
-#include <mpi.h>
 #include "fields.h"
+#include "support_func.h"
+#include <hdf5.h>
 #include <iomanip>
 #include <math.h>
+#include <mpi.h>
 #include <sstream>
 #include <string>
 
@@ -53,13 +53,25 @@ namespace ionsim
 		return file_id;
 	}
 
-	hid_t open_file(std::string const &filename, MPI::Intracomm &slave_comm_id)
+	hid_t open_file(std::string const &filename)
 	{
 		hid_t file_id;
 		return H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 	}
 
+	hid_t group_step_access(hid_t &file_id, long step)
+	{
+		char buf[10];
+		sprintf(buf, "Step_%04ld", step);
+		return group_access(file_id, buf);
+	}
+
 	hid_t group_access(hid_t &file_id, std::string const &group)
+	{
+		return group_access(file_id, group.c_str());
+	}
+
+	hid_t group_access(hid_t &file_id, const char *group)
 	{
 		herr_t status;
 		hid_t group_id;
@@ -68,19 +80,18 @@ namespace ionsim
 		// Access or create a new group
 		// ==================================
 		H5Eset_auto(NULL, NULL, NULL);
-		status = H5Gget_info_by_name(file_id, group.c_str(), NULL, H5P_DEFAULT);
+		status = H5Gget_info_by_name(file_id, group, NULL, H5P_DEFAULT);
 		if (status >= 0)
 		{
-			group_id = H5Gopen(file_id, group.c_str(), H5P_DEFAULT);
+			group_id = H5Gopen(file_id, group, H5P_DEFAULT);
 		} else {
-			group_id = H5Gcreate(file_id, group.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+			group_id = H5Gcreate(file_id, group, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		}
 		return group_id;
 	}
 
 	hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset)
 	{
-		std::stringstream dataset_str;
 		hid_t dataset_id;
 
 		dataspace_id = H5Screate_simple(2, count, NULL);
@@ -88,8 +99,7 @@ namespace ionsim
 		// ==================================
 		// Create dataset
 		// ==================================
-		dataset_str << "step_" << std::setfill('0') << std::setw(3) << dataset;
-		dataset_id = H5Dcreate(group_id, dataset_str.str().c_str(), H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		dataset_id = H5Dcreate(group_id, dataset.c_str(), H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		H5Gclose(group_id);
 	
 		return dataset_id;
@@ -103,23 +113,11 @@ namespace ionsim
 		return 0;
 	}
 
-	int serial_dump(std::string const &filename, long step, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Field &field)
+	int dump(std::string const &filename, long step, std::string const &group, std::string const &dataset, const Field &field)
 	{
 		// ==================================
 		// Initialize all variables
 		// ==================================
-		MPI::Info info;
-		int p  = comm.Get_size();
-		int id = comm.Get_rank();
-
-		/* long n_pts             = ebeam.n_pts; */
-		/* const double_vec * _x  = &ebeam.x; */
-		/* const double_vec * _xp = &ebeam.xp; */
-		/* const double_vec * _y  = &ebeam.y; */
-		/* const double_vec * _yp = &ebeam.yp; */
-		/* const double_vec * _z  = &ebeam.z; */
-		/* const double_vec * _zp = &ebeam.zp; */
-
 		long x_len = field.x_pts;
 		long y_len = field.y_pts;
 
@@ -139,27 +137,23 @@ namespace ionsim
 		// ==================================
 		// Open/create file
 		// ==================================
-		file_id = open_file(filename, comm);
+		file_id = open_file(filename);
 	
 		// ==================================
 		// Access or create a new group
 		// ==================================
-		temp_str         = "step_" + std::to_string(step);
-		step_group_id    = group_access(file_id, temp_str);
+		step_group_id    = group_step_access(file_id, step);
 
-		group_id         = group_access(file_id, group);
-
-		temp_str         = "field_x";
-		group_field_x_id = group_access(group_id, temp_str);
+		group_id         = group_access(step_group_id, group);
 
 		// ==================================
-		// Create dataset collectively
+		// Create dataset
 		// ==================================
 		// The total array of particles is (n_pts*num_processes, 6) in size
 		// Remember that each slave has n_pts of different particles!
 		count[0] = x_len;
 		count[1] = y_len;
-		dataset_id = dataset_create(group_field_x_id, dataspace_id, count, dataset); // Updates dataspace_id
+		dataset_id = dataset_create(group_id, dataspace_id, count, dataset); // Updates dataspace_id
 
 		// ==================================
 		// Write dataset rows

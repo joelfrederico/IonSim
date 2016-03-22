@@ -17,7 +17,7 @@
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	// ==================================
 	// Save things
@@ -47,7 +47,8 @@ Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, 
 	// ==================================
 	// Set random number generator seed
 	// ==================================
-	gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1);
+	/* gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1); */
+	gsl_rng_set(r, s);
 
 	// ==================================
 	// Create particles randomly
@@ -117,8 +118,8 @@ double Ebeam::x_mean()
 
 double Ebeam::x_std()
 {
-	double* x = &x[0];
-	return gsl_stats_sd(x, 1, n_pts);
+	double* x_local = &x[0];
+	return gsl_stats_sd_m(x_local, 1, n_pts, 0);
 }
 
 double Ebeam::y_mean()
@@ -129,8 +130,8 @@ double Ebeam::y_mean()
 
 double Ebeam::y_std()
 {
-	double* y = &y[0];
-	return gsl_stats_sd(y, 1, n_pts);
+	double* y_local = &y[0];
+	return gsl_stats_sd_m(y_local, 1, n_pts, 0);
 }
 
 Ebeam Ebeam::between(double z0, double z1)
@@ -211,22 +212,25 @@ Ebeam Ebeam::between(double z0, double z1)
 
 int Ebeam::field(Field &field)
 {
-	complex_double E;
-	double sx = x_std();
-	double sy = y_std();
+	double sx, sy, var_x, var_y, var_x_minus_var_y, a, b, f, temp;
+	double xx, yy, xt, yt, Ex, Ey, Et;
+	bool sx_bigger;
 
-	bool sx_bigger = (sx > sy);
+	complex_double E;
+
+	sx = x_std();
+	sy = y_std();
+
+	sx_bigger = (sx > sy);
 	if (!sx_bigger)
 	{
 		std::swap(sx, sy);
 	}
 
-	double var_x = pow(sx, 2);
-	double var_y = pow(sx, 2);
-	double a, b, f;
+	var_x = pow(sx, 2);
+	var_y = pow(sx, 2);
 
-	double xx, yy, xt, yt, Ex, Ey, Et;
-	double var_x_minus_var_y = var_x-var_y;
+	var_x_minus_var_y = var_x-var_y;
 	
 	for (long i=0; i < field.x_pts; i++)
 	{
@@ -248,17 +252,34 @@ int Ebeam::field(Field &field)
 				xx = -yt;
 			}
 
-			f = sqrt(2*var_x_minus_var_y);
-			b = yy / f;
-			a = xx / f;
-			E = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)) * ( Faddeeva::w(complex_double(xx, yy)/f) - gsl_sf_exp(-pow(xx,2)/(2*var_x)+pow(yy,2)/(2*var_y))* Faddeeva::w(complex_double(xx*sy/sx, yy*sx/sy)/f) );
-			Ex = E.imag();
-			Ey = E.real();
-			if (!sx_bigger) 
-			{ 
-				Et = Ex;
-				Ex = Ey;
-				Ey = -Et;
+			if (var_x_minus_var_y < 1e-2)
+			{
+				temp = xx*xx + yy*yy;
+				Et = (qpp*n_pts / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY));
+				if (temp == 0)
+				{
+					Ex = Et / (2*sx*sx);
+					Ey = Ex;
+				} else {
+					Ex = -Et * gsl_sf_expm1(-temp/(2*sx*sx))/temp;
+					Ey = Ex;
+				}
+			} else {
+				f = sqrt(2*var_x_minus_var_y);
+				b = yy / f;
+				a = xx / f;
+				temp = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y));
+				E =  temp * ( Faddeeva::w(complex_double(xx, yy)/f) - gsl_sf_exp(-pow(xx,2)/(2*var_x)+pow(yy,2)/(2*var_y))* Faddeeva::w(complex_double(xx*sy/sx, yy*sx/sy)/f) );
+
+				Ex = E.imag();
+				Ey = E.real();
+				/* std::cout << var_x_minus_var_y << std::endl; */
+				if (!sx_bigger) 
+				{ 
+					Et = Ex;
+					Ex = Ey;
+					Ey = -Et;
+				}
 			}
 
 			field.Ex_ind(i, j) = Ex;

@@ -114,7 +114,11 @@ am__v_lt_1 =
 libgtest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libgtest_la_LDFLAGS) $(LDFLAGS) -o $@
-am_demo_OBJECTS = demo-demo.$(OBJEXT) ../src/demo-fields.$(OBJEXT) \
+am_demo_OBJECTS = demo-demo.$(OBJEXT) \
+	../src/faddeeva/demo-Faddeeva.$(OBJEXT) \
+	../src/demo-beam.$(OBJEXT) ../src/demo-ebeam.$(OBJEXT) \
+	../src/demo-emit.$(OBJEXT) ../src/demo-fields.$(OBJEXT) \
+	../src/demo-parts.$(OBJEXT) ../src/demo-simparams.$(OBJEXT) \
 	../src/demo-support_func.$(OBJEXT)
 demo_OBJECTS = $(am_demo_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -552,7 +556,13 @@ gtest_LDADD = libgtest.la $(MYLDADD)
 gtest_LDFLAGS = -pthread -L/opt/local/lib
 gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
 demo_SOURCES = demo.cpp \
+	       ../src/faddeeva/Faddeeva.cc \
+	       ../src/beam.cpp \
+	       ../src/ebeam.cpp \
+	       ../src/emit.cpp \
 	       ../src/fields.cpp \
+	       ../src/parts.cpp \
+	       ../src/simparams.cpp \
 	       ../src/support_func.cpp
 
 demo_CPPFLAGS = -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
@@ -622,13 +632,32 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../src/faddeeva/$(am__dirstamp):
+	@$(MKDIR_P) ../src/faddeeva
+	@: > ../src/faddeeva/$(am__dirstamp)
+../src/faddeeva/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../src/faddeeva/$(DEPDIR)
+	@: > ../src/faddeeva/$(DEPDIR)/$(am__dirstamp)
+../src/faddeeva/demo-Faddeeva.$(OBJEXT):  \
+	../src/faddeeva/$(am__dirstamp) \
+	../src/faddeeva/$(DEPDIR)/$(am__dirstamp)
 ../src/$(am__dirstamp):
 	@$(MKDIR_P) ../src
 	@: > ../src/$(am__dirstamp)
 ../src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ../src/$(DEPDIR)
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
+../src/demo-beam.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/demo-ebeam.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/demo-emit.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/demo-fields.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/demo-parts.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/demo-simparams.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/demo-support_func.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
@@ -650,15 +679,22 @@ mostlyclean-compile:
 	-rm -f ../googletest/googletest/src/*.$(OBJEXT)
 	-rm -f ../googletest/googletest/src/*.lo
 	-rm -f ../src/*.$(OBJEXT)
+	-rm -f ../src/faddeeva/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@../googletest/googletest/src/$(DEPDIR)/libgtest_la-gtest-all.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-beam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-ebeam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-emit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-fields.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-parts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/demo-support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-fields.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-support_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/demo-demo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-gtest.Po@am__quote@
 
@@ -707,6 +743,62 @@ demo-demo.obj: demo.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o demo-demo.obj `if test -f 'demo.cpp'; then $(CYGPATH_W) 'demo.cpp'; else $(CYGPATH_W) '$(srcdir)/demo.cpp'; fi`
 
+../src/faddeeva/demo-Faddeeva.o: ../src/faddeeva/Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/faddeeva/demo-Faddeeva.o -MD -MP -MF ../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Tpo -c -o ../src/faddeeva/demo-Faddeeva.o `test -f '../src/faddeeva/Faddeeva.cc' || echo '$(srcdir)/'`../src/faddeeva/Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Tpo ../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/faddeeva/Faddeeva.cc' object='../src/faddeeva/demo-Faddeeva.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/faddeeva/demo-Faddeeva.o `test -f '../src/faddeeva/Faddeeva.cc' || echo '$(srcdir)/'`../src/faddeeva/Faddeeva.cc
+
+../src/faddeeva/demo-Faddeeva.obj: ../src/faddeeva/Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/faddeeva/demo-Faddeeva.obj -MD -MP -MF ../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Tpo -c -o ../src/faddeeva/demo-Faddeeva.obj `if test -f '../src/faddeeva/Faddeeva.cc'; then $(CYGPATH_W) '../src/faddeeva/Faddeeva.cc'; else $(CYGPATH_W) '$(srcdir)/../src/faddeeva/Faddeeva.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Tpo ../src/faddeeva/$(DEPDIR)/demo-Faddeeva.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/faddeeva/Faddeeva.cc' object='../src/faddeeva/demo-Faddeeva.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/faddeeva/demo-Faddeeva.obj `if test -f '../src/faddeeva/Faddeeva.cc'; then $(CYGPATH_W) '../src/faddeeva/Faddeeva.cc'; else $(CYGPATH_W) '$(srcdir)/../src/faddeeva/Faddeeva.cc'; fi`
+
+../src/demo-beam.o: ../src/beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-beam.o -MD -MP -MF ../src/$(DEPDIR)/demo-beam.Tpo -c -o ../src/demo-beam.o `test -f '../src/beam.cpp' || echo '$(srcdir)/'`../src/beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-beam.Tpo ../src/$(DEPDIR)/demo-beam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/beam.cpp' object='../src/demo-beam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-beam.o `test -f '../src/beam.cpp' || echo '$(srcdir)/'`../src/beam.cpp
+
+../src/demo-beam.obj: ../src/beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-beam.obj -MD -MP -MF ../src/$(DEPDIR)/demo-beam.Tpo -c -o ../src/demo-beam.obj `if test -f '../src/beam.cpp'; then $(CYGPATH_W) '../src/beam.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/beam.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-beam.Tpo ../src/$(DEPDIR)/demo-beam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/beam.cpp' object='../src/demo-beam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-beam.obj `if test -f '../src/beam.cpp'; then $(CYGPATH_W) '../src/beam.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/beam.cpp'; fi`
+
+../src/demo-ebeam.o: ../src/ebeam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-ebeam.o -MD -MP -MF ../src/$(DEPDIR)/demo-ebeam.Tpo -c -o ../src/demo-ebeam.o `test -f '../src/ebeam.cpp' || echo '$(srcdir)/'`../src/ebeam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-ebeam.Tpo ../src/$(DEPDIR)/demo-ebeam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/ebeam.cpp' object='../src/demo-ebeam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-ebeam.o `test -f '../src/ebeam.cpp' || echo '$(srcdir)/'`../src/ebeam.cpp
+
+../src/demo-ebeam.obj: ../src/ebeam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-ebeam.obj -MD -MP -MF ../src/$(DEPDIR)/demo-ebeam.Tpo -c -o ../src/demo-ebeam.obj `if test -f '../src/ebeam.cpp'; then $(CYGPATH_W) '../src/ebeam.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/ebeam.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-ebeam.Tpo ../src/$(DEPDIR)/demo-ebeam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/ebeam.cpp' object='../src/demo-ebeam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-ebeam.obj `if test -f '../src/ebeam.cpp'; then $(CYGPATH_W) '../src/ebeam.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/ebeam.cpp'; fi`
+
+../src/demo-emit.o: ../src/emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-emit.o -MD -MP -MF ../src/$(DEPDIR)/demo-emit.Tpo -c -o ../src/demo-emit.o `test -f '../src/emit.cpp' || echo '$(srcdir)/'`../src/emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-emit.Tpo ../src/$(DEPDIR)/demo-emit.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/emit.cpp' object='../src/demo-emit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-emit.o `test -f '../src/emit.cpp' || echo '$(srcdir)/'`../src/emit.cpp
+
+../src/demo-emit.obj: ../src/emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-emit.obj -MD -MP -MF ../src/$(DEPDIR)/demo-emit.Tpo -c -o ../src/demo-emit.obj `if test -f '../src/emit.cpp'; then $(CYGPATH_W) '../src/emit.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/emit.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-emit.Tpo ../src/$(DEPDIR)/demo-emit.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/emit.cpp' object='../src/demo-emit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-emit.obj `if test -f '../src/emit.cpp'; then $(CYGPATH_W) '../src/emit.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/emit.cpp'; fi`
+
 ../src/demo-fields.o: ../src/fields.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-fields.o -MD -MP -MF ../src/$(DEPDIR)/demo-fields.Tpo -c -o ../src/demo-fields.o `test -f '../src/fields.cpp' || echo '$(srcdir)/'`../src/fields.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-fields.Tpo ../src/$(DEPDIR)/demo-fields.Po
@@ -720,6 +812,34 @@ demo-demo.obj: demo.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/fields.cpp' object='../src/demo-fields.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-fields.obj `if test -f '../src/fields.cpp'; then $(CYGPATH_W) '../src/fields.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/fields.cpp'; fi`
+
+../src/demo-parts.o: ../src/parts.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-parts.o -MD -MP -MF ../src/$(DEPDIR)/demo-parts.Tpo -c -o ../src/demo-parts.o `test -f '../src/parts.cpp' || echo '$(srcdir)/'`../src/parts.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-parts.Tpo ../src/$(DEPDIR)/demo-parts.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/parts.cpp' object='../src/demo-parts.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-parts.o `test -f '../src/parts.cpp' || echo '$(srcdir)/'`../src/parts.cpp
+
+../src/demo-parts.obj: ../src/parts.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-parts.obj -MD -MP -MF ../src/$(DEPDIR)/demo-parts.Tpo -c -o ../src/demo-parts.obj `if test -f '../src/parts.cpp'; then $(CYGPATH_W) '../src/parts.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/parts.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-parts.Tpo ../src/$(DEPDIR)/demo-parts.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/parts.cpp' object='../src/demo-parts.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-parts.obj `if test -f '../src/parts.cpp'; then $(CYGPATH_W) '../src/parts.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/parts.cpp'; fi`
+
+../src/demo-simparams.o: ../src/simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-simparams.o -MD -MP -MF ../src/$(DEPDIR)/demo-simparams.Tpo -c -o ../src/demo-simparams.o `test -f '../src/simparams.cpp' || echo '$(srcdir)/'`../src/simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-simparams.Tpo ../src/$(DEPDIR)/demo-simparams.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/simparams.cpp' object='../src/demo-simparams.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-simparams.o `test -f '../src/simparams.cpp' || echo '$(srcdir)/'`../src/simparams.cpp
+
+../src/demo-simparams.obj: ../src/simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-simparams.obj -MD -MP -MF ../src/$(DEPDIR)/demo-simparams.Tpo -c -o ../src/demo-simparams.obj `if test -f '../src/simparams.cpp'; then $(CYGPATH_W) '../src/simparams.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/simparams.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/demo-simparams.Tpo ../src/$(DEPDIR)/demo-simparams.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/simparams.cpp' object='../src/demo-simparams.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/demo-simparams.obj `if test -f '../src/simparams.cpp'; then $(CYGPATH_W) '../src/simparams.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/simparams.cpp'; fi`
 
 ../src/demo-support_func.o: ../src/support_func.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(demo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/demo-support_func.o -MD -MP -MF ../src/$(DEPDIR)/demo-support_func.Tpo -c -o ../src/demo-support_func.o `test -f '../src/support_func.cpp' || echo '$(srcdir)/'`../src/support_func.cpp
@@ -1092,6 +1212,8 @@ distclean-generic:
 	-rm -f ../googletest/googletest/src/$(am__dirstamp)
 	-rm -f ../src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ../src/$(am__dirstamp)
+	-rm -f ../src/faddeeva/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../src/faddeeva/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1102,7 +1224,7 @@ clean-am: clean-checkLTLIBRARIES clean-checkPROGRAMS clean-generic \
 	clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ../src/faddeeva/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1148,7 +1270,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ../src/faddeeva/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
