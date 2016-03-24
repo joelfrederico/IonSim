@@ -8,10 +8,13 @@
 
 int main(int argv, char **argc)
 {
+	double x_cov[2][2];
+	double y_cov[2][2];
+
 	long n_e             = 1e4;
 	long n_ions          = 1e4;
 	double q_tot         = 2e10;
-	double radius        = 2.440175e-7*10;
+	double radius        = 6.133e-9;
 	double length        = 100e-6;
 	double E             = 20.35;
 	double emit_n        = 50e-6;
@@ -27,6 +30,23 @@ int main(int argv, char **argc)
 	long n_field_x       = 101;
 	long n_field_y       = 101;
 	long n_field_z       = 101;
+	unsigned long int s  = 1;
+
+	Emit emit;
+	emit.set_emit_n(emit_n, E);
+	Plasma plas(n_p_cgs, m_ion_amu);
+	Match mat(plas, E, emit);
+	Beam x_beam(mat.beta(), mat.alpha(), emit);
+	Beam y_beam(mat.beta(), mat.alpha(), emit);
+
+	x_beam.cov(x_cov);
+	y_beam.cov(y_cov);
+
+	radius = x_beam.sigma()*10;
+
+	/* radius = x_cov[0][0]*0.00001; */
+	printf("Radius: %e\n", radius);
+	printf("X_cov: %e\n", x_cov[0][0]);
 
 	SimParams simparams(
 		E,
@@ -50,25 +70,25 @@ int main(int argv, char **argc)
 		filename
 		);
 	
-	Emit emit;
-	emit.set_emit_n(emit_n, E);
-	Plasma plas(n_p_cgs, m_ion_amu);
-	Match mat(plas, E, emit);
-	Beam x_beam(mat.beta(), mat.alpha(), emit);
-	Beam y_beam(mat.beta(), mat.alpha(), emit);
+	std::cout << simparams.radius << std::endl;
 
-	unsigned long int s = 1;
-	Ebeam ebeam(simparams, x_beam, y_beam, s);
+	
+	Ebeam ebeam(simparams, x_cov[0][0]*5*5, y_cov[0][0]*1, s);
+	/* Ebeam ebeam(simparams, x_beam, y_beam, s); */
 
 	ionsim::overwrite_file_serial(filename);
 
 	Field field(simparams);
+
+
+	std::cout << "Field x_edge_mag: " << field.x_edge_mag << std::endl;
 
 	field.dump_serial(filename, 0);
 
 	ebeam.field(field);
 
 	field.dump_serial(filename, 1);
+	ebeam.dump_serial(filename, 1);
 
 	return 0;
 }

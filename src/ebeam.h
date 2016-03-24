@@ -15,18 +15,18 @@ class Ebeam : public Parts
 		// Private member data
 		// ==================================
 		SimParams _simparams;
-		Beam _x_beam;
-		Beam _y_beam;
+		/* Beam _x_beam; */
+		/* Beam _y_beam; */
 
-		double x_cov[2][2];
-		double y_cov[2][2];
-		double z_cov[2][2];
+
+		int _gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], double y_cov[2][2], double z_cov[2][2]);
 
 	public:
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
 		Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s);
+		Ebeam(SimParams &simparams, double sx, double sy, unsigned long int s);
 		Ebeam(
 				SimParams &simparams,
 				const double n_pts,
@@ -48,6 +48,7 @@ class Ebeam : public Parts
 		// Member methods
 		// ==================================
 		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
+		int dump_serial(std::string const &filename, int step);
 
 		double x_std();
 		double y_std();

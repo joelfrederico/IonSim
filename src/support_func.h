@@ -74,7 +74,8 @@ namespace ionsim
 	}
 
 	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam);
-	int dump(std::string const &filename, long step, std::string const &group, std::string const &dataset, const Field &field);
+	int dump_serial(std::string const &filename, long step, std::string const &group, std::string const &dataset, const Parts &ebeam);
+	int dump(std::string const &filename, long step, std::string const &group, const Field &field);
 	
 	// ==================================
 	// Consts

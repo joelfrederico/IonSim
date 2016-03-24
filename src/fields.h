@@ -68,6 +68,7 @@ class Field
 		double &Ex_ind(long i, long j);
 		double Ex_ind(long i, long j) const;
 		double &Ey_ind(long i, long j);
+		double Ey_ind(long i, long j) const;
 		double Ex(double x, double y);
 		double Ey(double x, double y);
 

@@ -65,10 +65,6 @@ int Field::_init()
 		y_data[i] = double(0);
 	}
 
-	/* std::cout << "n_pts: " << n_pts << std::endl; */
-	/* std::cout << "x_pts: " << x_pts << std::endl; */
-	/* std::cout << "y_pts: " << y_pts << std::endl; */
-
 	splinex = gsl_spline2d_alloc(T, x_pts, y_pts);
 	spliney = gsl_spline2d_alloc(T, x_pts, y_pts);
 	xacc    = gsl_interp_accel_alloc();
@@ -162,6 +158,11 @@ double &Field::Ey_ind(long i, long j)
 	return y_data[_index(i, j)];
 }
 
+double Field::Ey_ind(long i, long j) const
+{
+	return y_data[_index(i, j)];
+}
+
 double Field::Ex(double x, double y)
 {
 	if (!splines_valid)
@@ -193,9 +194,10 @@ double Field::j(double _x, double _y)
 int Field::dump_serial(std::string const &filename, long step)
 {
 	/* ionsim::serial_dump(filename, step, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Field &field) */
-	std::string group = "field";
-	std::string dataset = "Ex";
-	ionsim::dump(filename, step, group, dataset, *this);
+	std::string group;
+	group = "field";
+
+	ionsim::dump(filename, step, group, *this);
 	return 0;
 }
 
