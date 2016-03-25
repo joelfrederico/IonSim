@@ -3,7 +3,7 @@
 
 #include "mpi.h"
 
-int slave(int &p, int &id, MPI::Intracomm &slave_comm_id);
+int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose);
 
 
 #endif

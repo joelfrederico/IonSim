@@ -16,7 +16,7 @@ Field::Field(long _x_pts, long _y_pts, double _x_edge_mag, double _y_edge_mag) :
 	_init();
 }
 
-Field::Field(SimParams &simparams) :
+Field::Field(const SimParams &simparams) :
 	x_pts(simparams.n_field_x),
 	y_pts(simparams.n_field_y),
 	n_pts(simparams.n_field_x*simparams.n_field_y),
@@ -193,11 +193,10 @@ double Field::j(double _x, double _y)
 
 int Field::dump_serial(std::string const &filename, long step)
 {
-	/* ionsim::serial_dump(filename, step, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Field &field) */
 	std::string group;
 	group = "field";
 
-	ionsim::dump(filename, step, group, *this);
+	ionsim::dump_serial(filename, step, group, *this);
 	return 0;
 }
 
@@ -236,4 +235,55 @@ const Field Field::operator+(const Field &rhs)
 const Field Field::operator-(const Field &rhs)
 {
 	return Field(*this) -= rhs;
+}
+
+int Field::recv_field_others()
+{
+	double xbuf[n_pts];
+	double ybuf[n_pts];
+	int p = MPI::COMM_WORLD.Get_size();
+	int my_id = MPI::COMM_WORLD.Get_rank();
+
+	for (int id=0; id < p; id++)
+	{
+		if (id != my_id) {
+			MPI::COMM_WORLD.Recv(xbuf, n_pts, MPI::DOUBLE, id, ionsim::TAG_FIELD);
+			MPI::COMM_WORLD.Recv(ybuf, n_pts, MPI::DOUBLE, id, ionsim::TAG_FIELD);
+
+			for (int j=0; j < n_pts; j++)
+			{
+				x_data[j] += xbuf[j];
+				y_data[j] += ybuf[j];
+			}
+		}
+	}
+
+	return 0;
+}
+
+int Field::recv_field(int sender_id)
+{
+	double xbuf[n_pts];
+	double ybuf[n_pts];
+	int p = MPI::COMM_WORLD.Get_size();
+	int my_id = MPI::COMM_WORLD.Get_rank();
+
+	MPI::COMM_WORLD.Recv(xbuf, n_pts, MPI::DOUBLE, sender_id, ionsim::TAG_FIELD);
+	MPI::COMM_WORLD.Recv(ybuf, n_pts, MPI::DOUBLE, sender_id, ionsim::TAG_FIELD);
+
+	for (int j=0; j < n_pts; j++)
+	{
+		x_data[j] += xbuf[j];
+		y_data[j] += ybuf[j];
+	}
+
+	return 0;
+}
+
+int Field::send_field(int dest_id)
+{
+	MPI::COMM_WORLD.Send(x_data, n_pts, MPI::DOUBLE, dest_id, ionsim::TAG_FIELD);
+	MPI::COMM_WORLD.Send(y_data, n_pts, MPI::DOUBLE, dest_id, ionsim::TAG_FIELD);
+
+	return 0;
 }

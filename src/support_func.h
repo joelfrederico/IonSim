@@ -22,8 +22,10 @@ namespace ionsim
 	int dealloc_2d_array(double ** (&arr), long rowCount);
 	int overwrite_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id);
 	int overwrite_file_serial(std::string const &filename);
-	int sendloop(const int * message);
-	int sendloop(const int * message, int step);
+	int sendloop(const int &message);
+	int loop_get_fields(Field &field);
+	int loop_push_ions(Field &field);
+	int sendloop(const int &message, int step);
 	hid_t group_access(hid_t &file_id, std::string const &group);
 	hid_t group_access(hid_t &file_id, const char *group);
 
@@ -73,23 +75,31 @@ namespace ionsim
 		return 0;
 	}
 
-	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam);
+	int dump_parallel(std::string const &filename, long step, std::string const &dataset, MPI::Intracomm &comm, const Parts &parts);
 	int dump_serial(std::string const &filename, long step, std::string const &group, std::string const &dataset, const Parts &ebeam);
-	int dump(std::string const &filename, long step, std::string const &group, const Field &field);
+	int dump_serial(std::string const &filename, long step, std::string const &group, const Field &field);
 	
 	// ==================================
 	// Consts
 	// ==================================
 	const double ELECTRON_REST_ENERGY = GSL_CONST_MKSA_MASS_ELECTRON * pow(GSL_CONST_MKSA_SPEED_OF_LIGHT, 2);
-	const int TAG_LOOP_INSTRUCT       = 100;
-	const loopflag LOOP_DUMP_E        = 3;
-	const loopflag LOOP_DUMP_IONS     = 2;
-	const loopflag LOOP_GET_EFIELD    = 6;
-	const loopflag LOOP_KILL          = 1;
-	const loopflag LOOP_PUSH_E        = 4;
-	const loopflag LOOP_PUSH_IONS     = 5;
-	const parttype PARTS_E            = 2;
-	const parttype PARTS_ION          = 1;
+
+	const int TAG_LOOP_INSTRUCT = 100;
+	const int TAG_FIELD         = 200;
+
+	const loopflag_t LOOP_DUMP_E     = 3;
+	const loopflag_t LOOP_DUMP_IONS  = 2;
+	const loopflag_t LOOP_GET_EFIELD = 6;
+	const loopflag_t LOOP_KILL       = 1;
+	const loopflag_t LOOP_PUSH_E     = 4;
+	const loopflag_t LOOP_PUSH_IONS  = 5;
+
+	const parttype_t PARTS_E   = 2;
+	const parttype_t PARTS_ION = 1;
+
+	const pushmethod_t PUSH_RUNGE_KUTTA = 1;
+	const pushmethod_t PUSH_SIMPLE      = 2;
+	const pushmethod_t PUSH_FIELD       = 3;
 }
 
 #endif

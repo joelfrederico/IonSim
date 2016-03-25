@@ -2,6 +2,8 @@
 #define __SIMPARAMS_H_INCLUDED__
 
 #include <string>
+#include <mpi.h>
+#include "consts.h"
 
 class SimParams
 {
@@ -22,7 +24,7 @@ class SimParams
 			double _sz,
 			double _t_tot,
 			int _n_steps,
-			int _runge_kutta,
+			pushmethod_t _pushmethod,
 			long _n_e,
 			long _n_field_x,
 			long _n_field_y,
@@ -31,27 +33,48 @@ class SimParams
 			std::string _filename
 			);
 
+		SimParams();
+
+		int bcast_send() const;
+		int bcast_receive();
+
+		int write_attributes_parallel(MPI::Intracomm &slave_comm_id) const;
+
+		template <class T>
+		int bcast_send_wrap(T send) const
+		{
+			T buf = send;
+			if (typeid(send) == typeid(double)) {
+				MPI::COMM_WORLD.Bcast(&buf, 1, MPI::DOUBLE, 0);
+			} else if (typeid(send) == typeid(int)) {
+				MPI::COMM_WORLD.Bcast(&buf, 1, MPI::INT, 0);
+			} else if (typeid(send) == typeid(long)) {
+				MPI::COMM_WORLD.Bcast(&buf, 1, MPI::LONG, 0);
+			} else return 0;
+			return 1;
+		}
+
 		/* SimParams(SimParams &simparams); */
 
-		const double E;
-		const double dt;
-		const double emit_n;
-		const double length;
-		const double m_ion_amu;
-		const double n_p_cgs;
-		const double q_tot;
-		const double radius;
-		const double sdelta;
-		const double sz;
-		const double t_tot;
-		const int n_steps;
-		const int runge_kutta;
-		const long n_e;
-		const long n_field_x;
-		const long n_field_y;
-		const long n_field_z;
-		const long n_ions;
-		const std::string filename;
+		double E;
+		double dt;
+		double emit_n;
+		double length;
+		double m_ion_amu;
+		double n_p_cgs;
+		double q_tot;
+		double radius;
+		double sdelta;
+		double sz;
+		double t_tot;
+		int n_steps;
+		pushmethod_t pushmethod;
+		long n_e;
+		long n_field_x;
+		long n_field_y;
+		long n_field_z;
+		long n_ions;
+		std::string filename;
 
 		// ==================================
 		// Data methods

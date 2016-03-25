@@ -1,4 +1,5 @@
 #include "ions.h"
+#include "fields.h"
 #include <complex>
 #include <sstream>
 #include <gsl/gsl_const_mksa.h>
@@ -11,12 +12,12 @@
 // ==============================
 // Ions
 // ==============================
-Ions::Ions(SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(simparams, ionsim::PARTS_ION)
+Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(simparams, ionsim::PARTS_ION)
 {
 	_plasma      = &plasma;
 	_radius      = radius;
-	printf("Received radius is: %0.6e\n", _radius);
-	printf("Received mass is: %0.6e\n", simparams.ion_mass());
+	/* printf("Received radius is: %0.6e\n", _radius); */
+	/* printf("Received mass is: %0.6e\n", simparams.ion_mass()); */
 
 	_part_charge = plasma.n_p() * length * M_PI * pow(radius, 2) * GSL_CONST_MKSA_ELECTRON_CHARGE;
 
@@ -51,11 +52,9 @@ Ions::Ions(SimParams &simparams, Plasma &plasma, int n_pts, double radius, doubl
 	}
 }
 
-int Ions::dump(std::string const &filename, int step, MPI::Intracomm &comm)
+int Ions::dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm)
 {
-	std::stringstream dataset;
-	dataset << step;
-	ionsim::dump(filename, "ions", dataset.str(), comm, *this);
+	ionsim::dump_parallel(filename, step, "ions", comm, *this);
 	return 0;
 }
 
@@ -116,16 +115,14 @@ int Ions::push(double dt, double nb_0, double sig_r)
 	gsl_odeiv2_step *step = gsl_odeiv2_step_alloc(gsl_odeiv2_step_rk4, 4);
 
 	/* gsl_odeiv2_driver *d = gsl_odeiv2_driver_alloc_y_new(&sys, gsl_odeiv2_step_rk4, dt, sig_r/100, 1e-8); */
-
-
+	
 	for (int i=0; i < n_pts; i++)
 	{
 		double y[] = {x[i], y[i], xp[i], yp[i]};
 		double yerr[4];
-		/* printf("%d Trying\n", p); */
+		/* printf("%d Trying %d\n", p, i); */
 		/* gsl_odeiv2_driver_apply_fixed_step(d, &t, dt, 4, y); */
 		gsl_odeiv2_step_apply(step, t, dt, y, yerr, NULL, NULL, &sys);
-		/* printf("%d Got here\n", p); */
 		x[i]  = y[0];
 		xp[i] = y[2];
 		y[i]  = y[1];
@@ -134,6 +131,7 @@ int Ions::push(double dt, double nb_0, double sig_r)
 		F = F_r(x[i], y[i], nb_0, sig_r);
 		z[i]  = std::abs(F);
 		zp[i] = mass;
+		/* printf("%d Got here\n", p); */
 	}
 
 	/* gsl_odeiv2_driver_free(d); */
@@ -155,6 +153,33 @@ int Ions::push_simple(double dt, double nb_0, double sig_r)
 		xp[i] += F.real() * dt / mass;
 		yp[i] += F.imag() * dt / mass;
 	}
+	return 0;
+}
+
+int Ions::push_field(double dt, Field &field)
+{
+	// ==============================
+	// Gather 
+	// ==============================
+	double Fx, Fy;
+	/* std::complex<double> F; */
+	for (int i=0; i < n_pts; i++)
+	{
+		Fx = GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ex(x[i], y[i]);
+		Fy = GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ey(x[i], y[i]);
+
+		x[i] += xp[i] * dt;
+		y[i] += yp[i] * dt;
+
+		xp[i] += Fx * dt / mass;
+		yp[i] += Fy * dt / mass;
+		if (i==0) {
+			printf("Fx = %e, i: %d, x: %e, y: %e\n", Fx, i, x[i], y[i]);
+			printf("Fx = %e\n", field.Ex_ind(0, 0));
+			printf("x = %e\n", field.i_to_x(0));
+		}
+	}
+	printf("Updated\n");
 	return 0;
 }
 

@@ -17,7 +17,7 @@
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	// ==================================
 	// Save things
@@ -45,7 +45,7 @@ Ebeam::Ebeam(SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s
 	_gen_bivariate_gaussian(s, x_cov, y_cov, z_cov);
 }
 
-Ebeam::Ebeam(SimParams &simparams, double sx, double sy, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(const SimParams &simparams, double sx, double sy, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	// ==================================
 	// Initialize local variables
@@ -119,7 +119,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], doub
 }
 
 Ebeam::Ebeam(
-		SimParams &simparams,
+		const SimParams &simparams,
 		const double n_pts,
 		const double type,
 		double_vec x_in,
@@ -149,11 +149,9 @@ Ebeam::Ebeam(
 // Public Methods
 // ==================================
 
-int Ebeam::dump(std::string const &filename, int step, MPI::Intracomm &comm)
+int Ebeam::dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm)
 {
-	std::stringstream dataset;
-	dataset << step;
-	ionsim::dump(filename, "ebeam", dataset.str(), comm, *this);
+	ionsim::dump_parallel(filename, step, "ebeam", comm, *this);
 	return 0;
 }
 
@@ -269,13 +267,13 @@ int Ebeam::field(Field &field)
 {
 	double sx, sy, var_x, var_y, var_x_minus_var_y, f, temp, rsq, r;
 	double xx, yy, x_in, y_in, xt, yt, Ex, Ey, Et, Em;
-	std::complex<double> cd;
 	bool sx_bigger;
 
 	complex_double E;
 
 	sx = x_std();
 	sy = y_std();
+	/* std::cout << "Sx: " << sx << ", Sy: " << sy << std::endl; */
 
 	sx_bigger = (sx > sy);
 	if (!sx_bigger)
@@ -287,9 +285,11 @@ int Ebeam::field(Field &field)
 	var_y = sy*sy;
 
 	var_x_minus_var_y = var_x-var_y;
-	std::cout << "Left x: " << field.i_to_x(0) << std::endl;
-	std::cout << "Left y: " << field.j_to_y(0) << std::endl;
-	std::cout << "Bigger: " << sx_bigger << std::endl;
+	if (var_x_minus_var_y/var_x == 0) std::cout << "Using symmetric fields" << std::endl;
+	temp = qpp*n_pts * GSL_CONST_MKSA_ELECTRON_CHARGE/GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
+	/* temp = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)); */
+	/* int id = MPI::COMM_WORLD.Get_rank(); */
+	/* printf("Proc: %d, Field with associated charge is: %0.3e\n", id, temp); */
 
 	for (long i=0; i < field.x_pts; i++)
 	{
@@ -311,45 +311,33 @@ int Ebeam::field(Field &field)
 				xx = -yt;
 			}
 
-			if (var_x_minus_var_y/var_x < 1e-2)
-			/* if (false) */
-			/* if (true) */
-			{
-				rsq = xx*xx + yy*yy;
+			rsq = xx*xx + yy*yy;
+			if (rsq == 0) {
+				Ex = 0;
+				Ey = 0;
+			} else if (var_x_minus_var_y/var_x < 1e-3) {
 				r = sqrt(rsq);
-				if (rsq == 0)
-				{
-					Ex = 0;
-					Ey = 0;
-				} else {
-					/* Et = (qpp*n_pts / (GSL_CONST_MKSA_VACUUM_PERMITTIVITY)); */
-					Et = 1;
-					Et *= -gsl_sf_exprel(-rsq/(2*var_x)) * r / (4*M_PI*var_x);
-					/* Et *= (1-exp(-rsq/(2*var_x)))/(4*M_PI*r); */
-					Ex = Et*xx/r;
-					Ey = Et*yy/r;
-				}
+				/* Et = -(qpp*n_pts / (GSL_CONST_MKSA_VACUUM_PERMITTIVITY)); */
+				/* Et = 1; */
+				/* Et = temp * -gsl_sf_exprel(-rsq/(2*var_x)) * r / (4*M_PI*var_x); */
+				Et = temp * (1-exp(-rsq/(2*var_x)))/(2*M_PI*r);
+				Ex = Et*xx/r;
+				Ey = Et*yy/r;
 			} else {
 				y_in = std::abs(yy);
-				/* std::cout << "Using B-E" << std::endl; */
 				f = sqrt(2*var_x_minus_var_y);
-				/* temp = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)); */
-				temp = 1;
-				E =  temp * ( Faddeeva::w(complex_double(xx, y_in)/f) - gsl_sf_exp(-xx*xx/(2*var_x)-y_in*y_in/(2*var_y))* Faddeeva::w(complex_double(xx*sy/sx, y_in*sx/sy)/f) );
+				E =  temp * ( Faddeeva::w(complex_double(xx, y_in)/f) - exp(-xx*xx/(2*var_x)-y_in*y_in/(2*var_y))* Faddeeva::w(complex_double(xx*sy/sx, y_in*sx/sy)/f) ) / (2* sqrt(2*M_PI * var_x_minus_var_y));
 
 				Ex = E.imag();
 				Ey = E.real()*GSL_SIGN(yy);
 
-				/* cd = complex_double(10,5); */
-				/* cd = Faddeeva::w(cd) - gsl_sf_exp(0)* Faddeeva::w(cd); */
-				/* std::cout << "Faddeeva w(0) " << cd << std::endl; */
-				/* std::cout << var_x_minus_var_y << std::endl; */
-				/* if (!sx_bigger) */ 
-				/* { */ 
-				/* 	Et = Ex; */
-				/* 	Ex = Ey; */
-				/* 	Ey = -Et; */
-				/* } */
+			}
+
+			if (!sx_bigger) 
+			{ 
+				Et = Ex;
+				Ex = Ey;
+				Ey = -Et;
 			}
 			/* Ex = sqrt(Ex*Ex+Ey*Ey); */
 

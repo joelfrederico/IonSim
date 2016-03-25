@@ -1,22 +1,40 @@
-#include "main.h"
 #include "config.h"
+#include "main.h"
 
 #include "master.h"
 #include "slave.h"
 
-#include "mpi.h"
+#include <mpi.h>
+#include <unistd.h>
 
 const int INT_TAG = 1;
 
 int main(int argc, char **argv)
 {
-	printf("%d %d %d\n", OMPI_MAJOR_VERSION, 
-OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
+	int id, p, c;
+	int p_slave;
+	int *ranks;
+	MPI::Group world_group_id, slave_group_id;
+	MPI::Intracomm slave_comm_id;
+	bool verbose;
+
+	verbose = false;
+
+	while ((c = getopt (argc, argv, "v")) != -1)
+	{
+		switch (c)
+			{
+			case 'v':
+				verbose = true;
+				break;
+			default:
+				abort ();
+			}
+	}
+
 	// ==============================
 	// Initialize MPI
 	// ==============================
-	int id;
-	int p;
 	MPI::Init(argc, argv);
 
 	// ==============================
@@ -29,17 +47,15 @@ OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
 	// ==============================
 	id = MPI::COMM_WORLD.Get_rank();
 
+	if (verbose && id==0) printf("%d %d %d\n", OMPI_MAJOR_VERSION, OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
 	// ==============================
 	// Create slave comm
 	// ==============================
-	int p_slave = p-1;
-	int *ranks;
-	MPI::Intracomm slave_comm_id;
-	MPI::Group world_group_id = MPI::COMM_WORLD.Get_group();
-	MPI::Group slave_group_id;
+	p_slave = p-1;
+	world_group_id = MPI::COMM_WORLD.Get_group();
 
 	ranks = new int[p_slave];
-	for (int i=0; i < p; i++)
+	for (int i=0; i < p_slave; i++)
 	{
 		ranks[i] = i+1;
 	}
@@ -51,18 +67,26 @@ OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
 	// ==============================
 	// Simulate things
 	// ==============================
-	if (id == 0)
-	{
-		master(p);
-		printf("Master finished\n");
-	}
-	else
-	{
-		slave(p, id, slave_comm_id);
-		printf("Slave %d finished\n", id);
+	if (id == 0) {
+		master(p, verbose);
+	} else {
+		slave(p, id, slave_comm_id, verbose);
 	}
 
 	MPI::Finalize();
+
+	if (verbose)
+	{
+		if (id == 0)
+		{
+			printf("Master finished\n");
+		}
+		else
+		{
+			printf("Slave %d finished\n", id);
+		}
+	}
+
 
 	return 0;
 }

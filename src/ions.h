@@ -5,6 +5,7 @@
 
 #include "mpi.h"
 #include "beam.h"
+#include "fields.h"
 
 class Ions : public Parts
 {
@@ -15,11 +16,12 @@ class Ions : public Parts
 		Plasma * _plasma;
 
 	public:
-		Ions(SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length);
+		Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length);
 
-		int dump(std::string const &filename, int step, MPI::Intracomm &comm);
+		int dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm);
 		int push(double dt, double nb_0, double sig_r);
 		int push_simple(double dt, double nb_0, double sig_r);
+		int push_field(double dt, Field &field);
 };
 
 #endif

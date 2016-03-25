@@ -27,7 +27,6 @@ class Field
 		// Private methods
 		// ==================================
 		bool _samedim(const Field &rhs);
-		/* int _copy(const Field &rhs); */
 		int _init();
 		long _index(long i, long j) const;
 
@@ -47,7 +46,7 @@ class Field
 		// Constructors, Destructor
 		// ==================================
 		Field(long _x_pts, long _y_pts, double _x_edge_mag, double _y_edge_mag);
-		Field(SimParams &simparams);
+		Field(const SimParams &simparams);
 		~Field();
 
 		// ==================================
@@ -81,6 +80,10 @@ class Field
 		int y_array_alloc(double ** (&out), long k);
 
 		int dump_serial(std::string const &filename, long step);
+
+		int recv_field_others();
+		int recv_field(int sender_id);
+		int send_field(int dest_id);
 
 		// ==================================
 		// Operators

@@ -8,26 +8,26 @@
 // ==============================
 // Constructors
 // ==============================
-Parts::Parts(double _mass, long _n_pts, parttype _type) : mass(_mass), n_pts(_n_pts), type(_type)
+Parts::Parts(double _mass, long _n_pts, parttype_t _type) : mass(_mass), n_pts(_n_pts), type(_type)
 {
 	_vec_reserve();
 }
 
-long calc_n_pts(const SimParams &simparams, const parttype type)
+long calc_n_pts(const SimParams &simparams, const parttype_t type)
 {
 	switch (type)
 	{
 		case ionsim::PARTS_ION:
-			return simparams.n_e;
+			return simparams.n_ions;
 			break;
 		case ionsim::PARTS_E:
-			return simparams.n_ions;
+			return simparams.n_e;
 			break;
 	}
 	return 0;
 }
 
-Parts::Parts(const SimParams &simparams, const parttype _type) : type(_type), mass(simparams.ion_mass()), n_pts(calc_n_pts(simparams, _type))
+Parts::Parts(const SimParams &simparams, const parttype_t _type) : type(_type), mass(simparams.ion_mass()), n_pts(calc_n_pts(simparams, _type))
 {
 	_vec_reserve();
 }

@@ -81,14 +81,11 @@ namespace ionsim
 		// Access or create a new group
 		// ==================================
 		H5Eset_auto(NULL, NULL, NULL);
-		status = H5Gget_info_by_name(file_id, group, &objinfo, H5P_DEFAULT);
-		if (status >= 0)
+		group_id = H5Gopen(file_id, group, H5P_DEFAULT);
+		if (group_id < 0)
 		{
-			/* std::cout << "Successful opening: " << group << std::endl; */
-			group_id = H5Gopen(file_id, group, H5P_DEFAULT);
-		} else {
-			/* std::cout << "Unsuccessful opening: " << group << std::endl; */
 			group_id = H5Gcreate(file_id, group, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Gget_info_by_name(file_id, group, &objinfo, H5P_DEFAULT);
 		}
 		return group_id;
 	}
@@ -107,7 +104,7 @@ namespace ionsim
 		return dataset_id;
 	}
 
-	int dump(std::string const &filename, long step, std::string const &group, const Field &field)
+	int dump_serial(std::string const &filename, long step, std::string const &group, const Field &field)
 	{
 		// ==================================
 		// Initialize all variables
@@ -120,7 +117,6 @@ namespace ionsim
 
 		int n_write = MAX_N_WRITE;
 
-		hid_t plist_dx_id;
 		hid_t file_id;
 		hid_t step_group_id, group_id;
 		hid_t x_dataspace_id, y_dataspace_id;
@@ -183,12 +179,20 @@ namespace ionsim
 		// Close file
 		// ==================================
 		/* hdf5_cleanup(x_dataspace_id, y_dataspace_id, x_dataset_id, y_dataset_id, file_id); */
-
+		H5Gclose(step_group_id);
+		H5Gclose(group_id);
+		H5Sclose(x_dataspace_id);
+		H5Sclose(y_dataspace_id);
+		H5Dclose(x_dataset_id);
+		H5Dclose(y_dataset_id);
+		H5Sclose(x_memspace_id);
+		H5Sclose(y_memspace_id);
+		H5Fclose(file_id);
 	
 		return 0;
 	}
 
-	int dump(std::string const &filename, std::string const &group, std::string const &dataset, MPI::Intracomm &comm, const Parts &ebeam)
+	int dump_parallel(std::string const &filename, long step, std::string const &dataset, MPI::Intracomm &comm, const Parts &parts)
 	{
 		// ==================================
 		// Initialize all variables
@@ -197,19 +201,20 @@ namespace ionsim
 		int p  = comm.Get_size();
 		int id = comm.Get_rank();
 
-		long n_pts             = ebeam.n_pts;
-		const double_vec * _x  = &ebeam.x;
-		const double_vec * _xp = &ebeam.xp;
-		const double_vec * _y  = &ebeam.y;
-		const double_vec * _yp = &ebeam.yp;
-		const double_vec * _z  = &ebeam.z;
-		const double_vec * _zp = &ebeam.zp;
+		long n_pts             = parts.n_pts;
+		const double_vec * _x  = &parts.x;
+		const double_vec * _xp = &parts.xp;
+		const double_vec * _y  = &parts.y;
+		const double_vec * _yp = &parts.yp;
+		const double_vec * _z  = &parts.z;
+		const double_vec * _zp = &parts.zp;
+		double *buf;
 
 		int n_write = MAX_N_WRITE;
 
 		hid_t plist_dx_id;
 		hid_t file_id;
-		hid_t group_id;
+		hid_t step_group_id;
 		hid_t dataspace_id;
 		hid_t dataset_id;
 		hid_t memspace_id;
@@ -226,7 +231,7 @@ namespace ionsim
 		// ==================================
 		// Access or create a new group
 		// ==================================
-		group_id = group_access(file_id, group);
+		step_group_id    = group_step_access(file_id, step);
 
 		// ==================================
 		// Create dataset collectively
@@ -235,10 +240,8 @@ namespace ionsim
 		// Remember that each slave has n_pts of different particles!
 		count[0] = n_pts*p;
 		count[1] = 6;
-		dataset_id = dataset_create(group_id, dataspace_id, count, dataset);
+		dataset_id = dataset_create(step_group_id, dataspace_id, count, dataset);
 
-		/* hsize_t offset_init[2] = {n_pts, 0}; */
-	
 		// ==================================
 		// Write dataset rows
 		// ==================================
@@ -247,7 +250,8 @@ namespace ionsim
 	
 		int i=0;
 		if (n_pts < n_write) n_write = n_pts;
-		double buf[n_write*6];
+		/* double buf[n_write*6]; */
+		buf = new double[n_write*6];
 		for (int j=0; i < n_pts; j++)
 		{
 			if (n_pts - i < n_write)
@@ -280,13 +284,13 @@ namespace ionsim
 	
 			status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf);
 		}
+		delete [] buf;
 	
 		// ==================================
 		// Close file
 		// ==================================
 		H5Pclose(plist_dx_id);
-		H5Fclose(file_id);
-		H5Gclose(group_id);
+		H5Gclose(step_group_id);
 		H5Sclose(dataspace_id);
 		H5Dclose(dataset_id);
 		H5Sclose(memspace_id);
@@ -382,11 +386,12 @@ namespace ionsim
 		H5Sclose(step_group_id);
 		H5Sclose(dataspace_id);
 		H5Gclose(group_id);
-		H5Fclose(file_id);
 
 		H5Sclose(dataspace_id);
 		H5Dclose(dataset_id);
 		H5Sclose(memspace_id);
+
+		H5Fclose(file_id);
 	
 		return 0;
 	}
@@ -447,17 +452,33 @@ namespace ionsim
 		return 0;
 	}
 
-	int sendloop(const int * message)
+	int sendloop(const int &message)
 	{
 		int buf;
-		buf = *message;
+		buf = message;
 		MPI::COMM_WORLD.Bcast(&buf, 1, MPI::INT, 0);
 		return 0;
 	}
 
-	int sendloop(const int * message, int step)
+	int loop_get_fields(Field &field)
 	{
-		int buf;
+		sendloop(LOOP_GET_EFIELD);
+		field.recv_field_others();
+		return 0;
+	}
+
+	int loop_push_ions(Field &field)
+	{
+		sendloop(LOOP_PUSH_IONS);
+		int p = MPI::COMM_WORLD.Get_size();
+		for (int id=1; id < p; id++) {
+			field.send_field(id);
+		}
+		return 0;
+	}
+
+	int sendloop(const int &message, int step)
+	{
 		sendloop(message);
 		MPI::COMM_WORLD.Bcast(&step, 1, MPI::INT, 0);
 		return 0;
