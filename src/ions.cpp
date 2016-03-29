@@ -173,13 +173,13 @@ int Ions::push_field(double dt, Field &field)
 
 		xp[i] += Fx * dt / mass;
 		yp[i] += Fy * dt / mass;
-		if (i==0) {
-			printf("Fx = %e, i: %d, x: %e, y: %e\n", Fx, i, x[i], y[i]);
-			printf("Fx = %e\n", field.Ex_ind(0, 0));
-			printf("x = %e\n", field.i_to_x(0));
-		}
+		/* if (i==0) { */
+		/* 	printf("Fx = %e, i: %d, x: %e, y: %e\n", Fx, i, x[i], y[i]); */
+		/* 	printf("Fx = %e\n", field.Ex_ind(0, 0)); */
+		/* 	printf("x = %e\n", field.i_to_x(0)); */
+		/* } */
 	}
-	printf("Updated\n");
+	/* printf("Updated\n"); */
 	return 0;
 }
 

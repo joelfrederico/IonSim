@@ -21,7 +21,6 @@ class Field
 		double mid_i;
 		double mid_j;
 
-		bool splines_valid;
 
 		// ==================================
 		// Private methods
@@ -35,13 +34,16 @@ class Field
 		const gsl_interp2d_type *T;
 		gsl_spline2d *splinex;
 		gsl_spline2d *spliney;
-		gsl_interp_accel *xacc;
-		gsl_interp_accel *yacc;
+		gsl_interp_accel *Ex_xacc;
+		gsl_interp_accel *Ex_yacc;
+		gsl_interp_accel *Ey_xacc;
+		gsl_interp_accel *Ey_yacc;
 
 		bool _init_splines();
 
 		double *x_grid, *y_grid;
 	public:
+		bool splines_valid;
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
@@ -84,6 +86,8 @@ class Field
 		int recv_field_others();
 		int recv_field(int sender_id);
 		int send_field(int dest_id);
+
+		int get_interp(Field &field_in);
 
 		// ==================================
 		// Operators

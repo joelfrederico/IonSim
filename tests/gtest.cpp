@@ -36,7 +36,6 @@ void FieldTest::custom_init()
 	}
 }
 
-
 TEST_F(FieldTest, IsZeroInitially)
 {
 	for (long i=0; i < x_size; i++)
@@ -98,6 +97,21 @@ TEST_F(FieldTest, ArrayIsGood)
 	}
 	ionsim::dealloc_2d_array(arrx, rowCount);
 	ionsim::dealloc_2d_array(arry, rowCount);
+}
+
+TEST_F(FieldTest, InterpWorks)
+{
+	custom_init();
+	double Ex, Ey, dEx, dEy;
+
+	Ex = field.Ex(13e-6, -5e-6);
+	Ey = field.Ey(13e-6, -5e-6);
+
+	dEx = std::abs(84.4333 - Ex);
+	dEy = std::abs(-84.4333 - Ey);
+
+	EXPECT_LT(dEx, 4e-5);
+	EXPECT_LT(dEy, 4e-5);
 }
 
 TEST(IonsimTest, AllocThenDealloc)

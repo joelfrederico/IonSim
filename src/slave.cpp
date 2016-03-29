@@ -87,10 +87,10 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	// Fix for having less charge per particle with more processors
 	ebeam.qpp /= (p-1);
 
-	if (id == 1) {
-		printf("Qpp: %0.3e\n", ebeam.qpp);
-		printf("Qtot: %0.3e\n", ebeam.qpp*ebeam.n_pts);
-	}
+	/* if (id == 1) { */
+	/* 	printf("Qpp: %0.3e\n", ebeam.qpp); */
+	/* 	printf("Qtot: %0.3e\n", ebeam.qpp*ebeam.n_pts); */
+	/* } */
 
 	// ==================================
 	// Generate ions

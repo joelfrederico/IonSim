@@ -35,12 +35,12 @@ int master(int &p, bool verbose)
 	double sz               = 30e-6;
 	double sdelta           = 0.04;
 	double t_tot            = 1.58631e-12*2;
-	int n_steps             = 100;
+	int n_steps             = 1;
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
 	pushmethod_t pushmethod = ionsim::PUSH_FIELD;
-	long n_field_x          = 101;
-	long n_field_y          = 101;
+	long n_field_x          = 201;
+	long n_field_y          = 201;
 	long n_field_z          = 101;
 
 	const SimParams simparams(
@@ -66,18 +66,28 @@ int master(int &p, bool verbose)
 		);
 
 	Field *field;
+	Field *field_interp;
 
 	simparams.bcast_send();
 
 	for (int step=0; step < n_steps; step++)
 	{
+		printf("Step: %d\n", step);
 		field = new Field(simparams);
+		printf("Updating fields...\n");
 		ionsim::loop_get_fields(*field);
+		printf("Fields updated...\n");
+		printf("Master splines: %d\n", (*field).splines_valid);
 
 		ionsim::loop_push_ions(*field);
-		printf("Master field: %e\n", (*field).Ex_ind(0, 0));
 
-		(*field).dump_serial(simparams.filename, step);
+		/* (*field).dump_serial(simparams.filename, step); */
+
+		field_interp = new Field(1001, 1001, simparams.radius, simparams.radius);
+		printf("Interp field init'ed\n");
+		(*field).get_interp(*field_interp);
+		(*field_interp).dump_serial(simparams.filename, step);
+		delete field_interp;
 
 		delete field;
 

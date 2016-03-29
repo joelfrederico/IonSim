@@ -1,6 +1,10 @@
 #include "fields.h"
 #include "support_func.h"
 #include <gsl/gsl_interp2d.h>
+#include <gsl/gsl_spline2d.h>
+#include <gsl/gsl_errno.h>
+
+const gsl_interp2d_type *INTERPTYPE = gsl_interp2d_bilinear;
 
 // ==================================
 // Constructors, Destructor
@@ -11,7 +15,7 @@ Field::Field(long _x_pts, long _y_pts, double _x_edge_mag, double _y_edge_mag) :
 	n_pts(_x_pts*_y_pts),
 	x_edge_mag(_x_edge_mag),
 	y_edge_mag(_y_edge_mag),
-	T(gsl_interp2d_bicubic)
+	T(INTERPTYPE)
 {
 	_init();
 }
@@ -22,7 +26,7 @@ Field::Field(const SimParams &simparams) :
 	n_pts(simparams.n_field_x*simparams.n_field_y),
 	x_edge_mag(simparams.radius),
 	y_edge_mag(simparams.radius),
-	T(gsl_interp2d_bicubic)
+	T(INTERPTYPE)
 {
 	_init();
 }
@@ -35,8 +39,10 @@ Field::~Field()
 	delete[] y_grid;
 	gsl_spline2d_free(splinex);
 	gsl_spline2d_free(spliney);
-	gsl_interp_accel_free(xacc);
-	gsl_interp_accel_free(yacc);
+	gsl_interp_accel_free(Ex_xacc);
+	gsl_interp_accel_free(Ex_yacc);
+	gsl_interp_accel_free(Ey_xacc);
+	gsl_interp_accel_free(Ey_yacc);
 }
 
 // ==================================
@@ -65,24 +71,29 @@ int Field::_init()
 		y_data[i] = double(0);
 	}
 
+
 	splinex = gsl_spline2d_alloc(T, x_pts, y_pts);
 	spliney = gsl_spline2d_alloc(T, x_pts, y_pts);
-	xacc    = gsl_interp_accel_alloc();
-	yacc    = gsl_interp_accel_alloc();
+
+	Ex_xacc    = gsl_interp_accel_alloc();
+	Ex_yacc    = gsl_interp_accel_alloc();
+	Ey_xacc    = gsl_interp_accel_alloc();
+	Ey_yacc    = gsl_interp_accel_alloc();
 
 	dxdi = x_edge_mag * 2 / (x_pts-1);
 	dydj = y_edge_mag * 2 / (y_pts-1);
 
-	mid_i = x_pts / 2;
-	mid_j = y_pts / 2;
+	mid_i = (x_pts-1) / 2;
+	mid_j = (y_pts-1) / 2;
 	for (long i=0; i < x_pts; i++)
 	{
 		x_grid[i] = i_to_x(i);
-		/* std::cout << x_grid[i] << std::endl; */
+		/* std::cout << "x[" << i << "]=" << x_grid[i] << std::endl; */
 	}
 	for (long j=0; j < y_pts; j++)
 	{
 		y_grid[j] = j_to_y(j);
+		/* std::cout << "y[" << j << "]=" << y_grid[j] << std::endl; */
 		/* std::cout << y_grid[j] << std::endl; */
 	}
 
@@ -93,6 +104,7 @@ int Field::_init()
 
 bool Field::_init_splines()
 {
+	int status;
 	gsl_spline2d_init(splinex, x_grid, y_grid, x_data, x_pts, y_pts);
 	gsl_spline2d_init(spliney, x_grid, y_grid, y_data, x_pts, y_pts);
 	
@@ -165,11 +177,16 @@ double Field::Ey_ind(long i, long j) const
 
 double Field::Ex(double x, double y)
 {
+	int err;
+	double out;
 	if (!splines_valid)
 	{
 		splines_valid = _init_splines();
+		if (!splines_valid) printf("Something still wrong...");
 	}
-	return gsl_spline2d_eval(splinex, x, y, xacc, yacc);
+	err = gsl_spline2d_eval_e(splinex, x, y, Ex_xacc, Ex_yacc, &out);
+	if (err != 0) printf("Eval error: %d\n", err);
+	return out;
 }
 
 double Field::Ey(double x, double y)
@@ -178,7 +195,8 @@ double Field::Ey(double x, double y)
 	{
 		splines_valid = _init_splines();
 	}
-	return gsl_spline2d_eval(spliney, x, y, xacc, yacc);
+
+	return gsl_spline2d_eval(spliney, x, y, Ey_xacc, Ey_yacc);
 }
 
 double Field::i(double _x, double _y)
@@ -258,6 +276,8 @@ int Field::recv_field_others()
 		}
 	}
 
+	splines_valid = false;
+
 	return 0;
 }
 
@@ -284,6 +304,20 @@ int Field::send_field(int dest_id)
 {
 	MPI::COMM_WORLD.Send(x_data, n_pts, MPI::DOUBLE, dest_id, ionsim::TAG_FIELD);
 	MPI::COMM_WORLD.Send(y_data, n_pts, MPI::DOUBLE, dest_id, ionsim::TAG_FIELD);
+
+	return 0;
+}
+
+int Field::get_interp(Field &field)
+{
+	for (int i=0; i < field.x_pts; i++)
+	{
+		for (int j=0; j < field.y_pts; j++)
+		{
+			field.Ex_ind(i, j) = Ex(field.i_to_x(i), field.j_to_y(j));
+			field.Ey_ind(i, j) = Ey(field.i_to_x(i), field.j_to_y(j));
+		}
+	}
 
 	return 0;
 }
