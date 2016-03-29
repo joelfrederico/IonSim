@@ -2,6 +2,7 @@
 #include "gtest.h"
 #include "fields.h"
 #include "support_func.h"
+#include <gsl/gsl_interp.h>
 
 const long X_PTS = 13;
 const long Y_PTS = 15;
@@ -99,6 +100,11 @@ TEST_F(FieldTest, ArrayIsGood)
 	ionsim::dealloc_2d_array(arry, rowCount);
 }
 
+TEST_F(FieldTest, UseBicubic)
+{
+	ASSERT_EQ(field.T, gsl_interp2d_bicubic) << "The interpolation type is not 'bicubic'. It is likely currently set to 'bilinear'.";
+}
+
 TEST_F(FieldTest, InterpWorks)
 {
 	custom_init();
@@ -112,6 +118,17 @@ TEST_F(FieldTest, InterpWorks)
 
 	EXPECT_LT(dEx, 4e-5);
 	EXPECT_LT(dEy, 4e-5);
+}
+
+TEST_F(FieldTest, CopyWorks)
+{
+	custom_init();
+	Field tempfield = field;
+	for (int i=0; i < field.x_pts*field.y_pts; i++)
+	{
+		EXPECT_EQ(tempfield.x_data[i], field.x_data[i]);
+		EXPECT_EQ(tempfield.y_data[i], field.y_data[i]);
+	}
 }
 
 TEST(IonsimTest, AllocThenDealloc)

@@ -4,7 +4,7 @@
 #include <gsl/gsl_spline2d.h>
 #include <gsl/gsl_errno.h>
 
-const gsl_interp2d_type *INTERPTYPE = gsl_interp2d_bilinear;
+const gsl_interp2d_type *INTERPTYPE = gsl_interp2d_bicubic;
 
 // ==================================
 // Constructors, Destructor
@@ -37,12 +37,31 @@ Field::~Field()
 	delete[] y_data;
 	delete[] x_grid;
 	delete[] y_grid;
-	gsl_spline2d_free(splinex);
-	gsl_spline2d_free(spliney);
+	if (splines_valid)
+	{
+		gsl_spline2d_free(splinex);
+		gsl_spline2d_free(spliney);
+	}
 	gsl_interp_accel_free(Ex_xacc);
 	gsl_interp_accel_free(Ex_yacc);
 	gsl_interp_accel_free(Ey_xacc);
 	gsl_interp_accel_free(Ey_yacc);
+}
+
+Field::Field(const Field &rhs) : 
+	x_pts(rhs.x_pts),
+	y_pts(rhs.y_pts),
+	n_pts(rhs.n_pts),
+	x_edge_mag(rhs.x_edge_mag),
+	y_edge_mag(rhs.y_edge_mag),
+	T(rhs.T)
+{
+	_init();
+	for (int i=0; i < n_pts; i++)
+	{
+		x_data[i] = rhs.x_data[i];
+		y_data[i] = rhs.y_data[i];
+	}
 }
 
 // ==================================
@@ -296,6 +315,8 @@ int Field::recv_field(int sender_id)
 		x_data[j] += xbuf[j];
 		y_data[j] += ybuf[j];
 	}
+
+	splines_valid = false;
 
 	return 0;
 }

@@ -21,7 +21,6 @@ class Field
 		double mid_i;
 		double mid_j;
 
-
 		// ==================================
 		// Private methods
 		// ==================================
@@ -31,24 +30,25 @@ class Field
 
 		int _array_alloc(double ** (&out), double *data);
 
-		const gsl_interp2d_type *T;
 		gsl_spline2d *splinex;
 		gsl_spline2d *spliney;
 		gsl_interp_accel *Ex_xacc;
 		gsl_interp_accel *Ex_yacc;
 		gsl_interp_accel *Ey_xacc;
 		gsl_interp_accel *Ey_yacc;
+		bool splines_valid;
 
 		bool _init_splines();
 
 		double *x_grid, *y_grid;
 	public:
-		bool splines_valid;
+		const gsl_interp2d_type *T;
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
 		Field(long _x_pts, long _y_pts, double _x_edge_mag, double _y_edge_mag);
 		Field(const SimParams &simparams);
+		Field(const Field &rhs);
 		~Field();
 
 		// ==================================

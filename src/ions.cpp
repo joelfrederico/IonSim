@@ -165,8 +165,8 @@ int Ions::push_field(double dt, Field &field)
 	/* std::complex<double> F; */
 	for (int i=0; i < n_pts; i++)
 	{
-		Fx = GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ex(x[i], y[i]);
-		Fy = GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ey(x[i], y[i]);
+		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ex(x[i], y[i]);
+		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ey(x[i], y[i]);
 
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;

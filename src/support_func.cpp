@@ -470,6 +470,7 @@ namespace ionsim
 	int loop_push_ions(Field &field)
 	{
 		sendloop(LOOP_PUSH_IONS);
+
 		int p = MPI::COMM_WORLD.Get_size();
 		for (int id=1; id < p; id++) {
 			field.send_field(id);
