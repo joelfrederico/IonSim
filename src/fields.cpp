@@ -24,8 +24,8 @@ Field::Field(const SimParams &simparams) :
 	x_pts(simparams.n_field_x),
 	y_pts(simparams.n_field_y),
 	n_pts(simparams.n_field_x*simparams.n_field_y),
-	x_edge_mag(simparams.radius),
-	y_edge_mag(simparams.radius),
+	x_edge_mag(simparams.radius * 3),
+	y_edge_mag(simparams.radius * 3),
 	T(INTERPTYPE)
 {
 	_init();
@@ -230,10 +230,101 @@ double Field::j(double _x, double _y)
 
 int Field::dump_serial(std::string const &filename, long step)
 {
-	std::string group;
-	group = "field";
+	/* ionsim::dump_serial(filename, step, group, *this); */
+	// ==================================
+	// Initialize all variables
+	// ==================================
+	double *xbuf;
+	double *ybuf;
+	std::string x_dataset, y_dataset;
+	long x_len = x_pts;
+	long y_len = y_pts;
 
-	ionsim::dump_serial(filename, step, group, *this);
+	int n_write = ionsim::MAX_N_WRITE;
+
+	hid_t file_id;
+	hid_t step_group_id, group_id;
+	hid_t x_dataspace_id, y_dataspace_id;
+	hid_t x_dataset_id, y_dataset_id;
+	hid_t x_memspace_id, y_memspace_id;
+	hsize_t count[2];
+	hsize_t offset[2];
+	std::string temp_str;
+	herr_t status;
+	
+	// ==================================
+	// Open/create file
+	// ==================================
+	file_id = ionsim::open_file(filename);
+	
+	// ==================================
+	// Access or create a new group
+	// ==================================
+	step_group_id    = ionsim::group_step_access(file_id, step);
+
+	group_id         = ionsim::group_access(step_group_id, "field");
+
+	// ==================================
+	// Create dataset
+	// ==================================
+	// The total array of particles is (n_pts*num_processes, 6) in size
+	// Remember that each slave has n_pts of different particles!
+	count[0] = x_len;
+	count[1] = y_len;
+	x_dataset = "Ex";
+	x_dataset_id = ionsim::dataset_create(group_id, x_dataspace_id, count, x_dataset); // Updates dataspace_id
+	x_memspace_id = H5Screate_simple(2, count, NULL);
+
+	count[0] = x_len;
+	count[1] = y_len;
+	y_dataset = "Ey";
+	y_dataset_id = ionsim::dataset_create(group_id, y_dataspace_id, count, y_dataset); // Updates dataspace_id
+	y_memspace_id = H5Screate_simple(2, count, NULL);
+
+	// ==================================
+	// Write dataset rows
+	// ==================================
+	xbuf = new double[x_len*y_len];
+	ybuf = new double[x_len*y_len];
+	for (int i=0; i < x_len; i++)
+	{
+		for (int j=0; j < y_len; j++)
+		{
+			xbuf[i + j*x_len] = Ex_ind(i, j);
+			ybuf[i + j*x_len] = Ey_ind(i, j);
+		}
+	}
+	H5Dwrite(x_dataset_id, H5T_NATIVE_DOUBLE, x_memspace_id, x_dataspace_id, H5P_DEFAULT, xbuf);
+	H5Dwrite(y_dataset_id, H5T_NATIVE_DOUBLE, y_memspace_id, y_dataspace_id, H5P_DEFAULT, ybuf);
+
+	delete [] xbuf;
+	delete [] ybuf;
+
+	ionsim::writeattribute(group_id , "n_pts"      , n_pts);
+	ionsim::writeattribute(group_id , "dxdi"       , dxdi);
+	ionsim::writeattribute(group_id , "dydj"       , dydj);
+	ionsim::writeattribute(group_id , "mid_i"      , mid_i);
+	ionsim::writeattribute(group_id , "mid_j"      , mid_j);
+	ionsim::writeattribute(group_id , "x_pts"      , x_pts);
+	ionsim::writeattribute(group_id , "y_pts"      , y_pts);
+	ionsim::writeattribute(group_id , "x_edge_mag" , x_edge_mag);
+	ionsim::writeattribute(group_id , "y_edge_mag" , y_edge_mag);
+	
+	// ==================================
+	// Close file
+	// ==================================
+	/* hdf5_cleanup(x_dataspace_id, y_dataspace_id, x_dataset_id, y_dataset_id, file_id); */
+	H5Gclose(step_group_id);
+	H5Gclose(group_id);
+	H5Sclose(x_dataspace_id);
+	H5Sclose(y_dataspace_id);
+	H5Dclose(x_dataset_id);
+	H5Dclose(y_dataset_id);
+	H5Sclose(x_memspace_id);
+	H5Sclose(y_memspace_id);
+	H5Fclose(file_id);
+
+	
 	return 0;
 }
 

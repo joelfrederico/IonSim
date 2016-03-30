@@ -28,6 +28,8 @@ namespace ionsim
 	int sendloop(const int &message, int step);
 	hid_t group_access(hid_t &file_id, std::string const &group);
 	hid_t group_access(hid_t &file_id, const char *group);
+	hid_t group_step_access(hid_t &file_id, long step);
+	hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset);
 
 	template <class T>
 	int writeattribute(hid_t file_id, std::string const &attr_name, T attr_value)
@@ -100,6 +102,8 @@ namespace ionsim
 	const pushmethod_t PUSH_RUNGE_KUTTA = 1;
 	const pushmethod_t PUSH_SIMPLE      = 2;
 	const pushmethod_t PUSH_FIELD       = 3;
+
+	const int MAX_N_WRITE = 1e5;
 }
 
 #endif

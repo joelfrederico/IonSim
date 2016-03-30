@@ -152,6 +152,9 @@ int Ions::push_simple(double dt, double nb_0, double sig_r)
 		F = F_r(x[i], y[i], nb_0, sig_r);
 		xp[i] += F.real() * dt / mass;
 		yp[i] += F.imag() * dt / mass;
+
+		z[i]  = F.real();
+		zp[i] = F.imag();
 	}
 	return 0;
 }
@@ -178,6 +181,9 @@ int Ions::push_field(double dt, Field &field)
 		/* 	printf("Fx = %e\n", field.Ex_ind(0, 0)); */
 		/* 	printf("x = %e\n", field.i_to_x(0)); */
 		/* } */
+		z[i] = Fx;
+		/* zp[i] = std::sqrt(Fx*Fx+Fy*Fy); */
+		zp[i] = Fy;
 	}
 	/* printf("Updated\n"); */
 	return 0;

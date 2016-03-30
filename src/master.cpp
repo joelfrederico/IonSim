@@ -34,11 +34,11 @@ int master(int &p, bool verbose)
 	double m_ion_amu        = 1.00794;
 	double sz               = 30e-6;
 	double sdelta           = 0.04;
-	double t_tot            = 1.58631e-12*2;
-	int n_steps             = 100;
+	double t_tot            = 1.58631e-12*10;
+	int n_steps             = 1;
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
-	pushmethod_t pushmethod = ionsim::PUSH_FIELD;
+	pushmethod_t pushmethod = ionsim::PUSH_SIMPLE;
 	long n_field_x          = 201;
 	long n_field_y          = 201;
 	long n_field_z          = 101;
@@ -76,7 +76,15 @@ int master(int &p, bool verbose)
 		field = new Field(simparams);
 		ionsim::loop_get_fields(*field);
 
-		ionsim::loop_push_ions(*field);
+		switch (pushmethod)
+		{
+			case ionsim::PUSH_SIMPLE:
+				ionsim::sendloop(ionsim::LOOP_PUSH_IONS);
+				break;
+			case ionsim::PUSH_FIELD:
+				ionsim::loop_push_ions(*field);
+				break;
+		}
 
 		(*field).dump_serial(simparams.filename, step);
 
