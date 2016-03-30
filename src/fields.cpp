@@ -218,12 +218,12 @@ double Field::Ey(double x, double y)
 	return gsl_spline2d_eval(spliney, x, y, Ey_xacc, Ey_yacc);
 }
 
-double Field::i(double _x, double _y)
+double Field::i(double _x)
 {
 	return _x / dxdi + mid_i;
 }
 
-double Field::j(double _x, double _y)
+double Field::j(double _y)
 {
 	return _y / dydj + mid_j;
 }
