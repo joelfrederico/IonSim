@@ -4,13 +4,15 @@
 #include "ebeam.h"
 #include "support_func.h"
 #include "ions.h"
-#include "fields.h"
+#include "field_data.h"
+#include "writer.h"
 
 int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 {
 	int buf, step_buf;
 	bool loop_alive;
 	SimParams simparams_temp;
+	Field_Comm fieldcomm;
 
 	/* const double m_e = GSL_CONST_MKSA_MASS_ELECTRON; */
 
@@ -41,8 +43,8 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 
 	const SimParams simparams = simparams_temp;
 
-	Field *field;
-	field = new Field(simparams);
+	Field_Data *field;
+	field = new Field_Data(simparams);
 
 	// ==================================
 	// Collectively create output file
@@ -52,7 +54,8 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	// ==================================
 	// Write attributes
 	// ==================================
-	simparams.write_attributes_parallel(slave_comm_id);
+	Writer writer(simparams.filename);
+	writer.write_attributes_parallel(simparams);
 
 	// ==================================
 	// Generate beam
@@ -131,9 +134,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 						break;
 					case ionsim::PUSH_FIELD:
 						delete field;
-						field = new Field(simparams);
+						field = new Field_Data(simparams);
 
-						(*field).recv_field(0);
+						/* (*field).recv_field(0); */
 						
 						ions.push_field(simparams.dt, *field);
 
@@ -142,9 +145,10 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 				break;
 			case ionsim::LOOP_GET_EFIELD:
 				delete field;
-				field = new Field(simparams);
+				field = new Field_Data(simparams);
 				ebeam.field(*field);
-				(*field).send_field(0);
+				fieldcomm.send_field(*field, 0);
+				/* (*field).send_field(0); */
 				break;
 		}
 

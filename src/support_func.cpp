@@ -1,5 +1,5 @@
 #include "consts.h"
-#include "fields.h"
+#include "field_data.h"
 #include "support_func.h"
 #include <hdf5.h>
 #include <iomanip>
@@ -102,94 +102,6 @@ namespace ionsim
 		dataset_id = H5Dcreate(group_id, dataset.c_str(), H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	
 		return dataset_id;
-	}
-
-	int dump_serial(std::string const &filename, long step, std::string const &group, const Field &field)
-	{
-		// ==================================
-		// Initialize all variables
-		// ==================================
-		double *xbuf;
-		double *ybuf;
-		std::string x_dataset, y_dataset;
-		long x_len = field.x_pts;
-		long y_len = field.y_pts;
-
-		int n_write = MAX_N_WRITE;
-
-		hid_t file_id;
-		hid_t step_group_id, group_id;
-		hid_t x_dataspace_id, y_dataspace_id;
-		hid_t x_dataset_id, y_dataset_id;
-		hid_t x_memspace_id, y_memspace_id;
-		hsize_t count[2];
-		hsize_t offset[2];
-		std::string temp_str;
-		herr_t status;
-	
-		// ==================================
-		// Open/create file
-		// ==================================
-		file_id = open_file(filename);
-	
-		// ==================================
-		// Access or create a new group
-		// ==================================
-		step_group_id    = group_step_access(file_id, step);
-
-		group_id         = group_access(step_group_id, group);
-
-		// ==================================
-		// Create dataset
-		// ==================================
-		// The total array of particles is (n_pts*num_processes, 6) in size
-		// Remember that each slave has n_pts of different particles!
-		count[0] = x_len;
-		count[1] = y_len;
-		x_dataset = "Ex";
-		x_dataset_id = dataset_create(group_id, x_dataspace_id, count, x_dataset); // Updates dataspace_id
-		x_memspace_id = H5Screate_simple(2, count, NULL);
-
-		count[0] = x_len;
-		count[1] = y_len;
-		y_dataset = "Ey";
-		y_dataset_id = dataset_create(group_id, y_dataspace_id, count, y_dataset); // Updates dataspace_id
-		y_memspace_id = H5Screate_simple(2, count, NULL);
-
-		// ==================================
-		// Write dataset rows
-		// ==================================
-		xbuf = new double[x_len*y_len];
-		ybuf = new double[x_len*y_len];
-		for (int i=0; i < x_len; i++)
-		{
-			for (int j=0; j < y_len; j++)
-			{
-				xbuf[i + j*x_len] = field.Ex_ind(i, j);
-				ybuf[i + j*x_len] = field.Ey_ind(i, j);
-			}
-		}
-		H5Dwrite(x_dataset_id, H5T_NATIVE_DOUBLE, x_memspace_id, x_dataspace_id, H5P_DEFAULT, xbuf);
-		H5Dwrite(y_dataset_id, H5T_NATIVE_DOUBLE, y_memspace_id, y_dataspace_id, H5P_DEFAULT, ybuf);
-
-		delete [] xbuf;
-		delete [] ybuf;
-	
-		// ==================================
-		// Close file
-		// ==================================
-		/* hdf5_cleanup(x_dataspace_id, y_dataspace_id, x_dataset_id, y_dataset_id, file_id); */
-		H5Gclose(step_group_id);
-		H5Gclose(group_id);
-		H5Sclose(x_dataspace_id);
-		H5Sclose(y_dataspace_id);
-		H5Dclose(x_dataset_id);
-		H5Dclose(y_dataset_id);
-		H5Sclose(x_memspace_id);
-		H5Sclose(y_memspace_id);
-		H5Fclose(file_id);
-	
-		return 0;
 	}
 
 	int dump_parallel(std::string const &filename, long step, std::string const &dataset, MPI::Intracomm &comm, const Parts &parts)
@@ -432,26 +344,6 @@ namespace ionsim
 		return 0;
 	}
 
-	double ** alloc_2d_array(long rowCount, long colCount)
-	{
-		double ** out = new double*[rowCount];
-		for (long i=0; i < rowCount; i++)
-		{
-			out[i] = new double[colCount];
-		}
-		return out;
-	}
-
-	int dealloc_2d_array(double ** (&arr), long rowCount)
-	{
-		for (long i=0; i < rowCount; i++)
-		{
-			delete [] arr[i];
-		}
-		delete [] arr;
-		return 0;
-	}
-
 	int sendloop(const int &message)
 	{
 		int buf;
@@ -460,20 +352,21 @@ namespace ionsim
 		return 0;
 	}
 
-	int loop_get_fields(Field &field)
+	int loop_get_fields(Field_Comm &fieldcomm, Field_Data &field)
 	{
 		sendloop(LOOP_GET_EFIELD);
-		field.recv_field_others();
+
+		fieldcomm.recv_field_others(field);
 		return 0;
 	}
 
-	int loop_push_ions(Field &field)
+	int loop_push_ions(Field_Data &field)
 	{
 		sendloop(LOOP_PUSH_IONS);
 
 		int p = MPI::COMM_WORLD.Get_size();
 		for (int id=1; id < p; id++) {
-			field.send_field(id);
+			/* field.send_field(id); */
 		}
 		return 0;
 	}

@@ -38,7 +38,7 @@ class SimParams
 		int bcast_send() const;
 		int bcast_receive();
 
-		int write_attributes_parallel(MPI::Intracomm &slave_comm_id) const;
+		/* int write_attributes_parallel(Writer &writer) const; */
 
 		template <class T>
 		int bcast_send_wrap(T send) const

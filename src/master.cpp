@@ -1,5 +1,7 @@
 #include "mpi.h"
 #include "support_func.h"
+#include "field_data.h"
+#include "field_comm.h"
 
 int master(int &p, bool verbose)
 {
@@ -39,9 +41,9 @@ int master(int &p, bool verbose)
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
 	pushmethod_t pushmethod = ionsim::PUSH_SIMPLE;
-	long n_field_x          = 201;
-	long n_field_y          = 201;
-	long n_field_z          = 101;
+	long n_field_x          = 21;
+	long n_field_y          = 21;
+	long n_field_z          = 11;
 
 	const SimParams simparams(
 		E,
@@ -65,17 +67,19 @@ int master(int &p, bool verbose)
 		filename
 		);
 
-	Field *field;
-	Field *field_interp;
+	Field_Data *field;
+	Field_Data *field_interp;
+	Field_Comm fieldcomm;
 
 	simparams.bcast_send();
 
 	for (int step=0; step < n_steps; step++)
 	{
 		printf("Step: %d\n", step);
-		field = new Field(simparams);
-		ionsim::loop_get_fields(*field);
+		field = new Field_Data(simparams);
+		ionsim::loop_get_fields(fieldcomm, *field);
 
+		/*
 		switch (pushmethod)
 		{
 			case ionsim::PUSH_SIMPLE:
@@ -85,8 +89,9 @@ int master(int &p, bool verbose)
 				ionsim::loop_push_ions(*field);
 				break;
 		}
+		*/
 
-		(*field).dump_serial(simparams.filename, step);
+		/* (*field).dump_serial(simparams.filename, step); */
 
 		/* field_interp = new Field(1001, 1001, simparams.radius, simparams.radius); */
 		/* printf("Interp field init'ed\n"); */
@@ -96,18 +101,11 @@ int master(int &p, bool verbose)
 
 		delete field;
 
-		ionsim::sendloop(ionsim::LOOP_DUMP_IONS, step);
-		ionsim::sendloop(ionsim::LOOP_DUMP_E, step);
+		/* ionsim::sendloop(ionsim::LOOP_DUMP_IONS, step); */
+		/* ionsim::sendloop(ionsim::LOOP_DUMP_E, step); */
 	}
 
 	ionsim::sendloop(ionsim::LOOP_KILL);
-
-	return 0;
-}
-
-int push_ions()
-{
-	Field *field;
 
 	return 0;
 }

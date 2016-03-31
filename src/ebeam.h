@@ -6,7 +6,7 @@
 #include <mpi.h>
 #include <complex>
 #include "consts.h"
-#include "fields.h"
+#include "field_data.h"
 
 class Ebeam : public Parts
 {
@@ -53,7 +53,7 @@ class Ebeam : public Parts
 		double y_mean();
 
 		Ebeam between(double z0, double z1);
-		int field(Field &field);
+		int field(Field_Data &field);
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 #include "mpi.h"
 #include "beam.h"
-#include "fields.h"
+#include "field_data.h"
 
 class Ions : public Parts
 {
@@ -21,7 +21,7 @@ class Ions : public Parts
 		int dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm);
 		int push(double dt, double nb_0, double sig_r);
 		int push_simple(double dt, double nb_0, double sig_r);
-		int push_field(double dt, Field &field);
+		int push_field(double dt, Field_Data &field);
 };
 
 #endif

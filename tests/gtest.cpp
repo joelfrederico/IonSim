@@ -1,6 +1,6 @@
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
 #include "gtest.h"
-#include "fields.h"
+#include "field_data.h"
 #include "support_func.h"
 #include <gsl/gsl_interp.h>
 
@@ -16,7 +16,7 @@ FieldTest::FieldTest() :
 	x_size(X_PTS),
 	y_size(Y_PTS),
 	z_size(Z_PTS),
-	field(X_PTS, Y_PTS, X_EDGE_MAG, Y_EDGE_MAG),
+	field(X_PTS, Y_PTS, Z_PTS, X_EDGE_MAG, Y_EDGE_MAG, Z_EDGE_MAG),
 	x_edge_mag(X_EDGE_MAG),
 	y_edge_mag(Y_EDGE_MAG),
 	z_edge_mag(Z_EDGE_MAG)
@@ -26,15 +26,26 @@ FieldTest::FieldTest() :
 void FieldTest::custom_init()
 {
 	int count = 0;
-	for (long j=0; j < y_size; j++)
+	for (long k=0; k < z_size; k++)
 	{
-		for (long i=0; i < x_size; i++)
+		for (long j=0; j < y_size; j++)
 		{
-			field.Ex_ind(i, j) = count;
-			field.Ey_ind(i, j) = -count;
-			count++;
+			for (long i=0; i < x_size; i++)
+			{
+				field.Ex_ind(i, j, k) = count;
+				field.Ey_ind(i, j, k) = -count;
+				field.Ez_ind(i, j, k) = count*count;
+				count++;
+			}
 		}
 	}
+}
+
+TEST_F(FieldTest, DynamicAllocation)
+{
+	Field_Data *lies;
+	lies = new Field_Data(field);
+	delete lies;
 }
 
 TEST_F(FieldTest, IsZeroInitially)
@@ -43,8 +54,12 @@ TEST_F(FieldTest, IsZeroInitially)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			EXPECT_EQ(field.Ex_ind(i, j), 0) << "At location (" << i << ", " << j <<")";
-			EXPECT_EQ(field.Ey_ind(i, j), 0) << "At location (" << i << ", " << j <<")";
+			for (long k=0; k < z_size; k++)
+			{
+				EXPECT_EQ(field.Ex_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
+				EXPECT_EQ(field.Ey_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
+				EXPECT_EQ(field.Ez_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
+			}
 		}
 	}
 }
@@ -55,8 +70,12 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			field.Ex_ind(i, j) = i*j;
-			field.Ey_ind(i, j) = i*j*2;
+			for (long k=0; k < z_size; k++)
+			{
+				field.Ex_ind(i, j, k) = i*j*k;
+				field.Ey_ind(i, j, k) = i*j*k*2;
+				field.Ez_ind(i, j, k) = i*j*k*3;
+			}
 		}
 	}
 
@@ -64,8 +83,12 @@ TEST_F(FieldTest, AssigmentWorks)
 	{
 		for (long j=0; j < y_size; j++)
 		{
-			EXPECT_EQ(field.Ex_ind(i, j), i*j)   << "At location (" << i << ", " << j << ")";
-			EXPECT_EQ(field.Ey_ind(i, j), i*j*2) << "At location (" << i << ", " << j << ")";
+			for (long k=0; k < z_size; k++)
+			{
+				EXPECT_EQ(field.Ex_ind(i, j, k), i*j*k)   << "At location i=" << i << ", k=" << j << ", k=" << k;
+				EXPECT_EQ(field.Ey_ind(i, j, k), i*j*k*2) << "At location i=" << i << ", k=" << j << ", k=" << k;
+				EXPECT_EQ(field.Ez_ind(i, j, k), i*j*k*3) << "At location i=" << i << ", k=" << j << ", k=" << k;
+			}
 		}
 	}
 }
@@ -77,34 +100,11 @@ TEST_F(FieldTest, IndicesAreGood)
 	{
 		EXPECT_EQ(field.x_data[i], i);
 		EXPECT_EQ(field.y_data[i], -i);
+		EXPECT_EQ(field.z_data[i], i*i);
 	}
 }
 
-TEST_F(FieldTest, ArrayIsGood)
-{
-	custom_init();
-	double ** arrx;
-	double ** arry;
-	int rowCount;
-	rowCount = field.x_array_alloc(arrx, 0);
-	rowCount = field.y_array_alloc(arry, 0);
-	for (long j=0; j < y_size; j++)
-	{
-		for (long i=0; i < x_size; i++)
-		{
-			EXPECT_EQ(field.Ex_ind(i, j), arrx[i][j]) << "Ex at location (" << i << ", " << j << ")";
-			EXPECT_EQ(field.Ey_ind(i, j), arry[i][j]) << "Ey at location (" << i << ", " << j << ")";
-		}
-	}
-	ionsim::dealloc_2d_array(arrx, rowCount);
-	ionsim::dealloc_2d_array(arry, rowCount);
-}
-
-TEST_F(FieldTest, UseBicubic)
-{
-	ASSERT_EQ(field.T, gsl_interp2d_bicubic) << "The interpolation type is not 'bicubic'. It is likely currently set to 'bilinear'.";
-}
-
+/*
 TEST_F(FieldTest, InterpWorks)
 {
 	custom_init();
@@ -119,25 +119,17 @@ TEST_F(FieldTest, InterpWorks)
 	EXPECT_LT(dEx, 4e-5);
 	EXPECT_LT(dEy, 4e-5);
 }
+*/
 
 TEST_F(FieldTest, CopyWorks)
 {
 	custom_init();
-	Field tempfield = field;
+	Field_Data tempfield = field;
 	for (int i=0; i < field.x_pts*field.y_pts; i++)
 	{
 		EXPECT_EQ(tempfield.x_data[i], field.x_data[i]);
 		EXPECT_EQ(tempfield.y_data[i], field.y_data[i]);
 	}
-}
-
-TEST(IonsimTest, AllocThenDealloc)
-{
-	double ** arr = ionsim::alloc_2d_array(X_PTS, Y_PTS);
-	ionsim::dealloc_2d_array(arr, X_PTS);
-
-	arr = ionsim::alloc_2d_array(Y_PTS, X_PTS);
-	ionsim::dealloc_2d_array(arr, Y_PTS);
 }
 
 int main(int argc, char **argv)

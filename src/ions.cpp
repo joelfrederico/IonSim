@@ -1,5 +1,5 @@
 #include "ions.h"
-#include "fields.h"
+#include "field_data.h"
 #include <complex>
 #include <sstream>
 #include <gsl/gsl_const_mksa.h>
@@ -159,7 +159,7 @@ int Ions::push_simple(double dt, double nb_0, double sig_r)
 	return 0;
 }
 
-int Ions::push_field(double dt, Field &field)
+int Ions::push_field(double dt, Field_Data &field)
 {
 	// ==============================
 	// Gather 
@@ -168,8 +168,10 @@ int Ions::push_field(double dt, Field &field)
 	/* std::complex<double> F; */
 	for (int i=0; i < n_pts; i++)
 	{
-		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ex(x[i], y[i]);
-		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ey(x[i], y[i]);
+		/* Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ex(x[i], y[i], 0); */
+		/* Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ey(x[i], y[i], 0); */
+		Fx = 0;
+		Fy = 0;
 
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;

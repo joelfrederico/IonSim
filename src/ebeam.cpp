@@ -8,7 +8,7 @@
 #include <gsl/gsl_sf_exp.h>
 #include "support_func.h"
 #include <sstream>
-#include "fields.h"
+#include "field_data.h"
 #include "consts.h"
 #include <math.h>
 #include "simparams.h"
@@ -263,7 +263,7 @@ Ebeam Ebeam::between(double z0, double z1)
 		    );
 }
 
-int Ebeam::field(Field &field)
+int Ebeam::field(Field_Data &field)
 {
 	double sx, sy, var_x, var_y, var_x_minus_var_y, f, temp, rsq, r;
 	double xx, yy, x_in, y_in, xt, yt, Ex, Ey, Et, Em;
@@ -290,10 +290,11 @@ int Ebeam::field(Field &field)
 	/* temp = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)); */
 	/* int id = MPI::COMM_WORLD.Get_rank(); */
 	/* printf("Proc: %d, Field with associated charge is: %0.3e\n", id, temp); */
+	int k = 0;
 
 	for (long i=0; i < field.x_pts; i++)
 	{
-		xt = field.i_to_x(i);
+		xt = field.x_grid[i];
 		if (sx_bigger)
 		{
 			xx = xt;
@@ -303,7 +304,7 @@ int Ebeam::field(Field &field)
 
 		for (long j=0; j < field.y_pts; j++)
 		{
-			yt = field.j_to_y(j);
+			yt = field.y_grid[j];
 			if (sx_bigger)
 			{
 				yy = yt;
@@ -341,8 +342,8 @@ int Ebeam::field(Field &field)
 			}
 			/* Ex = sqrt(Ex*Ex+Ey*Ey); */
 
-			field.Ex_ind(i, j) = Ex;
-			field.Ey_ind(i, j) = Ey;
+			field.Ex_ind(i, j, k) = Ex;
+			field.Ey_ind(i, j, k) = Ey;
 		}
 	}
 	/* field.Ex_ind(25, 10) = 1; */

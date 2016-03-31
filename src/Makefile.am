@@ -9,14 +9,16 @@ ionsim_SOURCES=\
 		 ebeam.cpp \
 		 emit.cpp \
 		 faddeeva/Faddeeva.cc \
-		 fields.cpp \
+		 field_data.cpp \
+		 field_comm.cpp \
 		 ions.cpp \
 		 main.cpp \
 		 master.cpp \
 		 parts.cpp \
 		 simparams.cpp \
 		 slave.cpp \
-		 support_func.cpp
+		 support_func.cpp \
+		 writer.cpp
 
 ionsim_LDADD = $(MYLDADD)
 # ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)

@@ -2,7 +2,7 @@
 #define __MYGTEST_H_INCLUDED__
 
 #include "gtest/gtest.h"
-#include "fields.h"
+#include "field_data.h"
 #include "consts.h"
 
 class FieldTest : public ::testing::Test
@@ -20,7 +20,7 @@ class FieldTest : public ::testing::Test
 		const double y_edge_mag;
 		const double z_edge_mag;
 
-		Field field;
+		Field_Data field;
 };
 
 #endif
