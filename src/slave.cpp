@@ -5,7 +5,8 @@
 #include "support_func.h"
 #include "ions.h"
 #include "field_data.h"
-#include "writer.h"
+#include "writer_serial.h"
+#include "writer_parallel.h"
 
 int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 {
@@ -54,8 +55,9 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	// ==================================
 	// Write attributes
 	// ==================================
-	Writer writer(simparams.filename);
-	writer.write_attributes_parallel(simparams);
+	WriterParallel *writerparallel;
+	writerparallel = new WriterParallel(simparams.filename, &slave_comm_id);
+	(*writerparallel).write_attributes_parallel(simparams);
 
 	// ==================================
 	// Generate beam

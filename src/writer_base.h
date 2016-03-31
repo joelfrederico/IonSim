@@ -1,24 +1,24 @@
-#ifndef __WRITER_H_INCLUDED__
-#define __WRITER_H_INCLUDED__
+#ifndef __WRITER_BASE_H_INCLUDED__
+#define __WRITER_BASE_H_INCLUDED__
 
 #include <string>
 #include <hdf5.h>
 #include "field_data.h"
 #include "simparams.h"
 
-class Writer
+class WriterBase
 {
-	private:
+	protected:
 		hid_t file_id;
 
-		int open_file(std::string const &filename);
 		hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset);
 		hid_t group_step_access(hid_t &file_id, long step);
-		hid_t group_access(hid_t &file_id, std::string const &group);
+		hid_t group_access(hid_t &loc_id, std::string const &group);
+		hid_t group_access(hid_t &loc_id, const char *group);
 
 	public:
-		Writer(const std::string &filename);
-		~Writer();
+		WriterBase(const std::string &filename);
+		~WriterBase();
 
 		int dump_serial(const Field_Data &field, long step);
 		int dump_serial(std::string const &filename, long step, std::string const &group, const Field_Data &field);

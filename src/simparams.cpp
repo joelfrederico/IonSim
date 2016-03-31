@@ -3,7 +3,6 @@
 #include <math.h>
 #include "support_func.h"
 #include "consts.h"
-#include "writer.h"
 
 // ==================================
 // Constructors, Destructor

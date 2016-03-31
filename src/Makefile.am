@@ -18,7 +18,9 @@ ionsim_SOURCES=\
 		 simparams.cpp \
 		 slave.cpp \
 		 support_func.cpp \
-		 writer.cpp
+		 writer_base.cpp \
+		 writer_serial.cpp \
+		 writer_parallel.cpp
 
 ionsim_LDADD = $(MYLDADD)
 # ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)

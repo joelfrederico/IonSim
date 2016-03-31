@@ -1,36 +1,49 @@
-#include "writer.h"
+#include "writer_base.h"
 #include "field_data.h"
 #include "support_func.h"
 
-Writer::Writer(const std::string &filename)
+WriterBase::WriterBase(const std::string &filename)
 {
-	open_file(filename);
 }
 
-Writer::~Writer()
+WriterBase::~WriterBase()
 {
 	H5Fclose(file_id);
 }
 
-int Writer::open_file(std::string const &filename)
+
+hid_t WriterBase::group_access(hid_t &loc_id, std::string const &group)
 {
-	file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-	return 0;
+	return group_access(loc_id, group.c_str());
 }
 
-hid_t Writer::group_access(hid_t &file_id, std::string const &group)
+hid_t WriterBase::group_access(hid_t &loc_id, const char *group)
 {
-	return group_access(file_id, group.c_str());
+	herr_t status;
+	hid_t group_id;
+	H5G_info_t objinfo;
+
+	// ==================================
+	// Access or create a new group
+	// ==================================
+	H5Eset_auto(NULL, NULL, NULL);
+	group_id = H5Gopen(loc_id, group, H5P_DEFAULT);
+	if (group_id < 0)
+	{
+		group_id = H5Gcreate(loc_id, group, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		status = H5Gget_info_by_name(loc_id, group, &objinfo, H5P_DEFAULT);
+	}
+	return group_id;
 }
 
-hid_t Writer::group_step_access(hid_t &file_id, long step)
+hid_t WriterBase::group_step_access(hid_t &loc_id, long step)
 {
 	char buf[10];
 	sprintf(buf, "Step_%04ld", step);
-	return group_access(file_id, buf);
+	return group_access(loc_id, buf);
 }
 
-hid_t Writer::dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset)
+hid_t WriterBase::dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset)
 {
 	hid_t dataset_id;
 
@@ -44,7 +57,7 @@ hid_t Writer::dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count
 	return dataset_id;
 }
 
-int Writer::dump_serial(const Field_Data &field, long step)
+int WriterBase::dump_serial(const Field_Data &field, long step)
 {
 	/* ionsim::dump_serial(filename, step, group, *this); */
 	// ==================================
@@ -145,7 +158,7 @@ int Writer::dump_serial(const Field_Data &field, long step)
 	return 0;
 }
 
-int Writer::write_attributes_parallel(const SimParams &simparams) const
+int WriterBase::write_attributes_parallel(const SimParams &simparams) const
 {
 
 	writeattribute(file_id, "n_e"       , simparams.n_e      );
@@ -169,7 +182,7 @@ int Writer::write_attributes_parallel(const SimParams &simparams) const
 	return 0;
 }
 
-int Writer::dump_serial(std::string const &filename, long step, std::string const &group, const Field_Data &field)
+int WriterBase::dump_serial(std::string const &filename, long step, std::string const &group, const Field_Data &field)
 {
 	// ==================================
 	// Initialize all variables

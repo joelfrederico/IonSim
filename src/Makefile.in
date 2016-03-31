@@ -110,7 +110,8 @@ am_ionsim_OBJECTS = beam.$(OBJEXT) consts.$(OBJEXT) ebeam.$(OBJEXT) \
 	field_data.$(OBJEXT) field_comm.$(OBJEXT) ions.$(OBJEXT) \
 	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
 	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
-	writer.$(OBJEXT)
+	writer_base.$(OBJEXT) writer_serial.$(OBJEXT) \
+	writer_parallel.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -337,7 +338,9 @@ ionsim_SOURCES = \
 		 simparams.cpp \
 		 slave.cpp \
 		 support_func.cpp \
-		 writer.cpp
+		 writer_base.cpp \
+		 writer_serial.cpp \
+		 writer_parallel.cpp
 
 ionsim_LDADD = $(MYLDADD)
 all: all-am
@@ -455,7 +458,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slave.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support_func.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_base.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_parallel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_serial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@faddeeva/$(DEPDIR)/Faddeeva.Po@am__quote@
 
 .cc.o:
