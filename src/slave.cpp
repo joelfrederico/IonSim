@@ -26,6 +26,8 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	MPI::COMM_WORLD.Recv(&buf, 1, MPI::INT, MPI::ANY_SOURCE, MPI::ANY_TAG, status);
 	if (verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", id);
 
+	MPI::COMM_WORLD.Barrier();
+
 	// ==================================
 	// Receive run info
 	// ==================================
@@ -50,14 +52,15 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	// ==================================
 	// Collectively create output file
 	// ==================================
-	ionsim::overwrite_file_parallel(simparams.filename, slave_comm_id);
+	/* ionsim::overwrite_file_parallel(simparams.filename, slave_comm_id); */
 
 	// ==================================
 	// Write attributes
 	// ==================================
-	WriterParallel *writerparallel;
-	writerparallel = new WriterParallel(simparams.filename, &slave_comm_id);
-	(*writerparallel).write_attributes_parallel(simparams);
+	WriterParallel *writer_p;
+	writer_p = new WriterParallel(simparams.filename, &slave_comm_id, true);
+	(*writer_p).write_attributes(simparams);
+	delete writer_p;
 
 	// ==================================
 	// Generate beam
@@ -117,12 +120,12 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 
 			case ionsim::LOOP_DUMP_IONS:
 				MPI::COMM_WORLD.Bcast(&step_buf, 1, MPI::INT, 0);
-				ions.dump_parallel(simparams.filename, step_buf, slave_comm_id);
+				/* ions.dump_parallel(simparams.filename, step_buf, slave_comm_id); */
 				break;
 
 			case ionsim::LOOP_DUMP_E:
 				MPI::COMM_WORLD.Bcast(&step_buf, 1, MPI::INT, 0);
-				ebeam.dump_parallel(simparams.filename, step_buf, slave_comm_id);
+				/* ebeam.dump_parallel(simparams.filename, step_buf, slave_comm_id); */
 				break;
 
 			case ionsim::LOOP_PUSH_IONS:
@@ -146,16 +149,16 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 				}
 				break;
 			case ionsim::LOOP_GET_EFIELD:
+				std::cout << "Getting field" << std::endl;
 				delete field;
 				field = new Field_Data(simparams);
-				ebeam.field(*field);
+				ebeam.field_Coulomb(*field);
 				fieldcomm.send_field(*field, 0);
 				/* (*field).send_field(0); */
 				break;
 		}
 
 	} while ( loop_alive == true );
-
 
 	return 0;
 }

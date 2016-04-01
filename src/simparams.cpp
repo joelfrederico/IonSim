@@ -48,6 +48,7 @@ SimParams::SimParams(
 	n_field_z   = _n_field_z;
 	n_ions      = _n_ions;
 	filename    = _filename;
+	gamma_rel   = ionsim::GeV2gamma(_E);
 }
 
 SimParams::SimParams()

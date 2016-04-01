@@ -2,6 +2,7 @@
 #include "support_func.h"
 #include "field_data.h"
 #include "field_comm.h"
+#include "writer_serial.h"
 
 int master(int &p, bool verbose)
 {
@@ -15,6 +16,7 @@ int master(int &p, bool verbose)
 	{
 		MPI::COMM_WORLD.Send(&slave_id, 1, MPI::INT, slave_id, slave_id*2);
 	}
+	MPI::COMM_WORLD.Barrier();
 	// ==============================
 	// Set up sim
 	// ==============================
@@ -41,8 +43,8 @@ int master(int &p, bool verbose)
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
 	pushmethod_t pushmethod = ionsim::PUSH_SIMPLE;
-	long n_field_x          = 21;
-	long n_field_y          = 21;
+	long n_field_x          = 51;
+	long n_field_y          = 51;
 	long n_field_z          = 11;
 
 	const SimParams simparams(
@@ -73,9 +75,12 @@ int master(int &p, bool verbose)
 
 	simparams.bcast_send();
 
+	WriterSerial *writer_s;
+
 	for (int step=0; step < n_steps; step++)
 	{
 		printf("Step: %d\n", step);
+
 		field = new Field_Data(simparams);
 		ionsim::loop_get_fields(fieldcomm, *field);
 
@@ -90,7 +95,9 @@ int master(int &p, bool verbose)
 				break;
 		}
 		*/
-
+		writer_s = new WriterSerial(filename);
+		(*writer_s).writedata(step, *field);
+		delete writer_s;
 		/* (*field).dump_serial(simparams.filename, step); */
 
 		/* field_interp = new Field(1001, 1001, simparams.radius, simparams.radius); */

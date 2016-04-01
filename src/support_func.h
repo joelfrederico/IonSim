@@ -17,23 +17,11 @@ namespace ionsim
 	double GeV2gamma(double GeV);
 	double gamma2GeV(double gamma);
 	double gaussian(double mean, double sigma);
-	hid_t open_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id);
-	hid_t open_file(std::string const &filename);
-	int overwrite_file_parallel(std::string const &filename, MPI::Intracomm &slave_comm_id);
-	int overwrite_file_serial(std::string const &filename);
 	int sendloop(const int &message);
 	int loop_get_fields(Field_Comm &fieldcomm, Field_Data &field);
 	/* int loop_push_ions(Field &field); */
 	int sendloop(const int &message, int step);
-	hid_t group_access(hid_t &file_id, std::string const &group);
-	hid_t group_access(hid_t &file_id, const char *group);
-	hid_t group_step_access(hid_t &file_id, long step);
-	hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset);
 
-	int dump_parallel(std::string const &filename, long step, std::string const &dataset, MPI::Intracomm &comm, const Parts &parts);
-	int dump_serial(std::string const &filename, long step, std::string const &group, std::string const &dataset, const Parts &ebeam);
-	int dump_serial(std::string const &filename, long step, std::string const &group, const Field_Data &field);
-	
 	// ==================================
 	// Consts
 	// ==================================

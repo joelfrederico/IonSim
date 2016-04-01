@@ -52,12 +52,6 @@ Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius,
 	}
 }
 
-int Ions::dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm)
-{
-	ionsim::dump_parallel(filename, step, "ions", comm, *this);
-	return 0;
-}
-
 std::complex<double> F_r(double x, double y, double nb_0, double sig_r)
 {
 	double r = gsl_hypot(x, y);

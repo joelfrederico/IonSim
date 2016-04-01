@@ -35,6 +35,9 @@ class SimParams
 
 		SimParams();
 
+		// ==================================
+		// Communications
+		// ==================================
 		int bcast_send() const;
 		int bcast_receive();
 
@@ -54,8 +57,9 @@ class SimParams
 			return 1;
 		}
 
-		/* SimParams(SimParams &simparams); */
-
+		// ==================================
+		// Data
+		// ==================================
 		double E;
 		double dt;
 		double emit_n;
@@ -75,6 +79,7 @@ class SimParams
 		long n_field_z;
 		long n_ions;
 		std::string filename;
+		double gamma_rel;
 
 		// ==================================
 		// Data methods

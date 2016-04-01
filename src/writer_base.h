@@ -9,9 +9,10 @@
 class WriterBase
 {
 	protected:
+		std::string _filename;
 		hid_t file_id;
 
-		hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, hsize_t count[2], std::string const &dataset);
+		hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, int rank, hsize_t *count, std::string const &dataset);
 		hid_t group_step_access(hid_t &file_id, long step);
 		hid_t group_access(hid_t &loc_id, std::string const &group);
 		hid_t group_access(hid_t &loc_id, const char *group);
@@ -19,11 +20,6 @@ class WriterBase
 	public:
 		WriterBase(const std::string &filename);
 		~WriterBase();
-
-		int dump_serial(const Field_Data &field, long step);
-		int dump_serial(std::string const &filename, long step, std::string const &group, const Field_Data &field);
-
-		int write_attributes_parallel(const SimParams &simparams) const;
 
 		template <class T>
 		int writeattribute_file(std::string const &attr_name, T attr_value) const
@@ -43,7 +39,7 @@ class WriterBase
 			} else if (typeid(attr_value) == typeid(long)) {
 				type_id = H5T_NATIVE_LONG;
 			} else {
-				printf("Couldn't write attribute\n");
+				printf("Not a valid attribute type.\n");
 			}
 
 			hid_t attr_id, dataspace_id;
@@ -60,9 +56,15 @@ class WriterBase
 			// Create and write attribute
 			// ==================================
 			attr_id = H5Acreate(loc_id, attr_name.c_str(), type_id, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-			H5Sclose(dataspace_id);
-			status = H5Awrite(attr_id, type_id, &attr_value);
-			H5Aclose(attr_id);
+			/* attr_id = -1; */
+			if (attr_id < 0) {
+				std::cout << "Attribute not created!" << std::endl;
+				return -1;
+			} else {
+				H5Sclose(dataspace_id);
+				status = H5Awrite(attr_id, type_id, &attr_value);
+				H5Aclose(attr_id);
+			}
 
 			return 0;
 		}

@@ -77,13 +77,9 @@ Ebeam::Ebeam(const SimParams &simparams, double sx, double sy, unsigned long int
 
 int Ebeam::_gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], double y_cov[2][2], double z_cov[2][2])
 {
-	/* std::cout << sqrt(x_cov[0][0]) << std::endl; */
-	/* std::cout << sqrt(x_cov[1][1]) << std::endl; */
-	/* std::cout << sqrt(y_cov[0][0]) << std::endl; */
-	/* std::cout << sqrt(y_cov[1][1]) << std::endl; */
-	
 	double* rho_x;
 	double* rho_y;
+	double z_len;
 	// ==================================
 	// Set random number generator
 	// ==================================
@@ -92,7 +88,6 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], doub
 	// ==================================
 	// Set random number generator seed
 	// ==================================
-	/* gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1); */
 	gsl_rng_set(r, s);
 
 	// ==================================
@@ -106,9 +101,11 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], doub
 		gsl_ran_bivariate_gaussian(r , sqrt(x_cov[0][0]) , sqrt(x_cov[1][1]) , *rho_x , &x[i] , &xp[i]);
 		gsl_ran_bivariate_gaussian(r , sqrt(y_cov[0][0]) , sqrt(y_cov[1][1]) , *rho_y , &y[i] , &yp[i]);
 		/* gsl_ran_bivariate_gaussian(r , sqrt(z_cov[0][0]) , sqrt(z_cov[1][1]) , 0      , &_z[i] , &_zp[i]); */
+		
+		z_len = sqrt(z_cov[0][0]);
 
-		z[i] = gsl_ran_flat(r, 0, sqrt(z_cov[0][0]));
-		zp[i] = gsl_ran_gaussian(r, sqrt(z_cov[1][1]));
+		z[i] = gsl_ran_flat(r, -z_len/2, z_len/2);
+		zp[i] = gsl_ran_gaussian(r, z_len);
 	}
 
 	// ==================================
@@ -148,20 +145,6 @@ Ebeam::Ebeam(
 // ==================================
 // Public Methods
 // ==================================
-
-int Ebeam::dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm)
-{
-	ionsim::dump_parallel(filename, step, "ebeam", comm, *this);
-	return 0;
-}
-
-int Ebeam::dump_serial(std::string const &filename, int step)
-{
-	std::string group = "ebeam";
-	std::string dataset = "particles";
-	ionsim::dump_serial(filename, step, group, dataset, *this);
-	return 0;
-}
 
 double Ebeam::x_mean()
 {
@@ -263,7 +246,7 @@ Ebeam Ebeam::between(double z0, double z1)
 		    );
 }
 
-int Ebeam::field(Field_Data &field)
+int Ebeam::field_BE(Field_Data &field)
 {
 	double sx, sy, var_x, var_y, var_x_minus_var_y, f, temp, rsq, r;
 	double xx, yy, x_in, y_in, xt, yt, Ex, Ey, Et, Em;
@@ -273,7 +256,6 @@ int Ebeam::field(Field_Data &field)
 
 	sx = x_std();
 	sy = y_std();
-	/* std::cout << "Sx: " << sx << ", Sy: " << sy << std::endl; */
 
 	sx_bigger = (sx > sy);
 	if (!sx_bigger)
@@ -287,9 +269,7 @@ int Ebeam::field(Field_Data &field)
 	var_x_minus_var_y = var_x-var_y;
 	if (var_x_minus_var_y/var_x == 0) std::cout << "Using symmetric fields" << std::endl;
 	temp = qpp*n_pts * GSL_CONST_MKSA_ELECTRON_CHARGE/GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
-	/* temp = qpp*n_pts / (2*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sqrt(2*M_PI*var_x_minus_var_y)); */
-	/* int id = MPI::COMM_WORLD.Get_rank(); */
-	/* printf("Proc: %d, Field with associated charge is: %0.3e\n", id, temp); */
+
 	int k = 0;
 
 	for (long i=0; i < field.x_pts; i++)
@@ -318,9 +298,6 @@ int Ebeam::field(Field_Data &field)
 				Ey = 0;
 			} else if (var_x_minus_var_y/var_x < 1e-3) {
 				r = sqrt(rsq);
-				/* Et = -(qpp*n_pts / (GSL_CONST_MKSA_VACUUM_PERMITTIVITY)); */
-				/* Et = 1; */
-				/* Et = temp * -gsl_sf_exprel(-rsq/(2*var_x)) * r / (4*M_PI*var_x); */
 				Et = temp * (1-exp(-rsq/(2*var_x)))/(2*M_PI*r);
 				Ex = Et*xx/r;
 				Ey = Et*yy/r;
@@ -340,12 +317,48 @@ int Ebeam::field(Field_Data &field)
 				Ex = Ey;
 				Ey = -Et;
 			}
-			/* Ex = sqrt(Ex*Ex+Ey*Ey); */
 
 			field.Ex_ind(i, j, k) = Ex;
 			field.Ey_ind(i, j, k) = Ey;
 		}
 	}
-	/* field.Ex_ind(25, 10) = 1; */
+
+	return 0;
+}
+
+int Ebeam::field_Coulomb(Field_Data &field)
+{
+	double dx, dy, dz;
+	double drsq, dr;
+	double x_e, y_e, z_e;
+
+	const double common = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	double temp;
+
+	for (int n=0; n < n_pts; n++) {
+		x_e = x[n];
+		y_e = y[n];
+		z_e = z[n];
+
+		for (int i=0; i < field.x_pts; i++) {
+			dx = field.x_grid[i] - x_e;
+			for (int j=0; j < field.y_pts; j++) {
+				dy = field.y_grid[j] - y_e;
+				for (int k=0; k < field.z_pts; k++) {
+					dz = field.z_grid[k] - z_e;
+
+					drsq = dx*dx + dy*dy + dz*dz;
+					dr = sqrt(drsq);
+
+					temp = common / (drsq * dr);
+
+					field.Ex_ind(i, j, k) += temp * dx * _simparams.gamma_rel;
+					field.Ey_ind(i, j, k) += temp * dy * _simparams.gamma_rel;
+					field.Ez_ind(i, j, k) += temp * dz;
+				}
+			}
+		}
+	}
+	std::cout << "Stored field: " << field.Ex_ind(3, 5, 7) << std::endl;
 	return 0;
 }

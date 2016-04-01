@@ -44,16 +44,15 @@ class Ebeam : public Parts
 		// ==================================
 		// Member methods
 		// ==================================
-		int dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm);
-		int dump_serial(std::string const &filename, int step);
-
 		double x_std();
 		double y_std();
 		double x_mean();
 		double y_mean();
 
 		Ebeam between(double z0, double z1);
-		int field(Field_Data &field);
+
+		int field_BE(Field_Data &field);
+		int field_Coulomb(Field_Data &field);
 };
 
 #endif
