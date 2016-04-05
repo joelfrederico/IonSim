@@ -4,6 +4,7 @@
 #include <string>
 #include <mpi.h>
 #include "consts.h"
+#include <typeinfo>
 
 class SimParams
 {

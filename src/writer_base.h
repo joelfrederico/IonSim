@@ -3,6 +3,7 @@
 
 #include <string>
 #include <hdf5.h>
+#include <typeinfo>
 #include "field_data.h"
 #include "simparams.h"
 
