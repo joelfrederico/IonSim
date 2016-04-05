@@ -186,7 +186,6 @@ Ebeam Ebeam::between(double z0, double z1)
 	// ==================================
 	// Check and xfer particles
 	// ==================================
-	long ind = 0;
 	int reserve_length = 0;
 	for (long i=0; i < n_pts; i++)
 	{
@@ -202,7 +201,9 @@ Ebeam Ebeam::between(double z0, double z1)
 	z_out.reserve(reserve_length);
 	zp_out.reserve(reserve_length);
 
+	long ind = 0;
 	for (long i=0; i < n_pts; i++)
+	{
 		if ( (z0 < z[i]) && (z[i] < z1) )
 		{
 			x_out[ind]  = x[i];
@@ -211,6 +212,7 @@ Ebeam Ebeam::between(double z0, double z1)
 			yp_out[ind] = yp[i];
 			z_out[ind]  = z[i];
 			zp_out[ind] = zp[i];
+			ind++;
 		}
 	}
 
