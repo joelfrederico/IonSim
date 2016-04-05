@@ -107,11 +107,11 @@ PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_ionsim_OBJECTS = beam.$(OBJEXT) consts.$(OBJEXT) ebeam.$(OBJEXT) \
 	emit.$(OBJEXT) faddeeva/Faddeeva.$(OBJEXT) \
-	field_data.$(OBJEXT) field_comm.$(OBJEXT) ions.$(OBJEXT) \
-	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
-	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
-	writer_base.$(OBJEXT) writer_serial.$(OBJEXT) \
-	writer_parallel.$(OBJEXT)
+	field_data.$(OBJEXT) field_interp.$(OBJEXT) \
+	field_comm.$(OBJEXT) ions.$(OBJEXT) main.$(OBJEXT) \
+	master.$(OBJEXT) parts.$(OBJEXT) simparams.$(OBJEXT) \
+	slave.$(OBJEXT) support_func.$(OBJEXT) writer_base.$(OBJEXT) \
+	writer_serial.$(OBJEXT) writer_parallel.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -330,6 +330,7 @@ ionsim_SOURCES = \
 		 emit.cpp \
 		 faddeeva/Faddeeva.cc \
 		 field_data.cpp \
+		 field_interp.cpp \
 		 field_comm.cpp \
 		 ions.cpp \
 		 main.cpp \
@@ -451,6 +452,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_interp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@

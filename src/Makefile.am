@@ -10,6 +10,7 @@ ionsim_SOURCES=\
 		 emit.cpp \
 		 faddeeva/Faddeeva.cc \
 		 field_data.cpp \
+		 field_interp.cpp \
 		 field_comm.cpp \
 		 ions.cpp \
 		 main.cpp \

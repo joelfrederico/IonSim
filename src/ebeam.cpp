@@ -127,13 +127,6 @@ Ebeam::Ebeam(
  		double_vec zp_in
 		) : Parts(simparams.ion_mass(), n_pts, type), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
-	x_in.shrink_to_fit();
-	xp_in.shrink_to_fit();
-	y_in.shrink_to_fit();
-	yp_in.shrink_to_fit();
-	z_in.shrink_to_fit();
-	zp_in.shrink_to_fit();
-
 	x  = x_in;
 	xp = xp_in;
 	y  = y_in;
@@ -183,19 +176,6 @@ Ebeam Ebeam::between(double z0, double z1)
 	double_vec zp_out;
 
 	// ==================================
-	// Reserve space for all possible 
-	// particles
-	// ==================================
-	long reserve_length = x.size();
-
-	x_out.reserve(reserve_length);
-	xp_out.reserve(reserve_length);
-	y_out.reserve(reserve_length);
-	yp_out.reserve(reserve_length);
-	z_out.reserve(reserve_length);
-	zp_out.reserve(reserve_length);
-
-	// ==================================
 	// Check limits are correct
 	// ==================================
 	if (z0 > z1)
@@ -207,8 +187,22 @@ Ebeam Ebeam::between(double z0, double z1)
 	// Check and xfer particles
 	// ==================================
 	long ind = 0;
+	int reserve_length = 0;
 	for (long i=0; i < n_pts; i++)
 	{
+		if ( (z0 < z[i]) && (z[i] < z1) ) {
+			reserve_length++;
+		}
+	}
+
+	x_out.reserve(reserve_length);
+	xp_out.reserve(reserve_length);
+	y_out.reserve(reserve_length);
+	yp_out.reserve(reserve_length);
+	z_out.reserve(reserve_length);
+	zp_out.reserve(reserve_length);
+
+	for (long i=0; i < n_pts; i++)
 		if ( (z0 < z[i]) && (z[i] < z1) )
 		{
 			x_out[ind]  = x[i];
@@ -219,16 +213,6 @@ Ebeam Ebeam::between(double z0, double z1)
 			zp_out[ind] = zp[i];
 		}
 	}
-
-	// ==================================
-	// Shrink arrays to reduce memory
-	// ==================================
-	x_out.shrink_to_fit();
-	xp_out.shrink_to_fit();
-	y_out.shrink_to_fit();
-	yp_out.shrink_to_fit();
-	z_out.shrink_to_fit();
-	zp_out.shrink_to_fit();
 
 	// ==================================
 	// Create new ebeam from particles
@@ -329,11 +313,14 @@ int Ebeam::field_BE(Field_Data &field)
 int Ebeam::field_Coulomb(Field_Data &field)
 {
 	double dx, dy, dz;
-	double drsq, dr;
+	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 
-	const double common = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
-	double temp;
+	std::cout << "Calculating Coulomb field..." << std::endl;
+
+	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	const double common_tran = common_para * _simparams.gamma_rel;
+	double temp_para, temp_tran;
 
 	for (int n=0; n < n_pts; n++) {
 		x_e = x[n];
@@ -349,12 +336,14 @@ int Ebeam::field_Coulomb(Field_Data &field)
 
 					drsq = dx*dx + dy*dy + dz*dz;
 					dr = sqrt(drsq);
+					dr52 = drsq*dr;
 
-					temp = common / (drsq * dr);
+					temp_para = common_para / dr52;
+					temp_tran = common_tran / dr52;
 
-					field.Ex_ind(i, j, k) += temp * dx * _simparams.gamma_rel;
-					field.Ey_ind(i, j, k) += temp * dy * _simparams.gamma_rel;
-					field.Ez_ind(i, j, k) += temp * dz;
+					field.Ex_ind(i, j, k) = temp_tran * dx;
+					field.Ey_ind(i, j, k) = temp_tran * dy;
+					field.Ez_ind(i, j, k) = temp_para * dz;
 				}
 			}
 		}

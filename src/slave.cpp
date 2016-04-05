@@ -15,8 +15,6 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	SimParams simparams_temp;
 	Field_Comm fieldcomm;
 
-	/* const double m_e = GSL_CONST_MKSA_MASS_ELECTRON; */
-
 	// ==================================
 	// Receive starting gun
 	// ==================================
@@ -47,7 +45,7 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	const SimParams simparams = simparams_temp;
 
 	Field_Data *field;
-	field = new Field_Data(simparams);
+	/* field = new Field_Data(simparams); */
 
 	// ==================================
 	// Collectively create output file
@@ -74,31 +72,15 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
 
-	// if ((id == 1) && (verbose))
-	// {
-	// 	printf("Match- beta_x: %.5e\n", mat.beta());
-	// 	printf("Sigma: %.5e\n", x_beam.sigma());
-	// 	printf("Radius: %.5e\n", simparams.radius);
-	// }
-
 	double cov[2][2];
 	x_beam.cov(cov);
-	/* if (verbose) printf("Cov:\n[[ %.6e, %.6e ],\n [ %.6e, %.6e ]]\n", cov[0][0], cov[0][1], cov[1][0], cov[1][1]); */
 
 	sr = x_beam.sigma();
 	nb_0 = simparams.q_tot / (pow(2*M_PI, 1.5) * simparams.sz * sr * sr);
 
 	Ebeam ebeam(simparams, x_beam, y_beam, id + 1);
-	/* int lies   = 5; */
-	/* int nolies = 1; */
-	/* Ebeam ebeam(simparams, nolies, lies*lies, id + 1); */
 	// Fix for having less charge per particle with more processors
 	ebeam.qpp /= (p-1);
-
-	/* if (id == 1) { */
-	/* 	printf("Qpp: %0.3e\n", ebeam.qpp); */
-	/* 	printf("Qtot: %0.3e\n", ebeam.qpp*ebeam.n_pts); */
-	/* } */
 
 	// ==================================
 	// Generate ions
@@ -138,23 +120,23 @@ int slave(int &p, int &id, MPI::Intracomm &slave_comm_id, bool verbose)
 						ions.push_simple(simparams.dt, nb_0, sr);
 						break;
 					case ionsim::PUSH_FIELD:
-						delete field;
 						field = new Field_Data(simparams);
 
 						/* (*field).recv_field(0); */
 						
 						ions.push_field(simparams.dt, *field);
 
+						delete field;
+
 						break;
 				}
 				break;
 			case ionsim::LOOP_GET_EFIELD:
 				std::cout << "Getting field" << std::endl;
-				delete field;
 				field = new Field_Data(simparams);
 				ebeam.field_Coulomb(*field);
 				fieldcomm.send_field(*field, 0);
-				/* (*field).send_field(0); */
+				delete field;
 				break;
 		}
 
