@@ -20,17 +20,17 @@ int main(int argc, char **argv)
 
 	verbose = false;
 
-	while ((c = getopt (argc, argv, "v")) != -1)
-	{
-		switch (c)
-			{
-			case 'v':
-				verbose = true;
-				break;
-			default:
-				abort ();
-			}
-	}
+	/* while ((c = getopt (argc, argv, "v")) != -1) */
+	/* { */
+	/* 	switch (c) */
+	/* 		{ */
+	/* 		case 'v': */
+	/* 			verbose = true; */
+	/* 			break; */
+	/* 		default: */
+	/* 			abort (); */
+	/* 		} */
+	/* } */
 
 	// ==============================
 	// Initialize MPI
