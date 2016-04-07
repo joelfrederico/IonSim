@@ -10,7 +10,6 @@ class WriterParallel : public WriterBase
 {
 	private:
 		const LoopComm loopcomm;
-		const MPI_Comm _comm_id;
 
 		int _init(const std::string &filename, bool overwrite);
 		int _writedata(hid_t &group_id, const std::string &dataset, const Parts &parts);

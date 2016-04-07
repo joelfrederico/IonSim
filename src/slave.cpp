@@ -9,9 +9,13 @@
 #include "writer_parallel.h"
 #include "loop_comm.h"
 #include "consts.h"
+#include <sstream>
+#include <iomanip>
 
 int slave(bool verbose)
 {
+	std::stringstream streamme;
+	char charbuf[10];
 	std::string subgroup;
 	std::string dataset;
 	int buf, step_buf, substep_buf;
@@ -115,9 +119,11 @@ int slave(bool verbose)
 				loopcomm.recv_master(&substep_buf);
 				writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
 
-				subgroup = "ions";
-				dataset = "ions";
-				(*writer_p).writedata_substep(step_buf, substep_buf, dataset, subgroup, ions);
+				subgroup = "ions_steps";
+				streamme.str("");
+				streamme << "ions_" << std::setfill('0') << std::setw(4) << substep_buf;
+
+				(*writer_p).writedata_substep(step_buf, substep_buf, streamme.str(), subgroup, ions);
 
 				delete writer_p;
 
@@ -135,7 +141,6 @@ int slave(bool verbose)
 				// ==================================
 				// Push ions
 				// ==================================
-				/* MPI_Bcast(&step_buf, 1, MPI_INT, 0, MPI_COMM_WORLD); */
 				loopcomm.recv_master(&step_buf);
 				switch (simparams.pushmethod)
 				{

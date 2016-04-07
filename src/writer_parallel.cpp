@@ -4,15 +4,13 @@
 #include "loop_comm.h"
 
 WriterParallel::WriterParallel(const std::string &filename, const MPI_Comm comm_id) :
-	WriterBase(filename),
-	_comm_id(comm_id)
+	WriterBase(filename)
 {
 	_init(filename, false);
 }
 
 WriterParallel::WriterParallel(const std::string &filename, const MPI_Comm comm_id, bool overwrite) :
-	WriterBase(filename),
-	_comm_id(comm_id)
+	WriterBase(filename)
 {
 	_init(filename, overwrite);
 }
@@ -53,8 +51,6 @@ int WriterParallel::write_attributes(const SimParams &simparams) const
 
 int WriterParallel::open_file()
 {
-	LoopComm loopcomm;
-
 	// ==================================
 	// Set up file access property list
 	// ==================================
@@ -62,7 +58,7 @@ int WriterParallel::open_file()
 	hid_t plist_file_id;
 
 	plist_file_id = H5Pcreate(H5P_FILE_ACCESS);
-	H5Pset_fapl_mpio(plist_file_id, _comm_id, info);
+	H5Pset_fapl_mpio(plist_file_id, loopcomm.slave_comm, info);
 
 	// ==================================
 	// Open the file
@@ -82,7 +78,7 @@ int WriterParallel::overwrite_file_parallel()
 	// Set up file access property list
 	// ==================================
 	plist_file_id = H5Pcreate(H5P_FILE_ACCESS);
-	H5Pset_fapl_mpio(plist_file_id, _comm_id, info);
+	H5Pset_fapl_mpio(plist_file_id, loopcomm.slave_comm, info);
 
 	// ==================================
 	// Create a new file collectively
@@ -112,7 +108,7 @@ int WriterParallel::_writedata(hid_t &loc_id, std::string const &dataset, const 
 	hid_t dataspace_id;
 	hid_t plist_dx_id;
 	hid_t memspace_id;
-	herr_t status;
+	herr_t status, status1;
 
 	// ==================================
 	// Create dataset collectively
@@ -126,16 +122,11 @@ int WriterParallel::_writedata(hid_t &loc_id, std::string const &dataset, const 
 	// Creates new dataset_id, dataspace_id
 	dataset_id = dataset_create(loc_id, dataspace_id, rank, count, dataset);
 
-	status = H5Sclose(dataspace_id);
-	status = H5Dclose(dataset_id);
-
-	return 0;
-
 	// ==================================
 	// Write dataset rows
 	// ==================================
-	/* plist_dx_id = H5Pcreate(H5P_DATASET_XFER); */
-	/* H5Pset_dxpl_mpio(plist_dx_id, H5FD_MPIO_COLLECTIVE); */
+	plist_dx_id = H5Pcreate(H5P_DATASET_XFER);
+	H5Pset_dxpl_mpio(plist_dx_id, H5FD_MPIO_COLLECTIVE);
 
 	int i=0;
 	if (n_pts < n_write) n_write = n_pts;
@@ -152,13 +143,12 @@ int WriterParallel::_writedata(hid_t &loc_id, std::string const &dataset, const 
 		// ==================================
 		count[0]  = n_write;
 		count[1]  = 6;
-		offset[0] = (loopcomm.id * n_pts + i);
+		offset[0] = (loopcomm.id-1) * n_pts + i;
 		offset[1] = 0;
 
-		/* memspace_id = H5Screate_simple(2, count, NULL); */
+		memspace_id = H5Screate_simple(2, count, NULL);
 
-		/* H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL); */
-
+		status1 = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
 
 		for (int k=0; k < n_write; k++)
 		{
@@ -171,7 +161,16 @@ int WriterParallel::_writedata(hid_t &loc_id, std::string const &dataset, const 
 			i++;
 		}
 
-		/* status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf); */
+		status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf);
+		if (status < 0) 
+		{
+			std::cout << "PROBLEM"       << std::endl;
+			std::cout << "status: "      << status      << std::endl;
+			std::cout << "memspace_id: " << memspace_id << std::endl;
+			std::cout << "status1: "     << status1     << std::endl;
+			std::cout << "x[0]: "        << (*_x)[0]    << std::endl;
+			std::cout << "buf[0]: "      << (*_x)[0]    << std::endl;
+		}
 	}
 	delete [] buf;
 
@@ -218,13 +217,13 @@ int WriterParallel::writedata_substep(long step, long substep, const std::string
 	// ==================================
 	step_group_id     = group_step_access(file_id, step);
 	sub_group_id      = group_access(step_group_id, subgroup);
-	sub_step_group_id = group_step_access(sub_group_id, substep);
+	/* sub_step_group_id = group_step_access(sub_group_id, substep); */
 
-	_writedata(sub_step_group_id, dataset, parts);
+	_writedata(sub_group_id, dataset, parts);
 
 	status = H5Gclose(step_group_id);
 	status = H5Gclose(sub_group_id);
-	status = H5Gclose(sub_step_group_id);
+	/* status = H5Gclose(sub_step_group_id); */
 
 	return 0;
 }

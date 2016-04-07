@@ -59,8 +59,8 @@ class SimParams
 				MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
 			} else if (typeid(send) == typeid(long)) {
 				MPI_Bcast(&buf, 1, MPI_LONG, 0, MPI_COMM_WORLD);
-			} else return 0;
-			return 1;
+			} else return -1;
+			return 0;
 		}
 
 		// ==================================

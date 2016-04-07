@@ -29,7 +29,7 @@ int master(bool verbose)
 	// ==============================
 	
 	long n_e                = 1e5;
-	long n_ions             = 1e2;
+	long n_ions             = 1e4;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
 	double length           = 100e-6;
@@ -46,7 +46,7 @@ int master(bool verbose)
 	pushmethod_t pushmethod = PUSH_SIMPLE;
 	long n_field_x          = 11;
 	long n_field_y          = 11;
-	long n_field_z          = 1;
+	long n_field_z          = 11;
 
 	const SimParams simparams(
 		E,
@@ -139,14 +139,6 @@ int master(bool verbose)
 			loopcomm.send_slaves(z_step);
 
 		}
-
-		/* (*field).dump_serial(simparams.filename, step); */
-
-		/* field_interp = new Field(1001, 1001, simparams.radius, simparams.radius); */
-		/* printf("Interp field init'ed\n"); */
-		/* (*field).get_interp(*field_interp); */
-		/* (*field_interp).dump_serial(simparams.filename, step); */
-		/* delete field_interp; */
 	}
 
 	loopcomm.instruct(LOOP_KILL);

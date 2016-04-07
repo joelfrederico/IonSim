@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "ebeam.h"
 #include <mpi.h>
 #include "beam.h"
@@ -13,6 +14,7 @@
 #include <math.h>
 #include "simparams.h"
 #include "faddeeva/Faddeeva.hh"
+
 
 // ==================================
 // Constructors
@@ -356,12 +358,17 @@ int Ebeam::field_Coulomb(Field_Data &field)
 	if (id == 1)
 	{
 		std::cout << "=============================================" << std::endl;
-		std::cout << "dx: " << dx << std::endl;
-		std::cout << "dz: " << dz << std::endl;
-		std::cout << "z_e: " << z_e << std::endl;
-		std::cout << "z_grid: " << field.z_grid[0] << std::endl;
 
-		std::cout << "Stored field: " << field.Ex_ind(4, 4, 1) << std::endl;
+		std::cout << "dx: "           << dx                           << std::endl;
+		std::cout << "dz: "           << dz                           << std::endl;
+		std::cout << "z_e: "          << z_e                          << std::endl;
+		std::cout << "z_grid: "       << field.z_grid[0]              << std::endl;
+		std::cout << "gamma_rel: "    << _simparams.gamma_rel         << std::endl;
+		std::cout << "eV: "           << GSL_CONST_MKSA_ELECTRON_VOLT << std::endl;
+		std::cout << "E: "            << _simparams.E                 << std::endl;
+		std::cout << ": "             << ELECTRON_REST_ENERGY         << std::endl;
+		std::cout << "Stored field: " << std::setw(10)                << field.Ex_ind(4, 4, 1) << std::endl;
+
 		std::cout << "=============================================" << std::endl;
 	}
 

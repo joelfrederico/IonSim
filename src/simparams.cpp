@@ -48,6 +48,7 @@ SimParams::SimParams(
 	n_field_z   = _n_field_z;
 	n_ions      = _n_ions;
 	filename    = _filename;
+
 	gamma_rel   = ionsim::GeV2gamma(_E);
 
 	_init();
@@ -133,6 +134,9 @@ int SimParams::bcast_receive()
 	MPI_Bcast(cbuf, cbuf_l, MPI_CHAR, 0, MPI_COMM_WORLD);
 	filename = std::string(cbuf);
 	delete [] cbuf;
+
+	gamma_rel   = ionsim::GeV2gamma(E);
+
 	return 0;
 }
 
