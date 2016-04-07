@@ -13,7 +13,7 @@ WriterBase::~WriterBase()
 }
 
 
-hid_t WriterBase::group_access(hid_t &loc_id, std::string const &group)
+hid_t WriterBase::group_access(hid_t &loc_id, const std::string &group)
 {
 	return group_access(loc_id, group.c_str());
 }
@@ -44,7 +44,7 @@ hid_t WriterBase::group_step_access(hid_t &loc_id, long step)
 	return group_access(loc_id, buf);
 }
 
-hid_t WriterBase::dataset_create(hid_t &group_id, hid_t &dataspace_id, int rank, hsize_t *count, std::string const &dataset)
+hid_t WriterBase::dataset_create(hid_t &group_id, hid_t &dataspace_id, int rank, hsize_t *count, const std::string &dataset)
 {
 	hid_t dataset_id;
 

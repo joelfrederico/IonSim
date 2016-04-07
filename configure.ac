@@ -17,9 +17,6 @@ AC_CONFIG_MACRO_DIRS([m4])
 # Checks for libraries.
 PKG_CHECK_MODULES([GSL], [gsl >= 1.15])
 AX_LIB_HDF5([parallel])
-if test "$with_hdf5" = "yes"; then
-	HDF5_LIBS="$HDF5_LIBS -lhdf5_cpp"
-fi
 
 MYLDADD="$GSL_LIBS $HDF5_LIBS"
 AC_SUBST(MYLDADD,[$MYLDADD])

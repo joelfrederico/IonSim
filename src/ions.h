@@ -18,10 +18,9 @@ class Ions : public Parts
 	public:
 		Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length);
 
-		int dump_parallel(std::string const &filename, int step, MPI::Intracomm &comm);
 		int push(double dt, double nb_0, double sig_r);
 		int push_simple(double dt, double nb_0, double sig_r);
-		int push_field(double dt, Field_Data &field);
+		int push_field(double dt, Field_Data &field, int z_step);
 };
 
 #endif

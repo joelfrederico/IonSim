@@ -350,6 +350,20 @@ int Ebeam::field_Coulomb(Field_Data &field)
 			}
 		}
 	}
-	std::cout << "Stored field: " << field.Ex_ind(3, 5, 7) << std::endl;
+
+	int id;
+	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+	if (id == 1)
+	{
+		std::cout << "=============================================" << std::endl;
+		std::cout << "dx: " << dx << std::endl;
+		std::cout << "dz: " << dz << std::endl;
+		std::cout << "z_e: " << z_e << std::endl;
+		std::cout << "z_grid: " << field.z_grid[0] << std::endl;
+
+		std::cout << "Stored field: " << field.Ex_ind(4, 4, 1) << std::endl;
+		std::cout << "=============================================" << std::endl;
+	}
+
 	return 0;
 }

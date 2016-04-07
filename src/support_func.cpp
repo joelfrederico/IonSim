@@ -37,33 +37,20 @@ namespace ionsim
 	{
 		int buf;
 		buf = message;
-		MPI::COMM_WORLD.Bcast(&buf, 1, MPI::INT, 0);
+		MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
 		return 0;
 	}
 
-	int loop_get_fields(Field_Comm &fieldcomm, Field_Data &field)
+	int recvloop(int *buf)
 	{
-		sendloop(LOOP_GET_EFIELD);
-
-		fieldcomm.recv_field_others(field);
-		return 0;
-	}
-
-	int loop_push_ions(Field_Data &field)
-	{
-		sendloop(LOOP_PUSH_IONS);
-
-		int p = MPI::COMM_WORLD.Get_size();
-		for (int id=1; id < p; id++) {
-			/* field.send_field(id); */
-		}
+		MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
 		return 0;
 	}
 
 	int sendloop(const int &message, int step)
 	{
 		sendloop(message);
-		MPI::COMM_WORLD.Bcast(&step, 1, MPI::INT, 0);
+		MPI_Bcast(&step, 1, MPI_INT, 0, MPI_COMM_WORLD);
 		return 0;
 	}
 }

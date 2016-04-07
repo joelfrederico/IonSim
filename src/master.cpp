@@ -3,20 +3,22 @@
 #include "field_data.h"
 #include "field_comm.h"
 #include "writer_serial.h"
+#include "loop_comm.h"
 
-int master(int &p, bool verbose)
+int master(bool verbose)
 {
 	// ==============================
 	// Starting gun
 	// ==============================
-	MPI::Status status;
+	LoopComm loopcomm;
+	MPI_Status status;
 
 	if (verbose) printf("Master says: I am the MASTER!\n");
-	for (int slave_id=1; slave_id < p; slave_id++)
+	for (int slave_id=1; slave_id < loopcomm.p; slave_id++)
 	{
-		MPI::COMM_WORLD.Send(&slave_id, 1, MPI::INT, slave_id, slave_id*2);
+		MPI_Send(&slave_id, 1, MPI_INT, slave_id, slave_id*2, MPI_COMM_WORLD);
 	}
-	MPI::COMM_WORLD.Barrier();
+	MPI_Barrier(MPI_COMM_WORLD);
 	// ==============================
 	// Set up sim
 	// ==============================
@@ -43,9 +45,9 @@ int master(int &p, bool verbose)
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
 	pushmethod_t pushmethod = ionsim::PUSH_SIMPLE;
-	long n_field_x          = 51;
-	long n_field_y          = 51;
-	long n_field_z          = 11;
+	long n_field_x          = 11;
+	long n_field_y          = 11;
+	long n_field_z          = 1;
 
 	const SimParams simparams(
 		E,
@@ -69,35 +71,67 @@ int master(int &p, bool verbose)
 		filename
 		);
 
+	// ==============================
+	// Initialize fields
+	// ==============================
 	Field_Data *field;
 	Field_Data *field_interp;
 	Field_Comm fieldcomm;
 
+	// ==============================
+	// Send simparams everywhere
+	// ==============================
 	simparams.bcast_send();
 
+	// ==============================
+	// Initialize serial writer
+	// ==============================
 	WriterSerial *writer_s;
 
+	// ==============================
+	// Loop over electron evolution
+	// ==============================
 	for (int step=0; step < n_steps; step++)
 	{
 		printf("Step: %d\n", step);
 
+		// ==============================
+		// Get fields from slaves
+		// ==============================
+		ionsim::sendloop(ionsim::LOOP_GET_EFIELD);
 		field = new Field_Data(simparams);
-		ionsim::loop_get_fields(fieldcomm, *field);
+		fieldcomm.recv_field_others_add(*field);
 
-		/*
-		switch (pushmethod)
-		{
-			case ionsim::PUSH_SIMPLE:
-				ionsim::sendloop(ionsim::LOOP_PUSH_IONS);
-				break;
-			case ionsim::PUSH_FIELD:
-				ionsim::loop_push_ions(*field);
-				break;
-		}
-		*/
+		// ==============================
+		// Write total field
+		// ==============================
 		writer_s = new WriterSerial(filename);
 		(*writer_s).writedata(step, *field);
 		delete writer_s;
+
+		// ==============================
+		// Push field to slaves
+		// ==============================
+		ionsim::sendloop(ionsim::LOOP_SEND_EFIELD);
+		for (int id=1; id < loopcomm.p; id++)
+		{
+			fieldcomm.send_field(*field, id);
+		}
+
+		// ==============================
+		// Delete field
+		// ==============================
+		delete field;
+		
+		// ==============================
+		// Integrate ion motion
+		// ==============================
+		for (int z_step=0; z_step < n_field_z; z_step++)
+		{
+			ionsim::sendloop(ionsim::LOOP_PUSH_IONS, z_step);
+			ionsim::sendloop(ionsim::LOOP_DUMP_IONS, z_step);
+		}
+
 		/* (*field).dump_serial(simparams.filename, step); */
 
 		/* field_interp = new Field(1001, 1001, simparams.radius, simparams.radius); */
@@ -106,10 +140,10 @@ int master(int &p, bool verbose)
 		/* (*field_interp).dump_serial(simparams.filename, step); */
 		/* delete field_interp; */
 
-		delete field;
 
 		/* ionsim::sendloop(ionsim::LOOP_DUMP_IONS, step); */
 		/* ionsim::sendloop(ionsim::LOOP_DUMP_E, step); */
+
 	}
 
 	ionsim::sendloop(ionsim::LOOP_KILL);

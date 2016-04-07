@@ -15,7 +15,7 @@ class WriterBase
 
 		hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, int rank, hsize_t *count, std::string const &dataset);
 		hid_t group_step_access(hid_t &file_id, long step);
-		hid_t group_access(hid_t &loc_id, std::string const &group);
+		hid_t group_access(hid_t &loc_id, const std::string &group);
 		hid_t group_access(hid_t &loc_id, const char *group);
 
 	public:
@@ -23,13 +23,13 @@ class WriterBase
 		~WriterBase();
 
 		template <class T>
-		int writeattribute_file(std::string const &attr_name, T attr_value) const
+		int writeattribute_file(const std::string &attr_name, T attr_value) const
 		{
 			writeattribute(file_id, attr_name, attr_value);
 		}
 
 		template <class T>
-		int writeattribute(hid_t loc_id, std::string const &attr_name, T attr_value) const
+		int writeattribute(hid_t loc_id, const std::string &attr_name, T attr_value) const
 		{
 			hid_t type_id = H5T_NATIVE_DOUBLE;
 			const std::type_info &type = typeid(attr_value);

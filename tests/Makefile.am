@@ -16,6 +16,7 @@ check_PROGRAMS = gtest
 gtest_SOURCES = gtest.cpp \
 		../src/field_data.cpp \
 		../src/field_comm.cpp \
+		../src/loop_comm.cpp \
 		../src/support_func.cpp
 
 gtest_LDADD = libgtest.la $(MYLDADD)

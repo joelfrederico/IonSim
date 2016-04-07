@@ -1,5 +1,6 @@
 #include "ions.h"
 #include "field_data.h"
+#include "field_interp.h"
 #include <complex>
 #include <sstream>
 #include <gsl/gsl_const_mksa.h>
@@ -8,6 +9,7 @@
 #include <gsl/gsl_odeiv2.h>
 #include "support_func.h"
 #include "simparams.h"
+#include "loop_comm.h"
 
 // ==============================
 // Ions
@@ -27,7 +29,6 @@ Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius,
 	gsl_rng * r;
 
 	gsl_rng_env_setup();
-	/* gsl_rng_set(r, MPI::COMM_WORLD.Get_rank() + 1); */
 
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
@@ -71,12 +72,10 @@ int func(double t, const double y[], double dydt[], void * params)
 	double nb_0, sig_r, mass;
 	std::complex<double> F;
 	const double *x0, *xp0, *y0, *yp0;
-	int p = MPI::COMM_WORLD.Get_rank();
 
 	nb_0  = ((double *)params)[0];
 	sig_r = ((double *)params)[1];
 	mass  = ((double *)params)[2];
-	/* printf("Herro: %d, %0.3e; %0.3e; %0.3e\n", p, nb_0, sig_r, mass); */
 
 	x0  = &y[0];
 	xp0 = &y[2];
@@ -91,9 +90,6 @@ int func(double t, const double y[], double dydt[], void * params)
 	dydt[1] = y[3];
 	dydt[3] = F.imag() / mass;
 
-	/* printf("%d alive!\n", p); */
-
-	/* double *arr = *(double *)params; */
 	return GSL_SUCCESS;
 }
 
@@ -102,7 +98,6 @@ int Ions::push(double dt, double nb_0, double sig_r)
 	std::complex<double> F;
 	double params[3] = {nb_0, sig_r, mass};
 	double t = 0;
-	int p = MPI::COMM_WORLD.Get_rank();
 
 	gsl_odeiv2_system sys = {func, NULL, 4, &params};
 	gsl_odeiv2_evolve *e  = gsl_odeiv2_evolve_alloc(4);
@@ -114,7 +109,6 @@ int Ions::push(double dt, double nb_0, double sig_r)
 	{
 		double y[] = {x[i], y[i], xp[i], yp[i]};
 		double yerr[4];
-		/* printf("%d Trying %d\n", p, i); */
 		/* gsl_odeiv2_driver_apply_fixed_step(d, &t, dt, 4, y); */
 		gsl_odeiv2_step_apply(step, t, dt, y, yerr, NULL, NULL, &sys);
 		x[i]  = y[0];
@@ -125,7 +119,6 @@ int Ions::push(double dt, double nb_0, double sig_r)
 		F = F_r(x[i], y[i], nb_0, sig_r);
 		z[i]  = std::abs(F);
 		zp[i] = mass;
-		/* printf("%d Got here\n", p); */
 	}
 
 	/* gsl_odeiv2_driver_free(d); */
@@ -153,35 +146,25 @@ int Ions::push_simple(double dt, double nb_0, double sig_r)
 	return 0;
 }
 
-int Ions::push_field(double dt, Field_Data &field)
+int Ions::push_field(double dt, Field_Data &field, int z_step)
 {
-	// ==============================
-	// Gather 
-	// ==============================
+	Field_Interp fieldinterp(field, *gsl_interp2d_bicubic);
 	double Fx, Fy;
-	/* std::complex<double> F; */
+
 	for (int i=0; i < n_pts; i++)
 	{
-		/* Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ex(x[i], y[i], 0); */
-		/* Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * field.Ey(x[i], y[i], 0); */
-		Fx = 0;
-		Fy = 0;
+		Fx = fieldinterp.Ex(x[i], y[i], z_step);
+		Fy = fieldinterp.Ey(x[i], y[i], z_step);
 
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;
 
 		xp[i] += Fx * dt / mass;
 		yp[i] += Fy * dt / mass;
-		/* if (i==0) { */
-		/* 	printf("Fx = %e, i: %d, x: %e, y: %e\n", Fx, i, x[i], y[i]); */
-		/* 	printf("Fx = %e\n", field.Ex_ind(0, 0)); */
-		/* 	printf("x = %e\n", field.i_to_x(0)); */
-		/* } */
-		z[i] = Fx;
-		/* zp[i] = std::sqrt(Fx*Fx+Fy*Fy); */
+
+		z[i]  = Fx;
 		zp[i] = Fy;
 	}
 	/* printf("Updated\n"); */
 	return 0;
 }
-

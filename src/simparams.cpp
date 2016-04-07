@@ -49,10 +49,18 @@ SimParams::SimParams(
 	n_ions      = _n_ions;
 	filename    = _filename;
 	gamma_rel   = ionsim::GeV2gamma(_E);
+
+	_init();
 }
 
 SimParams::SimParams()
 {
+	_init();
+}
+
+int SimParams::_init()
+{
+	return 0;
 }
 
 int SimParams::bcast_send() const
@@ -83,10 +91,10 @@ int SimParams::bcast_send() const
 	// Send string
 
 	cbuf_l = filename.length()+1;
-	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);
+	MPI_Bcast(&cbuf_l, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 	cbuf = new char[cbuf_l];
 	strcpy(cbuf, filename.c_str());
-	MPI::COMM_WORLD.Bcast(cbuf, cbuf_l, MPI::CHAR, 0);
+	MPI_Bcast(cbuf, cbuf_l, MPI_CHAR, 0, MPI_COMM_WORLD);
 	delete [] cbuf;
 
 	return 0;
@@ -98,31 +106,31 @@ int SimParams::bcast_receive()
 	char *cbuf;
 
 	// Receive numerical parameters
-	MPI::COMM_WORLD.Bcast(&n_e         , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_ions      , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&q_tot       , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&radius      , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&length      , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&E           , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&emit_n      , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&n_p_cgs     , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&m_ion_amu   , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&sz          , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&sdelta      , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&t_tot       , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&n_steps     , 1 , MPI::INT    , 0);
-	MPI::COMM_WORLD.Bcast(&dt          , 1 , MPI::DOUBLE , 0);
-	MPI::COMM_WORLD.Bcast(&pushmethod , 1 , MPI::INT    , 0);
-	MPI::COMM_WORLD.Bcast(&n_field_x   , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_field_y   , 1 , MPI::LONG   , 0);
-	MPI::COMM_WORLD.Bcast(&n_field_z   , 1 , MPI::LONG   , 0);
+	MPI_Bcast(&n_e        , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_ions     , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&q_tot      , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&radius     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&length     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&E          , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&emit_n     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_p_cgs    , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&m_ion_amu  , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&sz         , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&sdelta     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&t_tot      , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_steps    , 1 , MPI_INT    , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&dt         , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&pushmethod , 1 , MPI_INT    , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_x  , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_y  , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_z  , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
 
 	// Receive string
 
-	MPI::COMM_WORLD.Bcast(&cbuf_l, 1, MPI::LONG, 0);
+	MPI_Bcast(&cbuf_l, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 
 	cbuf = new char[cbuf_l];
-	MPI::COMM_WORLD.Bcast(cbuf, cbuf_l, MPI::CHAR, 0);
+	MPI_Bcast(cbuf, cbuf_l, MPI_CHAR, 0, MPI_COMM_WORLD);
 	filename = std::string(cbuf);
 	delete [] cbuf;
 	return 0;

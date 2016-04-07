@@ -106,7 +106,7 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 11
+#serial 12
 
 AC_DEFUN([AX_LIB_HDF5], [
 
@@ -252,6 +252,7 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
         AC_MSG_RESULT([yes (version $[HDF5_VERSION])])
 
         dnl See if we can compile
+        AC_LANG_PUSH([C])
         ax_lib_hdf5_save_CC=$CC
         ax_lib_hdf5_save_CPPFLAGS=$CPPFLAGS
         ax_lib_hdf5_save_LIBS=$LIBS
@@ -273,6 +274,7 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
         CPPFLAGS=$ax_lib_hdf5_save_CPPFLAGS
         LIBS=$ax_lib_hdf5_save_LIBS
         LDFLAGS=$ax_lib_hdf5_save_LDFLAGS
+        AC_LANG_POP([C])
 
         AC_MSG_CHECKING([for matching HDF5 Fortran wrapper])
         dnl Presume HDF5 Fortran wrapper is just a name variant from H5CC

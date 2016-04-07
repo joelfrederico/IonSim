@@ -5,9 +5,14 @@
 #include <mpi.h>
 #include "consts.h"
 #include <typeinfo>
+#include "loop_comm.h"
 
 class SimParams
 {
+	private:
+		const LoopComm loopcomm;
+		int _init();
+
 	public:
 		// ==================================
 		// Constructors, Destructor
@@ -49,11 +54,11 @@ class SimParams
 		{
 			T buf = send;
 			if (typeid(send) == typeid(double)) {
-				MPI::COMM_WORLD.Bcast(&buf, 1, MPI::DOUBLE, 0);
+				MPI_Bcast(&buf, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 			} else if (typeid(send) == typeid(int)) {
-				MPI::COMM_WORLD.Bcast(&buf, 1, MPI::INT, 0);
+				MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
 			} else if (typeid(send) == typeid(long)) {
-				MPI::COMM_WORLD.Bcast(&buf, 1, MPI::LONG, 0);
+				MPI_Bcast(&buf, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 			} else return 0;
 			return 1;
 		}

@@ -60,6 +60,11 @@ int Field_Data::_init()
 		z_grid[k] = (k-mid_k) * dzdk;
 	}
 
+	if (z_pts == 1)
+	{
+		z_grid[0] = 0;
+	}
+
 	splines_valid = _init_splines();
 
 	return 0;

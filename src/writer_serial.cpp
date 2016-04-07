@@ -40,7 +40,7 @@ int WriterSerial::writedata(long step, std::string const &group, std::string con
 
 	int n_write = ionsim::MAX_N_WRITE;
 
-	hid_t step_group_id, group_id, file_id, dataspace_id;
+	hid_t step_group_id, group_id, dataspace_id;
 	hid_t dataset_id;
 	hid_t memspace_id;
 	hsize_t count[2];

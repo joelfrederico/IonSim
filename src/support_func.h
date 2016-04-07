@@ -18,9 +18,9 @@ namespace ionsim
 	double gamma2GeV(double gamma);
 	double gaussian(double mean, double sigma);
 	int sendloop(const int &message);
-	int loop_get_fields(Field_Comm &fieldcomm, Field_Data &field);
 	/* int loop_push_ions(Field &field); */
 	int sendloop(const int &message, int step);
+	int recvloop(int *buf);
 
 	// ==================================
 	// Consts
@@ -30,12 +30,13 @@ namespace ionsim
 	const int TAG_LOOP_INSTRUCT = 100;
 	const int TAG_FIELD         = 200;
 
-	const loopflag_t LOOP_DUMP_E     = 3;
-	const loopflag_t LOOP_DUMP_IONS  = 2;
-	const loopflag_t LOOP_GET_EFIELD = 6;
-	const loopflag_t LOOP_KILL       = 1;
-	const loopflag_t LOOP_PUSH_E     = 4;
-	const loopflag_t LOOP_PUSH_IONS  = 5;
+	const loopflag_t LOOP_KILL        = 1;
+	const loopflag_t LOOP_DUMP_IONS   = 2;
+	const loopflag_t LOOP_DUMP_E      = 3;
+	const loopflag_t LOOP_PUSH_E      = 4;
+	const loopflag_t LOOP_PUSH_IONS   = 5;
+	const loopflag_t LOOP_GET_EFIELD  = 6;
+	const loopflag_t LOOP_SEND_EFIELD = 7;
 
 	const parttype_t PARTS_E   = 2;
 	const parttype_t PARTS_ION = 1;

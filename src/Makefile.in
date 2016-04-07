@@ -108,10 +108,11 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am_ionsim_OBJECTS = beam.$(OBJEXT) consts.$(OBJEXT) ebeam.$(OBJEXT) \
 	emit.$(OBJEXT) faddeeva/Faddeeva.$(OBJEXT) \
 	field_data.$(OBJEXT) field_interp.$(OBJEXT) \
-	field_comm.$(OBJEXT) ions.$(OBJEXT) main.$(OBJEXT) \
-	master.$(OBJEXT) parts.$(OBJEXT) simparams.$(OBJEXT) \
-	slave.$(OBJEXT) support_func.$(OBJEXT) writer_base.$(OBJEXT) \
-	writer_serial.$(OBJEXT) writer_parallel.$(OBJEXT)
+	field_comm.$(OBJEXT) ions.$(OBJEXT) loop_comm.$(OBJEXT) \
+	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
+	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
+	writer_base.$(OBJEXT) writer_serial.$(OBJEXT) \
+	writer_parallel.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -324,23 +325,24 @@ top_srcdir = @top_srcdir@
 # AM_CPPFLAGS=$(GSL_CFLAGS) $(HDF5_CPPFLAGS)
 AM_CPPFLAGS = $(MYAM_CPPFLAGS)
 ionsim_SOURCES = \
-		 beam.cpp \
-		 consts.cpp \
-		 ebeam.cpp \
-		 emit.cpp \
+		 beam.cpp             \
+		 consts.cpp           \
+		 ebeam.cpp            \
+		 emit.cpp             \
 		 faddeeva/Faddeeva.cc \
-		 field_data.cpp \
-		 field_interp.cpp \
-		 field_comm.cpp \
-		 ions.cpp \
-		 main.cpp \
-		 master.cpp \
-		 parts.cpp \
-		 simparams.cpp \
-		 slave.cpp \
-		 support_func.cpp \
-		 writer_base.cpp \
-		 writer_serial.cpp \
+		 field_data.cpp       \
+		 field_interp.cpp     \
+		 field_comm.cpp       \
+		 ions.cpp             \
+		 loop_comm.cpp        \
+		 main.cpp             \
+		 master.cpp           \
+		 parts.cpp            \
+		 simparams.cpp        \
+		 slave.cpp            \
+		 support_func.cpp     \
+		 writer_base.cpp      \
+		 writer_serial.cpp    \
 		 writer_parallel.cpp
 
 ionsim_LDADD = $(MYLDADD)
@@ -454,6 +456,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_interp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parts.Po@am__quote@

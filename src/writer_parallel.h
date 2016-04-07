@@ -10,17 +10,20 @@ class WriterParallel : public WriterBase
 	private:
 		int p;
 		int id;
-		MPI::Intracomm *comm_id_ptr;
-		int _init(const std::string &filename, MPI::Intracomm *comm_id, bool overwrite);
+		const MPI_Comm _comm_id;
+
+		int _init(const std::string &filename, bool overwrite);
+		int _writedata(hid_t *group_id, const std::string &dataset, const Parts &parts);
 
 	public:
-		WriterParallel(const std::string &filename, MPI::Intracomm *comm_id);
-		WriterParallel(const std::string &filename, MPI::Intracomm *comm_id, bool overwrite);
+		WriterParallel(const std::string &filename, const MPI_Comm comm_id);
+		WriterParallel(const std::string &filename, const MPI_Comm comm_id, bool overwrite);
 
 		int write_attributes(const SimParams &simparams) const;
-		int open_file(std::string const &filename);
+		int open_file(const std::string &filename);
 		int overwrite_file_parallel(const std::string &filename);
-		int writedata(long step, std::string const &dataset, const Parts &parts);
+		int writedata(long step, const std::string &dataset, const Parts &parts);
+		int writedata_substep(long step, long substep, const std::string &dataset, const std::string &subgroup, const Parts &parts);
 
 };
 
