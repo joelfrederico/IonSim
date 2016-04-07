@@ -28,8 +28,6 @@ int slave(bool verbose)
 	MPI_Recv(&buf, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	if (verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
 
-	MPI_Barrier(MPI_COMM_WORLD);
-
 	// ==================================
 	// Receive run info
 	// ==================================
@@ -60,9 +58,11 @@ int slave(bool verbose)
 	// Write attributes
 	// ==================================
 	WriterParallel *writer_p;
+	/*
 	writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm, true);
 	(*writer_p).write_attributes(simparams);
 	delete writer_p;
+	*/
 
 	// ==================================
 	// Generate beam
@@ -117,7 +117,7 @@ int slave(bool verbose)
 
 				subgroup = "ions";
 				dataset = "ions";
-				/* (*writer_p).writedata_substep(step, substep, dataset, subgroup, &ions); */
+				(*writer_p).writedata_substep(step_buf, substep_buf, dataset, subgroup, ions);
 
 				delete writer_p;
 
@@ -137,7 +137,6 @@ int slave(bool verbose)
 				// ==================================
 				/* MPI_Bcast(&step_buf, 1, MPI_INT, 0, MPI_COMM_WORLD); */
 				loopcomm.recv_master(&step_buf);
-				loopcomm.recv_master(&substep_buf);
 				switch (simparams.pushmethod)
 				{
 					case PUSH_RUNGE_KUTTA:
@@ -176,6 +175,8 @@ int slave(bool verbose)
 		}
 
 	} while ( loop_alive == true );
+
+	delete field;
 
 	return 0;
 }

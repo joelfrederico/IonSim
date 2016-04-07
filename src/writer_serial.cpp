@@ -3,28 +3,47 @@
 #include "support_func.h"
 #include "field_data.h"
 
-WriterSerial::WriterSerial(const std::string &filename) : WriterBase(filename)
+WriterSerial::WriterSerial(const std::string &filename) :
+	WriterBase(filename)
 {
-	open_file(filename);
+	_init(filename, false);
 }
 
-int WriterSerial::open_file(std::string const &filename)
+WriterSerial::WriterSerial(const std::string &filename, bool overwrite) :
+	WriterBase(filename)
 {
-	file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+	_init(filename, overwrite);
+}
+
+int WriterSerial::_init(const std::string &filename, bool overwrite)
+{
+	if (overwrite)
+	{
+		overwrite_file_serial();
+	} else {
+		open_file();
+	}
+
 	return 0;
 }
 
-int WriterSerial::overwrite_file_serial(std::string const &filename)
+int WriterSerial::open_file()
+{
+	file_id = H5Fopen(_filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+	return 0;
+}
+
+int WriterSerial::overwrite_file_serial()
 {
 	// ==================================
 	// Create a new file
 	// ==================================
-	file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+	file_id = H5Fcreate(_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	
 	return 0;
 }
 
-int WriterSerial::writedata(long step, std::string const &group, std::string const &dataset, const Parts &parts)
+int WriterSerial::writedata(long step, const std::string &group, const std::string &dataset, const Parts &parts)
 {
 	// ==================================
 	// Initialize all variables
@@ -126,7 +145,7 @@ int WriterSerial::writedata(long step, const Field_Data &field)
 		long x_len = field.x_pts;
 		long y_len = field.y_pts;
 		long z_len = field.z_pts;
-		std::string const group = "field"; 
+		const std::string group = "field"; 
 
 		int n_write = MAX_N_WRITE;
 

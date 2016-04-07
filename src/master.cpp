@@ -18,7 +18,6 @@ int master(bool verbose)
 	{
 		MPI_Send(&slave_id, 1, MPI_INT, slave_id, slave_id*2, MPI_COMM_WORLD);
 	}
-	MPI_Barrier(MPI_COMM_WORLD);
 	// ==============================
 	// Set up sim
 	// ==============================
@@ -30,7 +29,7 @@ int master(bool verbose)
 	// ==============================
 	
 	long n_e                = 1e5;
-	long n_ions             = 1e4;
+	long n_ions             = 1e2;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
 	double length           = 100e-6;
@@ -87,6 +86,8 @@ int master(bool verbose)
 	// Initialize serial writer
 	// ==============================
 	WriterSerial *writer_s;
+	writer_s = new WriterSerial(filename, true);
+	delete writer_s;
 
 	// ==============================
 	// Loop over electron evolution
@@ -132,10 +133,11 @@ int master(bool verbose)
 		{
 			loopcomm.instruct(LOOP_PUSH_IONS);
 			loopcomm.send_slaves(step);
+
+			loopcomm.instruct(LOOP_DUMP_IONS);
+			loopcomm.send_slaves(step);
 			loopcomm.send_slaves(z_step);
 
-			/* ionsim::sendloop(ionsim::LOOP_PUSH_IONS, z_step); */
-			/* ionsim::sendloop(ionsim::LOOP_DUMP_IONS, z_step); */
 		}
 
 		/* (*field).dump_serial(simparams.filename, step); */
@@ -145,15 +147,9 @@ int master(bool verbose)
 		/* (*field).get_interp(*field_interp); */
 		/* (*field_interp).dump_serial(simparams.filename, step); */
 		/* delete field_interp; */
-
-
-		/* ionsim::sendloop(ionsim::LOOP_DUMP_IONS, step); */
-		/* ionsim::sendloop(ionsim::LOOP_DUMP_E, step); */
-
 	}
 
 	loopcomm.instruct(LOOP_KILL);
-	/* ionsim::sendloop(ionsim::LOOP_KILL); */
 
 	return 0;
 }

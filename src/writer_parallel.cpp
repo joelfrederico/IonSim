@@ -19,10 +19,11 @@ WriterParallel::WriterParallel(const std::string &filename, const MPI_Comm comm_
 
 int WriterParallel::_init(const std::string &filename, bool overwrite)
 {
+	writer_type = WRITER_PARALLEL;
 	if (overwrite) {
-		overwrite_file_parallel(filename);
+		overwrite_file_parallel();
 	} else {
-		open_file(filename);
+		open_file();
 	}
 
 	return 0;
@@ -50,7 +51,7 @@ int WriterParallel::write_attributes(const SimParams &simparams) const
 	return 0;
 }
 
-int WriterParallel::open_file(std::string const &filename)
+int WriterParallel::open_file()
 {
 	LoopComm loopcomm;
 
@@ -66,13 +67,13 @@ int WriterParallel::open_file(std::string const &filename)
 	// ==================================
 	// Open the file
 	// ==================================
-	file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, plist_file_id);
+	file_id = H5Fopen(_filename.c_str(), H5F_ACC_RDWR, plist_file_id);
 	H5Pclose(plist_file_id);
 	
 	return 0;
 }
 
-int WriterParallel::overwrite_file_parallel(const std::string &filename)
+int WriterParallel::overwrite_file_parallel()
 {
 	hid_t plist_file_id;
 	MPI_Info info = MPI_INFO_NULL;
@@ -86,15 +87,13 @@ int WriterParallel::overwrite_file_parallel(const std::string &filename)
 	// ==================================
 	// Create a new file collectively
 	// ==================================
-	file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_file_id);
+	file_id = H5Fcreate(_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_file_id);
 	H5Pclose(plist_file_id);
-	
-	std::cout << "File created: " << file_id << std::endl;
 	
 	return 0;
 }
 
-int WriterParallel::_writedata(hid_t *group_id, std::string const &dataset, const Parts &parts)
+int WriterParallel::_writedata(hid_t &loc_id, std::string const &dataset, const Parts &parts)
 {
 	long n_pts  = parts.n_pts;
 	int n_write = MAX_N_WRITE;
@@ -107,11 +106,11 @@ int WriterParallel::_writedata(hid_t *group_id, std::string const &dataset, cons
 	const double_vec * _z  = &parts.z;
 	const double_vec * _zp = &parts.zp;
 
-	hsize_t count[2] = {n_pts*p, 6};
+	hsize_t count[2];
 	hsize_t offset[2];
 	hid_t dataset_id;
-	hid_t plist_dx_id;
 	hid_t dataspace_id;
+	hid_t plist_dx_id;
 	hid_t memspace_id;
 	herr_t status;
 
@@ -121,16 +120,22 @@ int WriterParallel::_writedata(hid_t *group_id, std::string const &dataset, cons
 	// The total array of particles is (n_pts*num_processes, 6) in size
 	// Remember that each slave has n_pts of different particles!
 	int rank = 2;
-	count[0] = n_pts*p;
+	count[0] = n_pts*(loopcomm.p-1);
 	count[1] = 6;
 
-	dataset_id = dataset_create(*group_id, dataspace_id, rank, count, dataset);
+	// Creates new dataset_id, dataspace_id
+	dataset_id = dataset_create(loc_id, dataspace_id, rank, count, dataset);
+
+	status = H5Sclose(dataspace_id);
+	status = H5Dclose(dataset_id);
+
+	return 0;
 
 	// ==================================
 	// Write dataset rows
 	// ==================================
-	plist_dx_id = H5Pcreate(H5P_DATASET_XFER);
-	H5Pset_dxpl_mpio(plist_dx_id, H5FD_MPIO_COLLECTIVE);
+	/* plist_dx_id = H5Pcreate(H5P_DATASET_XFER); */
+	/* H5Pset_dxpl_mpio(plist_dx_id, H5FD_MPIO_COLLECTIVE); */
 
 	int i=0;
 	if (n_pts < n_write) n_write = n_pts;
@@ -147,12 +152,12 @@ int WriterParallel::_writedata(hid_t *group_id, std::string const &dataset, cons
 		// ==================================
 		count[0]  = n_write;
 		count[1]  = 6;
-		offset[0] = (id * n_pts + i);
+		offset[0] = (loopcomm.id * n_pts + i);
 		offset[1] = 0;
 
-		memspace_id = H5Screate_simple(2, count, NULL);
+		/* memspace_id = H5Screate_simple(2, count, NULL); */
 
-		H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
+		/* H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL); */
 
 
 		for (int k=0; k < n_write; k++)
@@ -166,7 +171,7 @@ int WriterParallel::_writedata(hid_t *group_id, std::string const &dataset, cons
 			i++;
 		}
 
-		status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf);
+		/* status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, plist_dx_id, buf); */
 	}
 	delete [] buf;
 
@@ -193,7 +198,7 @@ int WriterParallel::writedata(long step, std::string const &dataset, const Parts
 	// ==================================
 	step_group_id    = group_step_access(file_id, step);
 
-	_writedata(&step_group_id, dataset, parts);
+	_writedata(step_group_id, dataset, parts);
 
 	H5Gclose(step_group_id);
 	
@@ -206,6 +211,7 @@ int WriterParallel::writedata_substep(long step, long substep, const std::string
 	// Initialize all variables
 	// ==================================
 	hid_t step_group_id, sub_group_id, sub_step_group_id;
+	herr_t status;
 
 	// ==================================
 	// Access or create a new group
@@ -214,6 +220,11 @@ int WriterParallel::writedata_substep(long step, long substep, const std::string
 	sub_group_id      = group_access(step_group_id, subgroup);
 	sub_step_group_id = group_step_access(sub_group_id, substep);
 
-	_writedata(&step_group_id, dataset, parts);
+	_writedata(sub_step_group_id, dataset, parts);
+
+	status = H5Gclose(step_group_id);
+	status = H5Gclose(sub_group_id);
+	status = H5Gclose(sub_step_group_id);
+
 	return 0;
 }

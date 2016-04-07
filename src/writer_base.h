@@ -7,11 +7,17 @@
 #include "field_data.h"
 #include "simparams.h"
 
+typedef int writer_t;
+const writer_t WRITER_NULL     = 0;
+const writer_t WRITER_SERIAL   = 1;
+const writer_t WRITER_PARALLEL = 2;
+
 class WriterBase
 {
 	protected:
 		std::string _filename;
 		hid_t file_id;
+		writer_t writer_type;
 
 		hid_t dataset_create(hid_t &group_id, hid_t &dataspace_id, int rank, hsize_t *count, std::string const &dataset);
 		hid_t group_step_access(hid_t &file_id, long step);

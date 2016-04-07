@@ -49,6 +49,8 @@ int main(int argc, char **argv)
 		slave(verbose);
 	}
 
+	MPI_Barrier(MPI_COMM_WORLD);
+
 	MPI_Finalize();
 
 	if (verbose)

@@ -5,11 +5,34 @@
 WriterBase::WriterBase(const std::string &filename)
 {
 	_filename = filename;
+	writer_type = WRITER_NULL;
 }
 
 WriterBase::~WriterBase()
 {
-	H5Fclose(file_id);
+	herr_t status;
+	ssize_t num_open;
+	hid_t *obj_id_list;
+	H5O_info_t obj_info;
+
+	status = H5Fclose(file_id);
+	if (status == -1)
+	{
+		num_open = H5Fget_obj_count(file_id, H5F_OBJ_ALL);
+		obj_id_list = new hid_t[num_open];
+		H5Fget_obj_ids(file_id, H5F_OBJ_ALL, num_open, obj_id_list);
+
+		std::cout << "ERROR: COULD NOT CLOSE FILE." << std::endl;
+		std::cout << "Open obj count: " << num_open << std::endl;
+
+		for (int i=0; i < num_open; i++)
+		{
+			std::cout << "Obj id: " << obj_id_list[i] << std::endl;
+		}
+
+		delete obj_id_list;
+	}
+
 }
 
 
@@ -33,6 +56,7 @@ hid_t WriterBase::group_access(hid_t &loc_id, const char *group)
 	{
 		group_id = H5Gcreate(loc_id, group, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Gget_info_by_name(loc_id, group, &objinfo, H5P_DEFAULT);
+		if ((status < 0) || (group_id < 0)) printf("WARNING\n");
 	}
 	return group_id;
 }

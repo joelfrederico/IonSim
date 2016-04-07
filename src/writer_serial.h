@@ -8,14 +8,17 @@
 class WriterSerial : public WriterBase
 {
 	private:
-		int open_file(std::string const &filename);
+		int open_file();
+		int overwrite_file_serial();
+
+		int _init(const std::string &filename, bool overwrite);
 
 	public:
 		WriterSerial(const std::string &filename);
+		WriterSerial(const std::string &filename, bool overwrite);
 
-		int overwrite_file_serial(std::string const &filename);
 
-		int writedata(long step, std::string const &group, std::string const &dataset, const Parts &parts);
+		int writedata(long step, const std::string &group, const std::string &dataset, const Parts &parts);
 		int writedata(long step, const Field_Data &field);
 };
 
