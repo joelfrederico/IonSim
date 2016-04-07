@@ -17,10 +17,10 @@ long calc_n_pts(const SimParams &simparams, const parttype_t type)
 {
 	switch (type)
 	{
-		case ionsim::PARTS_ION:
+		case PARTS_ION:
 			return simparams.n_ions;
 			break;
-		case ionsim::PARTS_E:
+		case PARTS_E:
 			return simparams.n_e;
 			break;
 	}

@@ -8,10 +8,13 @@
 #include "writer_serial.h"
 #include "writer_parallel.h"
 #include "loop_comm.h"
+#include "consts.h"
 
 int slave(bool verbose)
 {
-	int buf, step_buf;
+	std::string subgroup;
+	std::string dataset;
+	int buf, step_buf, substep_buf;
 	bool loop_alive;
 	SimParams simparams_temp;
 	Field_Comm fieldcomm;
@@ -94,30 +97,33 @@ int slave(bool verbose)
 	loop_alive = true;
 	do
 	{
-		MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
+		loopcomm.instruct(&buf);
 		switch (buf)
 		{
-			case ionsim::LOOP_KILL:
+			case LOOP_KILL:
 				// ==================================
 				// Terminate Loop
 				// ==================================
 				loop_alive = false;
 				break;
 
-			case ionsim::LOOP_DUMP_IONS:
+			case LOOP_DUMP_IONS:
 				// ==================================
 				// Write ions to file
 				// ==================================
-				ionsim::sendloop(step_buf);
+				loopcomm.recv_master(&step_buf);
+				loopcomm.recv_master(&substep_buf);
 				writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
 
-				/* (*writer_p).writedata_substep(step_buf, */ 
+				subgroup = "ions";
+				dataset = "ions";
+				/* (*writer_p).writedata_substep(step, substep, dataset, subgroup, &ions); */
 
 				delete writer_p;
 
 				break;
 
-			case ionsim::LOOP_DUMP_E:
+			case LOOP_DUMP_E:
 				// ==================================
 				// Write electrons to file
 				// ==================================
@@ -125,26 +131,28 @@ int slave(bool verbose)
 				/* ebeam.dump_parallel(simparams.filename, step_buf, slave_comm_id); */
 				break;
 
-			case ionsim::LOOP_PUSH_IONS:
+			case LOOP_PUSH_IONS:
 				// ==================================
 				// Push ions
 				// ==================================
-				MPI_Bcast(&step_buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
+				/* MPI_Bcast(&step_buf, 1, MPI_INT, 0, MPI_COMM_WORLD); */
+				loopcomm.recv_master(&step_buf);
+				loopcomm.recv_master(&substep_buf);
 				switch (simparams.pushmethod)
 				{
-					case ionsim::PUSH_RUNGE_KUTTA:
+					case PUSH_RUNGE_KUTTA:
 						ions.push(simparams.dt, nb_0, sr);
 						break;
-					case ionsim::PUSH_SIMPLE:
+					case PUSH_SIMPLE:
 						ions.push_simple(simparams.dt, nb_0, sr);
 						break;
-					case ionsim::PUSH_FIELD:
+					case PUSH_FIELD:
 						ions.push_field(simparams.dt, *field, step_buf);
 
 						break;
 				}
 				break;
-			case ionsim::LOOP_GET_EFIELD:
+			case LOOP_GET_EFIELD:
 				// ==================================
 				// Send E-field to Master
 				// ==================================
@@ -157,7 +165,7 @@ int slave(bool verbose)
 				fieldcomm.send_field(*field, 0);
 
 				break;
-			case ionsim::LOOP_SEND_EFIELD:
+			case LOOP_SEND_EFIELD:
 				// ==================================
 				// Retrieve field from Master
 				// ==================================

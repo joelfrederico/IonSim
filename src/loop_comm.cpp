@@ -1,6 +1,7 @@
 #include "loop_comm.h"
 #include <mpi.h>
 
+
 int _p()
 {
 	int out;
@@ -17,6 +18,7 @@ int _id()
 
 MPI_Comm LoopComm::_slave_create()
 {
+	MPI_Group world_group, slave_group;
 	int p = _p();
 	int id = _id();
 	MPI_Comm out;
@@ -50,4 +52,41 @@ LoopComm::LoopComm() :
 	id         ( _id()           ) ,
 	slave_comm ( _slave_create() )
 {
+}
+
+int LoopComm::instruct(int *buf) const
+{
+	MPI_Bcast(buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	return 0;
+}
+
+int LoopComm::instruct(const int buf) const
+{
+	int temp = buf;
+	MPI_Bcast(&temp, 1, MPI_INT, MASTER_RANK, MPI_COMM_WORLD);
+	return 0;
+}
+
+int LoopComm::send_slaves(const int buf) const
+{
+	if (id != 0) return -1;
+
+	int temp = buf;
+
+	for (int i=1; i < p; i++)
+	{
+		MPI_Send(&temp, 1, MPI_INT, i, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
+	}
+
+	return 0;
+}
+
+int LoopComm::recv_master(int *buf) const
+{
+	MPI_Status status;
+	if (id == 0) return -1;
+
+	MPI_Recv(buf, 1, MPI_INT, MASTER_RANK, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, &status);
+
+	return 0;
 }

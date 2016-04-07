@@ -8,10 +8,6 @@
 #include <sstream>
 #include <string>
 
-// Number of entries to write at once
-// because HDF5 crashes if you try to
-// do too much all at once.
-const int MAX_N_WRITE = 1e5;
 
 namespace ionsim
 {
@@ -33,24 +29,4 @@ namespace ionsim
 		return 0;
 	}
 
-	int sendloop(const int &message)
-	{
-		int buf;
-		buf = message;
-		MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
-		return 0;
-	}
-
-	int recvloop(int *buf)
-	{
-		MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
-		return 0;
-	}
-
-	int sendloop(const int &message, int step)
-	{
-		sendloop(message);
-		MPI_Bcast(&step, 1, MPI_INT, 0, MPI_COMM_WORLD);
-		return 0;
-	}
 }

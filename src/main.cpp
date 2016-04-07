@@ -46,7 +46,6 @@ int main(int argc, char **argv)
 	if (id == 0) {
 		master(verbose);
 	} else {
-		std::cout << "Slavestart" << std::endl;
 		slave(verbose);
 	}
 

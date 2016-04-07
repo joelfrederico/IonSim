@@ -17,7 +17,7 @@
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	// ==================================
 	// Save things
@@ -45,7 +45,7 @@ Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long
 	_gen_bivariate_gaussian(s, x_cov, y_cov, z_cov);
 }
 
-Ebeam::Ebeam(const SimParams &simparams, double sx, double sy, unsigned long int s) : Parts(simparams, ionsim::PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(const SimParams &simparams, double sx, double sy, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
 {
 	// ==================================
 	// Initialize local variables

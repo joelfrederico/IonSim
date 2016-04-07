@@ -96,8 +96,8 @@ int WriterParallel::overwrite_file_parallel(const std::string &filename)
 
 int WriterParallel::_writedata(hid_t *group_id, std::string const &dataset, const Parts &parts)
 {
-	long n_pts             = parts.n_pts;
-	int n_write = ionsim::MAX_N_WRITE;
+	long n_pts  = parts.n_pts;
+	int n_write = MAX_N_WRITE;
 	double *buf;
 
 	const double_vec * _x  = &parts.x;

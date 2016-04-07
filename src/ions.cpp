@@ -14,7 +14,7 @@
 // ==============================
 // Ions
 // ==============================
-Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(simparams, ionsim::PARTS_ION)
+Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(simparams, PARTS_ION)
 {
 	_plasma      = &plasma;
 	_radius      = radius;

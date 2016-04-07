@@ -44,7 +44,7 @@ int master(bool verbose)
 	int n_steps             = 1;
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
-	pushmethod_t pushmethod = ionsim::PUSH_SIMPLE;
+	pushmethod_t pushmethod = PUSH_SIMPLE;
 	long n_field_x          = 11;
 	long n_field_y          = 11;
 	long n_field_z          = 1;
@@ -98,7 +98,8 @@ int master(bool verbose)
 		// ==============================
 		// Get fields from slaves
 		// ==============================
-		ionsim::sendloop(ionsim::LOOP_GET_EFIELD);
+		loopcomm.instruct(LOOP_GET_EFIELD);
+		/* ionsim::sendloop(ionsim::LOOP_GET_EFIELD); */
 		field = new Field_Data(simparams);
 		fieldcomm.recv_field_others_add(*field);
 
@@ -112,7 +113,8 @@ int master(bool verbose)
 		// ==============================
 		// Push field to slaves
 		// ==============================
-		ionsim::sendloop(ionsim::LOOP_SEND_EFIELD);
+		loopcomm.instruct(LOOP_SEND_EFIELD);
+		/* ionsim::sendloop(ionsim::LOOP_SEND_EFIELD); */
 		for (int id=1; id < loopcomm.p; id++)
 		{
 			fieldcomm.send_field(*field, id);
@@ -128,8 +130,12 @@ int master(bool verbose)
 		// ==============================
 		for (int z_step=0; z_step < n_field_z; z_step++)
 		{
-			ionsim::sendloop(ionsim::LOOP_PUSH_IONS, z_step);
-			ionsim::sendloop(ionsim::LOOP_DUMP_IONS, z_step);
+			loopcomm.instruct(LOOP_PUSH_IONS);
+			loopcomm.send_slaves(step);
+			loopcomm.send_slaves(z_step);
+
+			/* ionsim::sendloop(ionsim::LOOP_PUSH_IONS, z_step); */
+			/* ionsim::sendloop(ionsim::LOOP_DUMP_IONS, z_step); */
 		}
 
 		/* (*field).dump_serial(simparams.filename, step); */
@@ -146,7 +152,8 @@ int master(bool verbose)
 
 	}
 
-	ionsim::sendloop(ionsim::LOOP_KILL);
+	loopcomm.instruct(LOOP_KILL);
+	/* ionsim::sendloop(ionsim::LOOP_KILL); */
 
 	return 0;
 }

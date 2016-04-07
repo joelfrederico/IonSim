@@ -38,7 +38,7 @@ int WriterSerial::writedata(long step, std::string const &group, std::string con
 	const double_vec * _zp = &parts.zp;
 	double *buf;
 
-	int n_write = ionsim::MAX_N_WRITE;
+	int n_write = MAX_N_WRITE;
 
 	hid_t step_group_id, group_id, dataspace_id;
 	hid_t dataset_id;
@@ -116,7 +116,6 @@ int WriterSerial::writedata(long step, std::string const &group, std::string con
 
 int WriterSerial::writedata(long step, const Field_Data &field)
 	{
-		std::cout << "Here" << std::endl;
 		// ==================================
 		// Initialize all variables
 		// ==================================
@@ -129,7 +128,7 @@ int WriterSerial::writedata(long step, const Field_Data &field)
 		long z_len = field.z_pts;
 		std::string const group = "field"; 
 
-		int n_write = ionsim::MAX_N_WRITE;
+		int n_write = MAX_N_WRITE;
 
 		hid_t step_group_id, group_id;
 		hid_t x_dataspace_id, y_dataspace_id, z_dataspace_id;
