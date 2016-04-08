@@ -42,7 +42,7 @@ int master(bool verbose)
 	double sz               = 30e-6;
 	double sdelta           = 0.04;
 	double t_tot            = 1.58631e-12*10;
-	int n_steps             = 1;
+	int n_steps             = 2;
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
 	pushmethod_t pushmethod = PUSH_SIMPLE;
@@ -100,6 +100,11 @@ int master(bool verbose)
 	for (int step=0; step < n_steps; step++)
 	{
 		printf("Step: %d\n", step);
+		// ==============================
+		// Write electrons
+		// ==============================
+		loopcomm.instruct(LOOP_DUMP_E);
+		loopcomm.send_slaves(step);
 
 		// ==============================
 		// Get fields from slaves

@@ -166,32 +166,17 @@ int WriterParallel::_writedata(hid_t &loc_id, const std::string &dataset_str, co
 	return 0;
 }
 
-int WriterParallel::writedata(unsigned int step, const std::string &dataset, const Parts &parts)
+int WriterParallel::writedata(unsigned int step, const std::string &dataset_str, const Parts &parts)
 {
-	// ==================================
-	// Initialize all variables
-	// ==================================
-
-	// ==================================
-	// Access or create a new group
-	// ==================================
 	GroupStepAccess step_group = GroupStepAccess(file_id, step);
 
-	_writedata(step_group.group_id, dataset, parts, step);
+	_writedata(step_group.group_id, dataset_str, parts, step);
 
 	return 0;
 }
 
 int WriterParallel::writedata_substep(unsigned int step, unsigned int substep, const std::string &dataset_str, const std::string &subgroup, const Parts &parts)
 {
-	// ==================================
-	// Initialize all variables
-	// ==================================
-	herr_t status;
-
-	// ==================================
-	// Access or create a new group
-	// ==================================
 	GroupStepAccess step_group = GroupStepAccess(file_id, step);
 	GroupAccess sub_group = GroupAccess(step_group.group_id, subgroup);
 

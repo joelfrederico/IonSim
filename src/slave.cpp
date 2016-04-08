@@ -56,11 +56,6 @@ int slave(bool verbose)
 	field = new Field_Data(simparams);
 
 	// ==================================
-	// Collectively create output file
-	// ==================================
-	/* ionsim::overwrite_file_parallel(simparams.filename, slave_comm_id); */
-
-	// ==================================
 	// Write attributes
 	// ==================================
 	WriterParallel *writer_p;
@@ -130,8 +125,14 @@ int slave(bool verbose)
 				// ==================================
 				// Write electrons to file
 				// ==================================
-				MPI_Bcast(&step_buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
-				/* ebeam.dump_parallel(simparams.filename, step_buf, slave_comm_id); */
+				loopcomm.recv_master(&step_buf);
+
+				writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
+
+				(*writer_p).writedata(step_buf, "electrons", ebeam);
+
+				delete writer_p;
+
 				break;
 
 			case LOOP_PUSH_IONS:
