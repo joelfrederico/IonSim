@@ -197,9 +197,5 @@ int WriterParallel::writedata_substep(unsigned int step, unsigned int substep, c
 
 	_writedata(sub_group.group_id, dataset_str, parts, substep);
 
-	/* std::string mystring = "Substep"; */
-	/* writeattribute(dataset_id, mystring, substep); */
-
-
 	return 0;
 }

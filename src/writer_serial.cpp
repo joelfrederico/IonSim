@@ -60,10 +60,8 @@ int WriterSerial::writedata(long step, const std::string &group_str, const std::
 
 	int n_write = MAX_N_WRITE;
 
-	/* hid_t memspace_id; */
 	DataspaceCreate *memspace;
 	hsize_t count[2];
-
 	herr_t status;
 
 	// ==================================
