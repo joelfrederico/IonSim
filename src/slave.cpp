@@ -32,6 +32,8 @@ int slave(bool verbose)
 	MPI_Recv(&buf, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	if (verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
 
+	MPI_Barrier(MPI_COMM_WORLD);
+
 	// ==================================
 	// Receive run info
 	// ==================================
@@ -62,11 +64,6 @@ int slave(bool verbose)
 	// Write attributes
 	// ==================================
 	WriterParallel *writer_p;
-	/*
-	writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm, true);
-	(*writer_p).write_attributes(simparams);
-	delete writer_p;
-	*/
 
 	// ==================================
 	// Generate beam
@@ -160,8 +157,6 @@ int slave(bool verbose)
 				// ==================================
 				// Send E-field to Master
 				// ==================================
-				std::cout << "Getting field" << std::endl;
-
 				delete field;
 				field = new Field_Data(simparams);
 

@@ -320,7 +320,7 @@ int Ebeam::field_Coulomb(Field_Data &field)
 	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 
-	std::cout << "Calculating Coulomb field..." << std::endl;
+	/* std::cout << "Calculating Coulomb field..." << std::endl; */
 
 	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	const double common_tran = common_para * _simparams.gamma_rel;
@@ -355,6 +355,8 @@ int Ebeam::field_Coulomb(Field_Data &field)
 
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+
+	/*
 	if (id == 1)
 	{
 		std::cout << "=============================================" << std::endl;
@@ -371,6 +373,7 @@ int Ebeam::field_Coulomb(Field_Data &field)
 
 		std::cout << "=============================================" << std::endl;
 	}
+	*/
 
 	return 0;
 }

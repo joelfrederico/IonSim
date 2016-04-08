@@ -18,6 +18,8 @@ int master(bool verbose)
 	{
 		MPI_Send(&slave_id, 1, MPI_INT, slave_id, slave_id*2, MPI_COMM_WORLD);
 	}
+
+	MPI_Barrier(MPI_COMM_WORLD);
 	// ==============================
 	// Set up sim
 	// ==============================
@@ -83,11 +85,14 @@ int master(bool verbose)
 	simparams.bcast_send();
 
 	// ==============================
-	// Initialize serial writer
+	// Overwrite current file
 	// ==============================
 	WriterSerial *writer_s;
 	writer_s = new WriterSerial(filename, true);
+	(*writer_s).write_attributes(simparams);
 	delete writer_s;
+
+
 
 	// ==============================
 	// Loop over electron evolution
@@ -100,7 +105,6 @@ int master(bool verbose)
 		// Get fields from slaves
 		// ==============================
 		loopcomm.instruct(LOOP_GET_EFIELD);
-		/* ionsim::sendloop(ionsim::LOOP_GET_EFIELD); */
 		field = new Field_Data(simparams);
 		fieldcomm.recv_field_others_add(*field);
 
@@ -115,7 +119,6 @@ int master(bool verbose)
 		// Push field to slaves
 		// ==============================
 		loopcomm.instruct(LOOP_SEND_EFIELD);
-		/* ionsim::sendloop(ionsim::LOOP_SEND_EFIELD); */
 		for (int id=1; id < loopcomm.p; id++)
 		{
 			fieldcomm.send_field(*field, id);

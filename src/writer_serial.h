@@ -18,7 +18,7 @@ class WriterSerial : public WriterBase
 		WriterSerial(const std::string &filename, bool overwrite);
 
 
-		int writedata(long step, const std::string &group, const std::string &dataset, const Parts &parts);
+		int writedata(long step, const std::string &group, const std::string &dataset_str, const Parts &parts);
 		int writedata(long step, const Field_Data &field);
 };
 
