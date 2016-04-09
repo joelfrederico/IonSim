@@ -1,4 +1,5 @@
 #include "hdf5_classes.h"
+#include <typeinfo>
 
 Debug::Debug(const bool debug_flag) :
 	debug(debug_flag)

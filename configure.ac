@@ -10,6 +10,7 @@ AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AX_PROG_CXX_MPI
+AX_PROG_CC_MPI
 AM_PROG_AR
 LT_INIT
 AC_CONFIG_MACRO_DIRS([m4])
