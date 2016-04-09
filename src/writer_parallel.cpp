@@ -3,6 +3,7 @@
 #include "support_func.h"
 #include "loop_comm.h"
 #include "hdf5_classes.h"
+#include <hdf5.h>
 
 WriterParallel::WriterParallel(const std::string &filename, const MPI_Comm comm_id) :
 	WriterBase(filename)

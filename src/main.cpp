@@ -6,6 +6,7 @@
 
 #include <mpi.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 const int INT_TAG = 1;
 

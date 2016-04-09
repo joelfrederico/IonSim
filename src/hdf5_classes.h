@@ -3,6 +3,8 @@
 
 #include <hdf5.h>
 #include <string>
+#include <typeinfo>
+#include <iostream>
 
 class DataspaceCreate;
 
