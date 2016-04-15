@@ -87,7 +87,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = gtest$(EXEEXT)
+check_PROGRAMS = gtest$(EXEEXT) mpi_gtest$(EXEEXT)
 TESTS = gtest$(EXEEXT)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -125,6 +125,12 @@ gtest_DEPENDENCIES = libgtest.la $(am__DEPENDENCIES_1)
 gtest_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(gtest_LDFLAGS) $(LDFLAGS) -o $@
+am_mpi_gtest_OBJECTS = mpi_gtest-mpi_gtest.$(OBJEXT)
+mpi_gtest_OBJECTS = $(am_mpi_gtest_OBJECTS)
+mpi_gtest_DEPENDENCIES = libgtest.la $(am__DEPENDENCIES_1)
+mpi_gtest_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(mpi_gtest_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -159,8 +165,9 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libgtest_la_SOURCES) $(gtest_SOURCES)
-DIST_SOURCES = $(libgtest_la_SOURCES) $(gtest_SOURCES)
+SOURCES = $(libgtest_la_SOURCES) $(gtest_SOURCES) $(mpi_gtest_SOURCES)
+DIST_SOURCES = $(libgtest_la_SOURCES) $(gtest_SOURCES) \
+	$(mpi_gtest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -553,6 +560,10 @@ gtest_SOURCES = gtest.cpp \
 gtest_LDADD = libgtest.la $(MYLDADD)
 gtest_LDFLAGS = -pthread -L/opt/local/lib
 gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
+mpi_gtest_SOURCES = mpi_gtest.cpp
+mpi_gtest_LDADD = libgtest.la $(MYLDADD)
+mpi_gtest_LDFLAGS = -pthread -L/opt/local/lib
+mpi_gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -637,6 +648,10 @@ gtest$(EXEEXT): $(gtest_OBJECTS) $(gtest_DEPENDENCIES) $(EXTRA_gtest_DEPENDENCIE
 	@rm -f gtest$(EXEEXT)
 	$(AM_V_CXXLD)$(gtest_LINK) $(gtest_OBJECTS) $(gtest_LDADD) $(LIBS)
 
+mpi_gtest$(EXEEXT): $(mpi_gtest_OBJECTS) $(mpi_gtest_DEPENDENCIES) $(EXTRA_mpi_gtest_DEPENDENCIES) 
+	@rm -f mpi_gtest$(EXEEXT)
+	$(AM_V_CXXLD)$(mpi_gtest_LINK) $(mpi_gtest_OBJECTS) $(mpi_gtest_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f ../googletest/googletest/src/*.$(OBJEXT)
@@ -652,6 +667,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-gtest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi_gtest-mpi_gtest.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -753,6 +769,20 @@ gtest-gtest.obj: gtest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/gtest-support_func.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
+
+mpi_gtest-mpi_gtest.o: mpi_gtest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mpi_gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mpi_gtest-mpi_gtest.o -MD -MP -MF $(DEPDIR)/mpi_gtest-mpi_gtest.Tpo -c -o mpi_gtest-mpi_gtest.o `test -f 'mpi_gtest.cpp' || echo '$(srcdir)/'`mpi_gtest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mpi_gtest-mpi_gtest.Tpo $(DEPDIR)/mpi_gtest-mpi_gtest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mpi_gtest.cpp' object='mpi_gtest-mpi_gtest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mpi_gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mpi_gtest-mpi_gtest.o `test -f 'mpi_gtest.cpp' || echo '$(srcdir)/'`mpi_gtest.cpp
+
+mpi_gtest-mpi_gtest.obj: mpi_gtest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mpi_gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mpi_gtest-mpi_gtest.obj -MD -MP -MF $(DEPDIR)/mpi_gtest-mpi_gtest.Tpo -c -o mpi_gtest-mpi_gtest.obj `if test -f 'mpi_gtest.cpp'; then $(CYGPATH_W) 'mpi_gtest.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi_gtest.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mpi_gtest-mpi_gtest.Tpo $(DEPDIR)/mpi_gtest-mpi_gtest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mpi_gtest.cpp' object='mpi_gtest-mpi_gtest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mpi_gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mpi_gtest-mpi_gtest.obj `if test -f 'mpi_gtest.cpp'; then $(CYGPATH_W) 'mpi_gtest.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi_gtest.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

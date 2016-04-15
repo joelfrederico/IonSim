@@ -30,8 +30,8 @@ int master(bool verbose)
 	// Generate beam
 	// ==============================
 	
-	long n_e                = 1e5;
-	long n_ions             = 1e4;
+	long n_e                = 1e6;
+	long n_ions             = 1e6;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
 	double length           = 100e-6;
@@ -46,9 +46,9 @@ int master(bool verbose)
 	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
 	pushmethod_t pushmethod = PUSH_SIMPLE;
-	long n_field_x          = 11;
-	long n_field_y          = 11;
-	long n_field_z          = 11;
+	long n_field_x          = 51;
+	long n_field_y          = 51;
+	long n_field_z          = 21;
 
 	const SimParams simparams(
 		E,
@@ -103,8 +103,8 @@ int master(bool verbose)
 		// ==============================
 		// Write electrons
 		// ==============================
-		loopcomm.instruct(LOOP_DUMP_E);
-		loopcomm.send_slaves(step);
+		/* loopcomm.instruct(LOOP_DUMP_E); */
+		/* loopcomm.send_slaves(step); */
 
 		// ==============================
 		// Get fields from slaves
