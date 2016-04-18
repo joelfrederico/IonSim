@@ -2383,6 +2383,8 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+ac_config_headers="$ac_config_headers config.h"
+
 am__api_version='1.15'
 
 ac_aux_dir=
@@ -2993,8 +2995,6 @@ fi
 
 
 # AC_CONFIG_MACRO_DIRS([googletest/googletest/m4])
-ac_config_headers="$ac_config_headers config.h"
-
 
 # Checks for programs.
 DEPDIR="${am__leading_dot}deps"
@@ -16990,7 +16990,7 @@ MYAM_CPPFLAGS=$MYAM_CPPFLAGS
 # Checks for library functions.
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile tests/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/ioncheck/Makefile tests/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -18107,6 +18107,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/ioncheck/Makefile") CONFIG_FILES="$CONFIG_FILES src/ioncheck/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

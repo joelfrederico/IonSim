@@ -1,4 +1,4 @@
-# AM_CPPFLAGS=$(GSL_CFLAGS) $(HDF5_CPPFLAGS)
+SUBDIRS = ioncheck
 AM_CPPFLAGS=$(MYAM_CPPFLAGS)
 
 bin_PROGRAMS=ionsim
@@ -26,5 +26,3 @@ ionsim_SOURCES=\
 		 writer_parallel.cpp
 
 ionsim_LDADD = $(MYLDADD)
-# ionsim_LDADD = $(GSL_LIBS) $(HDF5_LIBS)
-# ionsim_CPPFLAGS = $(GSL_CFLAGS) $(HDF5_CPPFLAGS)
