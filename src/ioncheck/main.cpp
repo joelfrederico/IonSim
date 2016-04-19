@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <hdf5.h>
 #include <iomanip>
-#include <argp.h>
+/* #include <argp.h> */
 #include <string>
 
 const char *argp_program_version = "v0.1";
@@ -38,45 +38,55 @@ herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void 
 	return 0;
 }
 
-struct arguments
-{
-	std::string file;
-};
+/* struct arguments */
+/* { */
+/* 	std::string file; */
+/* }; */
 
-error_t myparser(int key, char *arg, struct argp_state *state)
-{
-	struct arguments *arguments;
-	arguments = (struct arguments*)state->input;
+/* error_t myparser(int key, char *arg, struct argp_state *state) */
+/* { */
+/* 	struct arguments *arguments; */
+/* 	arguments = (struct arguments*)state->input; */
 
-	switch (key)
-	{
-		case ARGP_KEY_ARG:
-			arguments->file = arg;
-			break;
-		default:
-			return ARGP_ERR_UNKNOWN;
-	}
+/* 	switch (key) */
+/* 	{ */
+/* 		case ARGP_KEY_ARG: */
+/* 			arguments->file = arg; */
+/* 			break; */
+/* 		default: */
+/* 			return ARGP_ERR_UNKNOWN; */
+/* 	} */
 
-	return 0;
-}
+/* 	return 0; */
+/* } */
 
 int main(int argc, char **argv)
 {
-	int arg_err;
+	/* int arg_err; */
 
-	struct arguments args;
-	args.file = "output.h5";
+	/* struct arguments args; */
+	/* args.file = "output.h5"; */
 
-	struct argp argp = {0, myparser, args_doc, 0};
-	argp_parse(&argp, argc, argv, 0, 0, &args);
+	/* struct argp argp = {0, myparser, args_doc, 0}; */
+	/* argp_parse(&argp, argc, argv, 0, 0, &args); */
 
-	if (arg_err != 0)
+	/* if (arg_err != 0) */
+	/* { */
+	/* 	std::cout << "Error: " << arg_err << std::endl; */
+	/* 	return arg_err; */
+	/* } */
+
+	const char *file;
+
+	if (argc == 2)
 	{
-		std::cout << "Error: " << arg_err << std::endl;
-		return arg_err;
+		file = argv[1];
+		std::cout << "Checking file: " << file << std::endl;
+	} else {
+		file = "output.h5";
+		std::cout << "Checking default file: " << file << std::endl;
 	}
 
-	std::cout << "Checking file: " << args.file << std::endl;
 	std::cout << "=========================================" << std::endl;
 
 	hid_t file_id, root_obj;
@@ -84,7 +94,14 @@ int main(int argc, char **argv)
 	H5O_info_t root_info;
 	hsize_t n = 0;
 
-	file_id = H5Fopen(args.file.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+	status = H5Eset_auto(H5E_DEFAULT, NULL, NULL);
+	file_id = H5Fopen(file, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+	if (file_id < 0)
+	{
+		std::cout << "File could not be opened!" << std::endl;
+		return -1;
+	}
 
 	status = H5Oget_info(file_id, &root_info);
 
