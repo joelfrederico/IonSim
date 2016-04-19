@@ -137,6 +137,9 @@ int master(bool verbose)
 		// ==============================
 		// Integrate ion motion
 		// ==============================
+		loopcomm.instruct(LOOP_DUMP_IONS);
+		loopcomm.send_slaves(step);
+		loopcomm.send_slaves(0);
 		for (int z_step=0; z_step < n_field_z; z_step++)
 		{
 			loopcomm.instruct(LOOP_PUSH_IONS);
@@ -144,7 +147,7 @@ int master(bool verbose)
 
 			loopcomm.instruct(LOOP_DUMP_IONS);
 			loopcomm.send_slaves(step);
-			loopcomm.send_slaves(z_step);
+			loopcomm.send_slaves(z_step+1);
 
 		}
 	}
