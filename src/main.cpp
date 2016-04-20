@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 	// ==============================
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-	if (verbose && id==0) printf("%d %d %d\n", OMPI_MAJOR_VERSION, OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
+	if (verbose && id==0) printf("OpenMPI v%d.%d.%d\n", OMPI_MAJOR_VERSION, OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
 
 	// ==============================
 	// Simulate things

@@ -30,8 +30,8 @@ int master(bool verbose)
 	// Generate beam
 	// ==============================
 	
-	long n_e                = 1e6;
-	long n_ions             = 1e6;
+	long n_e                = 1e4;
+	long n_ions             = 1e4;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
 	double length           = 100e-6;
@@ -48,7 +48,7 @@ int master(bool verbose)
 	pushmethod_t pushmethod = PUSH_SIMPLE;
 	long n_field_x          = 51;
 	long n_field_y          = 51;
-	long n_field_z          = 21;
+	long n_field_z          = 1;
 
 	const SimParams simparams(
 		E,
@@ -103,8 +103,8 @@ int master(bool verbose)
 		// ==============================
 		// Write electrons
 		// ==============================
-		/* loopcomm.instruct(LOOP_DUMP_E); */
-		/* loopcomm.send_slaves(step); */
+		loopcomm.instruct(LOOP_DUMP_E);
+		loopcomm.send_slaves(step);
 
 		// ==============================
 		// Get fields from slaves
