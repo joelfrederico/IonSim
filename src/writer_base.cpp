@@ -1,3 +1,4 @@
+#include "config.h"
 #include "writer_base.h"
 #include "field_data.h"
 #include "support_func.h"
@@ -52,6 +53,7 @@ hid_t WriterBase::dataset_create(hid_t &group_id, hid_t &dataspace_id, int rank,
 
 int WriterBase::write_attributes(const SimParams &simparams) const
 {
+	AttributeCreate version   ( file_id , "version"   , VERSION             ) ;
 	AttributeCreate n_e       ( file_id , "n_e"       , simparams.n_e       ) ;
 	AttributeCreate n_ions    ( file_id , "n_ions"    , simparams.n_ions    ) ;
 	AttributeCreate q_tot     ( file_id , "q_tot"     , simparams.q_tot     ) ;

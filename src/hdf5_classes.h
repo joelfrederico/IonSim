@@ -88,7 +88,11 @@ class AttributeCreate : public Debug
 		AttributeCreate(hid_t loc_id, const std::string &attr_name, T attr_value) :
 			Debug(true)
 		{
-			/* hid_t type_id = H5T_NATIVE_DOUBLE; */
+			herr_t status;
+
+			// ==================================
+			// Figure out the HDF5 type to write
+			// ==================================
 			if (typeid(attr_value) == typeid(double)) {
 				type_id = H5T_NATIVE_DOUBLE;
 			} else if (typeid(attr_value) == typeid(int)) {
@@ -97,13 +101,13 @@ class AttributeCreate : public Debug
 				type_id = H5T_NATIVE_LONG;
 			} else if (typeid(attr_value) == typeid(unsigned int)) {
 				type_id = H5T_NATIVE_UINT;
+			} else if (typeid(attr_value) == typeid(const char *)) {
+				type_id = H5Tcopy(H5T_C_S1);
+				status = H5Tset_size(type_id, H5T_VARIABLE);
 			} else {
 				printf("Not a valid attribute type.\n");
 				return;
 			}
-
-			herr_t status;
-			const hsize_t mysize = 1;
 
 			// ==================================
 			// Create an appropriate dataspace
@@ -121,6 +125,13 @@ class AttributeCreate : public Debug
 				std::cout << "Attribute not created!" << std::endl;
 			} else {
 				status = H5Awrite(attr_id, type_id, &attr_value);
+			}
+
+			// ==================================
+			// Close resources
+			// ==================================
+			if (typeid(attr_value) == typeid(const char *)) {
+				H5Tclose(type_id);
 			}
 		}
 

@@ -92,8 +92,6 @@ int master(bool verbose)
 	(*writer_s).write_attributes(simparams);
 	delete writer_s;
 
-
-
 	// ==============================
 	// Loop over electron evolution
 	// ==============================
