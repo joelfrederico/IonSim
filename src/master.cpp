@@ -48,7 +48,7 @@ int master(bool verbose)
 	pushmethod_t pushmethod = PUSH_SIMPLE;
 	long n_field_x          = 51;
 	long n_field_y          = 51;
-	long n_field_z          = 1;
+	long n_field_z          = 3;
 
 	const SimParams simparams(
 		E,
