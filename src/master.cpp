@@ -29,9 +29,8 @@ int master(bool verbose)
 	// ==============================
 	// Generate beam
 	// ==============================
-	
-	long n_e                = 1e4;
-	long n_ions             = 1e4;
+	long n_e                = 1e5;
+	long n_ions             = 1e5;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
 	double length           = 100e-6;
@@ -48,7 +47,7 @@ int master(bool verbose)
 	pushmethod_t pushmethod = PUSH_SIMPLE;
 	long n_field_x          = 51;
 	long n_field_y          = 51;
-	long n_field_z          = 1;
+	long n_field_z          = 2;
 
 	const SimParams simparams(
 		E,
