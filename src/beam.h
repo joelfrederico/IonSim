@@ -3,6 +3,22 @@
 
 #include "emit.h"
 
+class Cov
+{
+	private:
+		double _cov[4];
+
+		int _index(int i, int j);
+
+	public:
+		Cov();
+		Cov(double cov[2][2]);
+		Cov(double arr[4]);
+		Cov(double xx, double xy, double yx, double yy);
+
+		double & operator()(int i, int j);
+};
+
 class Beam
 {
 	private:
@@ -13,10 +29,10 @@ class Beam
 		Beam();
 		Beam(double beta, double alpha, Emit emit);
 
-		double alpha();
-		double beta();
-		double sigma();
-		void cov(double output[2][2]);
+		double alpha() const;
+		double beta() const;
+		double sigma() const;
+		Cov cov() const;
 
 };
 

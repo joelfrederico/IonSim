@@ -11,7 +11,7 @@ class Emit
 		void set_emit_n(double emit_n, double E_GeV);
 		void set_emit(double emit, double E_GeV);
 
-		double emit();
+		double emit() const;
 };
 
 #endif

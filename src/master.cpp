@@ -4,6 +4,7 @@
 #include "field_comm.h"
 #include "writer_serial.h"
 #include "loop_comm.h"
+#include "consts.h"
 
 int master(bool verbose)
 {
@@ -48,6 +49,7 @@ int master(bool verbose)
 	long n_field_x          = 51;
 	long n_field_y          = 51;
 	long n_field_z          = 3;
+	zdist_t zdist           = Z_DIST_FLAT;
 
 	const SimParams simparams(
 		E,
@@ -58,8 +60,9 @@ int master(bool verbose)
 		n_p_cgs,
 		q_tot,
 		radius,
-		sdelta,
 		sz,
+		sdelta,
+		zdist,
 		t_tot,
 		n_steps,
 		pushmethod,

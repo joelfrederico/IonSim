@@ -65,6 +65,7 @@ int WriterBase::write_attributes(const SimParams &simparams) const
 	AttributeCreate m_ion_amu ( file_id , "m_ion_amu" , simparams.m_ion_amu ) ;
 	AttributeCreate sz        ( file_id , "sz"        , simparams.sz        ) ;
 	AttributeCreate sdelta    ( file_id , "sdelta"    , simparams.sdelta    ) ;
+	AttributeCreate zdist     ( file_id , "zdist"     , simparams.zdist     ) ;
 	AttributeCreate dt        ( file_id , "dt"        , simparams.dt        ) ;
 	AttributeCreate n_steps   ( file_id , "n_steps"   , simparams.n_steps   ) ;
 	AttributeCreate n_field_x ( file_id , "n_field_x" , simparams.n_field_x ) ;

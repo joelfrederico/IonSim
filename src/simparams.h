@@ -26,8 +26,9 @@ class SimParams
 			double _n_p_cgs,
 			double _q_tot,
 			double _radius,
-			double _sdelta,
 			double _sz,
+			double _sdelta,
+			zdist_t _zdist,
 			double _t_tot,
 			int _n_steps,
 			pushmethod_t _pushmethod,
@@ -74,8 +75,9 @@ class SimParams
 		double n_p_cgs;
 		double q_tot;
 		double radius;
-		double sdelta;
 		double sz;
+		double sdelta;
+		zdist_t zdist;
 		double t_tot;
 		int n_steps;
 		pushmethod_t pushmethod;

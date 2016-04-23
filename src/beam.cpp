@@ -3,6 +3,58 @@
 #include <gsl/gsl_const_mksa.h>
 
 // ==============================
+// Cov
+// ==============================
+int Cov::_index(int i, int j)
+{
+	return i + 2*j;
+}
+
+Cov::Cov()
+{
+	for (int i=0; i < 2; i++)
+	{
+		for (int j=0; j < 2; j++)
+		{
+			_cov[_index(i, j)] = 0;
+		}
+	}
+}
+
+Cov::Cov(double cov[2][2])
+{
+	for (int i=0; i < 2; i++)
+	{
+		for (int j=0; j < 2; j++)
+		{
+			_cov[_index(i, j)] = cov[i][j];
+		}
+	}
+}
+
+Cov::Cov(double cov[4])
+{
+	for (int i=0; i < 4; i++)
+	{
+		_cov[i] = cov[i];
+	}
+}
+
+Cov::Cov(double xx, double xy, double yx, double yy)
+{
+	Cov out;
+	out(0, 0) = xx;
+	out(0, 1) = xy;
+	out(1, 0) = yx;
+	out(1, 1) = yy;
+}
+
+double & Cov::operator()(int i, int j)
+{
+	return _cov[_index(i, j)];
+}
+
+// ==============================
 // Beam
 // ==============================
 Beam::Beam() {}
@@ -14,35 +66,51 @@ Beam::Beam(double beta, double alpha, Emit emit)
 	_emit = emit;
 }
 
-double Beam::alpha()
+double Beam::alpha() const
 {
 	return _alpha;
 }
 
-double Beam::beta()
+double Beam::beta() const
 {
 	return _beta;
 }
 
-double Beam::sigma()
+double Beam::sigma() const
 {
 	return sqrt(_beta*_emit.emit());
 }
 
-void Beam::cov(double output[2][2])
+Cov Beam::cov() const
 {
-	output[0][0] = beta();
-	output[0][1] = output[1][0] = -alpha();
-	output[1][1] = (1.0+pow(alpha(), 2))/beta();
+	Cov out;
+
+	out(0, 0) = beta();
+	out(0, 1) = out(1, 0) = -alpha();
+	out(1, 1) = (1.0 + pow(alpha(), 2))/beta();
 	double buf = _emit.emit();
 	for (int i=0; i < 2; i++) 
 	{
 		for (int j=0; j < 2; j++)
 		{
-			output[i][j] *= _emit.emit();
+			out(i, j) *= buf;
 		}
 	}
-	return;
+
+	return out;
+
+	/* output[0][0] = beta(); */
+	/* output[0][1] = output[1][0] = -alpha(); */
+	/* output[1][1] = (1.0+pow(alpha(), 2))/beta(); */
+	/* double buf = _emit.emit(); */
+	/* for (int i=0; i < 2; i++) */ 
+	/* { */
+	/* 	for (int j=0; j < 2; j++) */
+	/* 	{ */
+	/* 		output[i][j] *= _emit.emit(); */
+	/* 	} */
+	/* } */
+	/* return; */
 }
 
 // ==============================

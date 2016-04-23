@@ -13,7 +13,6 @@ class Field_Data
 		// ==================================
 		double dxdi;
 		double dydj;
-		double dzdk;
 
 		double mid_i;
 		double mid_j;
@@ -32,6 +31,8 @@ class Field_Data
 	protected:
 
 	public:
+		double dzdk;
+
 		// ==================================
 		// Constructors, Destructor
 		// ==================================

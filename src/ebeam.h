@@ -16,14 +16,18 @@ class Ebeam : public Parts
 		// ==================================
 		SimParams _simparams;
 
-		int _gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], double y_cov[2][2], double z_cov[2][2]);
+		int _gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Cov z_cov);
+		
+		const Cov _x_cov;
+		const Cov _y_cov;
+		const Cov _z_cov;
 
 	public:
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
 		Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s);
-		Ebeam(const SimParams &simparams, double sx, double sy, unsigned long int s);
+		Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s);
 		Ebeam(
 				const SimParams &simparams,
 				const double n_pts,
@@ -40,6 +44,7 @@ class Ebeam : public Parts
 		// Member data
 		// ==================================
 		double qpp;
+		double z_end;
 
 		// ==================================
 		// Member methods
@@ -53,6 +58,7 @@ class Ebeam : public Parts
 
 		int field_BE(Field_Data &field);
 		int field_Coulomb(Field_Data &field);
+		int field_Coulomb_sliced(Field_Data &field);
 };
 
 #endif

@@ -72,9 +72,6 @@ int slave(bool verbose)
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
 
-	double cov[2][2];
-	x_beam.cov(cov);
-
 	sr = x_beam.sigma();
 	nb_0 = simparams.q_tot / (pow(2*M_PI, 1.5) * simparams.sz * sr * sr);
 

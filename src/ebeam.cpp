@@ -15,11 +15,20 @@
 #include "simparams.h"
 #include "faddeeva/Faddeeva.hh"
 
+Cov z_cov(SimParams simparams)
+{
+	Cov out;
+	out(0, 0) = simparams.sz;
+	out(0, 1) = out(1, 0) = 0;
+	out(1, 1) = simparams.sdelta;
+
+	return out;
+}
 
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams), _x_cov(x_beam.cov()), _y_cov(y_beam.cov()), _z_cov(z_cov(simparams))
 {
 	// ==================================
 	// Save things
@@ -28,60 +37,44 @@ Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long
 	/* _y_beam = y_beam; */
 
 	// ==================================
-	// Initialize local variables
-	// ==================================
-	double x_cov[2][2];
-	double y_cov[2][2];
-	double z_cov[2][2];
-
-	// ==================================
 	// Get covariances for x and y
 	// ==================================
-	x_beam.cov(x_cov);
-	y_beam.cov(y_cov);
+	/* x_beam.cov(_x_cov); */
+	/* y_beam.cov(_y_cov); */
 
-	z_cov[0][0] = simparams.sz;
-	z_cov[0][1] = z_cov[1][0] = 0;
-	z_cov[1][1] = simparams.sdelta;
+	/* _z_cov[0][0] = simparams.sz; */
+	/* _z_cov[0][1] = _z_cov[1][0] = 0; */
+	/* _z_cov[1][1] = simparams.sdelta; */
 
-	_gen_bivariate_gaussian(s, x_cov, y_cov, z_cov);
+	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
 }
 
-Ebeam::Ebeam(const SimParams &simparams, double sx, double sy, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams), _x_cov(sx*sx, 0, 0, syp*syp), _y_cov(sy*sy, 0, 0, syp*syp), _z_cov(z_cov(simparams))
 {
 	// ==================================
 	// Initialize local variables
 	// ==================================
-	double x_cov[2][2];
-	double y_cov[2][2];
-	double z_cov[2][2];
+	/* double x_cov[2][2]; */
+	/* double y_cov[2][2]; */
+	/* double z_cov[2][2]; */
 
 	// ==================================
 	// Get covariances for x and y
 	// ==================================
-	for (int i=0; i < 2; i++)
-	{
-		for (int j=0; j < 2; j++)
-		{
-			x_cov[i][j] = 0;
-			y_cov[i][j] = 0;
-		}
-	}
-	x_cov[0][0] = sx;
-	y_cov[0][0] = sy;
+	/* _x_cov[0][0] = sx; */
+	/* _y_cov[0][0] = sy; */
 
-	z_cov[0][0] = simparams.sz;
-	z_cov[0][1] = z_cov[1][0] = 0;
-	z_cov[1][1] = simparams.sdelta;
+	/* _z_cov[0][0] = simparams.sz; */
+	/* _z_cov[0][1] = _z_cov[1][0] = 0; */
+	/* _z_cov[1][1] = simparams.sdelta; */
 
-	_gen_bivariate_gaussian(s, x_cov, y_cov, z_cov);
+	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
 }
 
-int Ebeam::_gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], double y_cov[2][2], double z_cov[2][2])
+int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Cov z_cov)
 {
 	double* rho_x;
 	double* rho_y;
-	double z_len;
 	// ==================================
 	// Set random number generator
 	// ==================================
@@ -95,19 +88,27 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, double x_cov[2][2], doub
 	// ==================================
 	// Create particles randomly
 	// ==================================
-	rho_x = &x_cov[0][1];
-	rho_y = &y_cov[0][1];
+	rho_x = &x_cov(0, 1);
+	rho_y = &y_cov(0, 1);
 	for (int i=0; i < n_pts; i++)
 	{
 
-		gsl_ran_bivariate_gaussian(r , sqrt(x_cov[0][0]) , sqrt(x_cov[1][1]) , *rho_x , &x[i] , &xp[i]);
-		gsl_ran_bivariate_gaussian(r , sqrt(y_cov[0][0]) , sqrt(y_cov[1][1]) , *rho_y , &y[i] , &yp[i]);
+		gsl_ran_bivariate_gaussian(r , sqrt(x_cov(0, 0)) , sqrt(x_cov(1, 1)) , *rho_x , &x[i] , &xp[i]);
+		gsl_ran_bivariate_gaussian(r , sqrt(y_cov(0, 0)) , sqrt(y_cov(1, 1)) , *rho_y , &y[i] , &yp[i]);
 		/* gsl_ran_bivariate_gaussian(r , sqrt(z_cov[0][0]) , sqrt(z_cov[1][1]) , 0      , &_z[i] , &_zp[i]); */
 		
-		z_len = sqrt(z_cov[0][0]);
+		switch (_simparams.zdist)
+		{
+			case Z_DIST_FLAT:
+				z_end = sqrt(z_cov(0, 0));
 
-		z[i] = gsl_ran_flat(r, -z_len/2, z_len/2);
-		zp[i] = gsl_ran_gaussian(r, z_len);
+				z[i] = gsl_ran_flat(r, 0, z_end);
+				zp[i] = gsl_ran_gaussian(r, z_end);
+
+				break;
+			case Z_DIST_GAUSS:
+				break;
+		}
 	}
 
 	// ==================================
@@ -320,8 +321,6 @@ int Ebeam::field_Coulomb(Field_Data &field)
 	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 
-	/* std::cout << "Calculating Coulomb field..." << std::endl; */
-
 	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	const double common_tran = common_para * _simparams.gamma_rel;
 	double temp_para, temp_tran;
@@ -353,27 +352,46 @@ int Ebeam::field_Coulomb(Field_Data &field)
 		}
 	}
 
-	int id;
-	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+	return 0;
+}
 
-	/*
-	if (id == 1)
-	{
-		std::cout << "=============================================" << std::endl;
+int Ebeam::field_Coulomb_sliced(Field_Data &field)
+{
+	double dx, dy, dz;
+	double drsq, dr, dr52;
+	double x_e, y_e, z_e;
+	int k;
 
-		std::cout << "dx: "           << dx                           << std::endl;
-		std::cout << "dz: "           << dz                           << std::endl;
-		std::cout << "z_e: "          << z_e                          << std::endl;
-		std::cout << "z_grid: "       << field.z_grid[0]              << std::endl;
-		std::cout << "gamma_rel: "    << _simparams.gamma_rel         << std::endl;
-		std::cout << "eV: "           << GSL_CONST_MKSA_ELECTRON_VOLT << std::endl;
-		std::cout << "E: "            << _simparams.E                 << std::endl;
-		std::cout << ": "             << ELECTRON_REST_ENERGY         << std::endl;
-		std::cout << "Stored field: " << std::setw(10)                << field.Ex_ind(4, 4, 1) << std::endl;
+	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	const double common_tran = common_para * _simparams.gamma_rel;
+	double temp_para, temp_tran;
 
-		std::cout << "=============================================" << std::endl;
+	dz = z_end / field.z_pts;
+
+	for (int n=0; n < n_pts; n++) {
+		x_e = x[n];
+		y_e = y[n];
+		z_e = z[n];
+
+		k = floor(z_e / dz);
+
+		for (int i=0; i < field.x_pts; i++)
+		{
+			for (int j; j < field.y_pts; j++)
+			{
+				drsq = dx*dx + dy*dy;
+				dr = sqrt(drsq);
+				dr52 = drsq*dr;
+
+				temp_para = common_para / dr52;
+				temp_tran = common_tran / dr52;
+
+				field.Ex_ind(i, j, k) = temp_tran * dx;
+				field.Ey_ind(i, j, k) = temp_tran * dy;
+				field.Ez_ind(i, j, k) = 0;
+			}
+		}
 	}
-	*/
 
 	return 0;
 }
