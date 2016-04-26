@@ -19,7 +19,7 @@ class WriterSerial : public WriterBase
 
 
 		int writedata(long step, const std::string &group, const std::string &dataset_str, const Parts &parts);
-		int writedata(long step, const Field_Data &field);
+		int writedata(long step, Field_Data &field);
 };
 
 #endif

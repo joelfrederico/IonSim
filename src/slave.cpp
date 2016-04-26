@@ -158,7 +158,8 @@ int slave(bool verbose)
 				delete field;
 				field = new Field_Data(simparams);
 
-				ebeam.field_Coulomb(*field);
+				/* ebeam.field_Coulomb(*field); */
+				ebeam.field_Coulomb_sliced(*field);
 				fieldcomm.send_field(*field, 0);
 
 				break;

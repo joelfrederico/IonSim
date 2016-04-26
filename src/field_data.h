@@ -11,8 +11,6 @@ class Field_Data
 		// ==================================
 		// Private data members
 		// ==================================
-		double dxdi;
-		double dydj;
 
 		double mid_i;
 		double mid_j;
@@ -31,6 +29,8 @@ class Field_Data
 	protected:
 
 	public:
+		double dxdi;
+		double dydj;
 		double dzdk;
 
 		// ==================================
@@ -66,7 +66,7 @@ class Field_Data
 		// ==================================
 		double &Ex_ind(long i, long j, long k);
 		double &Ex_ind(long ind);
-		double Ex_ind(long i, long j, long k) const;
+		/* double Ex_ind(long i, long j, long k) const; */
 
 		double &Ey_ind(long i, long j, long k);
 		double &Ey_ind(long ind);

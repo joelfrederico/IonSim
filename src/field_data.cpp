@@ -149,10 +149,10 @@ double &Field_Data::Ex_ind(long ind)
 	return x_data[ind];
 }
 
-double Field_Data::Ex_ind(long i, long j, long k) const
-{
-	return x_data[_index(i, j, k)];
-}
+/* double Field_Data::Ex_ind(long i, long j, long k) const */
+/* { */
+/* 	return x_data[_index(i, j, k)]; */
+/* } */
 
 double &Field_Data::Ey_ind(long i, long j, long k)
 {

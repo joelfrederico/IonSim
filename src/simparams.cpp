@@ -18,7 +18,7 @@ SimParams::SimParams(
 	double _radius,
 	double _sz,
 	double _sdelta,
-	zdist_t zdist,
+	zdist_t _zdist,
 	double _t_tot,
 	int _n_steps,
 	pushmethod_t _pushmethod,
@@ -30,25 +30,26 @@ SimParams::SimParams(
 	std::string _filename
 	)
 {
-	E           = _E;
-	dt          = _dt;
-	emit_n      = _emit_n;
-	length      = _length;
-	m_ion_amu   = _m_ion_amu;
-	n_p_cgs     = _n_p_cgs;
-	q_tot       = _q_tot;
-	radius      = _radius;
-	sdelta      = _sdelta;
-	sz          = _sz;
-	t_tot       = _t_tot;
-	n_steps     = _n_steps;
+	E          = _E;
+	dt         = _dt;
+	emit_n     = _emit_n;
+	length     = _length;
+	m_ion_amu  = _m_ion_amu;
+	n_p_cgs    = _n_p_cgs;
+	q_tot      = _q_tot;
+	radius     = _radius;
+	sz         = _sz;
+	sdelta     = _sdelta;
+	zdist      = _zdist;
+	t_tot      = _t_tot;
+	n_steps    = _n_steps;
 	pushmethod = _pushmethod;
-	n_e         = _n_e;
-	n_field_x   = _n_field_x;
-	n_field_y   = _n_field_y;
-	n_field_z   = _n_field_z;
-	n_ions      = _n_ions;
-	filename    = _filename;
+	n_e        = _n_e;
+	n_field_x  = _n_field_x;
+	n_field_y  = _n_field_y;
+	n_field_z  = _n_field_z;
+	n_ions     = _n_ions;
+	filename   = _filename;
 
 	gamma_rel   = ionsim::GeV2gamma(_E);
 
@@ -82,6 +83,7 @@ int SimParams::bcast_send() const
 	bcast_send_wrap(m_ion_amu  );
 	bcast_send_wrap(sz         );
 	bcast_send_wrap(sdelta     );
+	bcast_send_wrap(zdist      );
 	bcast_send_wrap(t_tot      );
 	bcast_send_wrap(n_steps    );
 	bcast_send_wrap(dt         );
@@ -108,24 +110,25 @@ int SimParams::bcast_receive()
 	char *cbuf;
 
 	// Receive numerical parameters
-	MPI_Bcast(&n_e        , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&n_ions     , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&q_tot      , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&radius     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&length     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&E          , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&emit_n     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&n_p_cgs    , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&m_ion_amu  , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&sz         , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&sdelta     , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&t_tot      , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&n_steps    , 1 , MPI_INT    , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&dt         , 1 , MPI_DOUBLE , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&pushmethod , 1 , MPI_INT    , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_x  , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_y  , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_z  , 1 , MPI_LONG   , 0, MPI_COMM_WORLD);
+	MPI_Bcast(&n_e        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_ions     , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&q_tot      , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&radius     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&length     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&E          , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&emit_n     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_p_cgs    , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&m_ion_amu  , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&sz         , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&sdelta     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&zdist      , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&t_tot      , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_steps    , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&dt         , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&pushmethod , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_x  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_y  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_z  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
 
 	// Receive string
 

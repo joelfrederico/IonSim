@@ -90,12 +90,14 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 	// ==================================
 	rho_x = &x_cov(0, 1);
 	rho_y = &y_cov(0, 1);
+
+	/* std::cout << "zdist: " << _simparams.zdist << std::endl; */
+
 	for (int i=0; i < n_pts; i++)
 	{
 
 		gsl_ran_bivariate_gaussian(r , sqrt(x_cov(0, 0)) , sqrt(x_cov(1, 1)) , *rho_x , &x[i] , &xp[i]);
 		gsl_ran_bivariate_gaussian(r , sqrt(y_cov(0, 0)) , sqrt(y_cov(1, 1)) , *rho_y , &y[i] , &yp[i]);
-		/* gsl_ran_bivariate_gaussian(r , sqrt(z_cov[0][0]) , sqrt(z_cov[1][1]) , 0      , &_z[i] , &_zp[i]); */
 		
 		switch (_simparams.zdist)
 		{
@@ -107,6 +109,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 
 				break;
 			case Z_DIST_GAUSS:
+				gsl_ran_bivariate_gaussian(r , sqrt(z_cov(0, 0)) , sqrt(z_cov(1, 1)) , 0      , &z[i] , &zp[i]);
 				break;
 		}
 	}
@@ -344,9 +347,9 @@ int Ebeam::field_Coulomb(Field_Data &field)
 					temp_para = common_para / dr52;
 					temp_tran = common_tran / dr52;
 
-					field.Ex_ind(i, j, k) = temp_tran * dx;
-					field.Ey_ind(i, j, k) = temp_tran * dy;
-					field.Ez_ind(i, j, k) = temp_para * dz;
+					field.Ex_ind(i, j, k) += temp_tran * dx;
+					field.Ey_ind(i, j, k) += temp_tran * dy;
+					field.Ez_ind(i, j, k) += temp_para * dz;
 				}
 			}
 		}
@@ -364,7 +367,7 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 
 	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	const double common_tran = common_para * _simparams.gamma_rel;
-	double temp_para, temp_tran;
+	double temp_tran;
 
 	dz = z_end / field.z_pts;
 
@@ -374,21 +377,33 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 		z_e = z[n];
 
 		k = floor(z_e / dz);
+		/* k=0; */
+
+		field.Ez_ind(k, k, 0) ++;
+		field.Ez_ind(3, 3, 0) ++;
 
 		for (int i=0; i < field.x_pts; i++)
 		{
-			for (int j; j < field.y_pts; j++)
+			dx = field.x_grid[i] - x_e;
+			for (int j=0; j < field.y_pts; j++)
 			{
+				dy = field.y_grid[j] - y_e;
+
 				drsq = dx*dx + dy*dy;
-				dr = sqrt(drsq);
-				dr52 = drsq*dr;
 
-				temp_para = common_para / dr52;
-				temp_tran = common_tran / dr52;
+				if (drsq > field.dxdi*field.dxdi + field.dydj*field.dydj)
+				/* if (true) */
+				{
+					dr   = sqrt(drsq);
+					dr52 = drsq*dr;
 
-				field.Ex_ind(i, j, k) = temp_tran * dx;
-				field.Ey_ind(i, j, k) = temp_tran * dy;
-				field.Ez_ind(i, j, k) = 0;
+					/* temp_para = common_para / dr52; */
+					temp_tran = common_tran / dr52;
+
+					field.Ex_ind(i, j, k) += temp_tran * dx;
+					field.Ey_ind(i, j, k) += temp_tran * dy;
+					/* field.Ez_ind(i, j, k) = 0; */
+				}
 			}
 		}
 	}

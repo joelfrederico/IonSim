@@ -8,7 +8,7 @@
 class Field_Interp
 {
 	private:
-		const Field_Data _field;
+		Field_Data _field;
 		const gsl_interp2d_type _interptype;
 
 		bool splines_valid;

@@ -125,7 +125,7 @@ int WriterSerial::writedata(long step, const std::string &group_str, const std::
 	return 0;
 }
 
-int WriterSerial::writedata(long step, const Field_Data &field)
+int WriterSerial::writedata(long step, Field_Data &field)
 {
 	// ==================================
 	// Initialize all variables
@@ -191,9 +191,6 @@ int WriterSerial::writedata(long step, const Field_Data &field)
 	for (int i=0; i < x_len; i++) {
 		for (int j=0; j < y_len; j++) {
 			for (int k=0; k < z_len; k++) {
-				/* xbuf[i + x_len*(j + k*y_len)] = field.Ex_ind(i, j, k); */
-				/* ybuf[i + x_len*(j + k*y_len)] = field.Ey_ind(i, j, k); */
-				/* zbuf[i + x_len*(j + k*y_len)] = field.Ez_ind(i, j, k); */
 				xbuf[k + z_len*(i + j*x_len)] = field.Ex_ind(i, j, k);
 				ybuf[k + z_len*(i + j*x_len)] = field.Ey_ind(i, j, k);
 				zbuf[k + z_len*(i + j*x_len)] = field.Ez_ind(i, j, k);
