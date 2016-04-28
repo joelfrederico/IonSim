@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 #include "field_data.h"
 #include "consts.h"
+#include <hdf5.h>
 
 class FieldTest : public ::testing::Test
 {
@@ -21,6 +22,15 @@ class FieldTest : public ::testing::Test
 		const double z_edge_mag;
 
 		Field_Data field;
+};
+
+class HDF5Test : public :: testing::Test
+{
+	public:
+		hid_t file_id;
+
+		HDF5Test();
+		~HDF5Test();
 };
 
 #endif

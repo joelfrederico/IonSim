@@ -17,6 +17,7 @@ check_PROGRAMS = gtest mpi_gtest
 gtest_SOURCES = gtest.cpp \
 		../src/field_data.cpp \
 		../src/field_comm.cpp \
+		../src/hdf5_classes.cpp \
 		../src/loop_comm.cpp \
 		../src/support_func.cpp
 

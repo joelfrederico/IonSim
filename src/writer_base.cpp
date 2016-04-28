@@ -15,7 +15,6 @@ WriterBase::~WriterBase()
 	herr_t status;
 	ssize_t num_open;
 	hid_t *obj_id_list;
-	H5O_info_t obj_info;
 
 	status = H5Fclose(file_id);
 	if (status == -1)
