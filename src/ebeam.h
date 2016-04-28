@@ -22,6 +22,9 @@ class Ebeam : public Parts
 		const Cov _y_cov;
 		const Cov _z_cov;
 
+		double n_resolve;
+		double srsq;
+
 	public:
 		// ==================================
 		// Constructors, Destructor

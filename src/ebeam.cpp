@@ -7,6 +7,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_statistics_double.h>
 #include <gsl/gsl_sf_exp.h>
+#include <gsl/gsl_sf_erf.h>
 #include "support_func.h"
 #include <sstream>
 #include "field_data.h"
@@ -106,6 +107,9 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 
 				z[i] = gsl_ran_flat(r, 0, z_end);
 				zp[i] = gsl_ran_gaussian(r, z_end);
+
+				srsq = x_cov(0, 0);
+				n_resolve = (_simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE / qpp) / (pow(2*M_PI, 1.5) * srsq * z_end * gsl_sf_expm1(-4.5));
 
 				break;
 			case Z_DIST_GAUSS:
@@ -364,8 +368,13 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 	int k;
+	double sr_macro;
+	double srsq_macro;
 
-	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	sr_macro   = 0.26 / n_resolve;
+	srsq_macro = sr_macro * sr_macro;
+
+	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*srsq_macro*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	const double common_tran = common_para * _simparams.gamma_rel;
 	double temp_tran;
 
@@ -390,20 +399,12 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 				dy = field.y_grid[j] - y_e;
 
 				drsq = dx*dx + dy*dy;
+				dr   = sqrt(drsq);
 
-				if (drsq > field.dxdi*field.dxdi + field.dydj*field.dydj)
-				/* if (true) */
-				{
-					dr   = sqrt(drsq);
-					dr52 = drsq*dr;
+				temp_tran = gsl_sf_exprel(- drsq / (2*srsq_macro)) * common_para;
 
-					/* temp_para = common_para / dr52; */
-					temp_tran = common_tran / dr52;
-
-					field.Ex_ind(i, j, k) += temp_tran * dx;
-					field.Ey_ind(i, j, k) += temp_tran * dy;
-					/* field.Ez_ind(i, j, k) = 0; */
-				}
+				field.Ex_ind(i, j, k) += temp_tran * dx;
+				field.Ey_ind(i, j, k) += temp_tran * dy;
 			}
 		}
 	}
