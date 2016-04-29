@@ -371,15 +371,15 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 	double sr_macro;
 	double srsq_macro;
 
-	sr_macro   = 0.26 / pow(n_resolve, 1./3.);
+	dz = z_end / field.z_pts;
+
+	sr_macro   = 0.23475 / sqrt(n_resolve * dz);
 	/* sr_macro   = 0.26 / n_resolve; */
 	std::cout << "sr_macro: " << sr_macro << std::endl;
 	srsq_macro = sr_macro * sr_macro;
 
-	dz = z_end / field.z_pts;
 
-	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (2*M_PI*dz*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
-	const double common_tran = common_para * _simparams.gamma_rel/2*srsq_macro;
+	const double common = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	double temp_tran;
 
 
@@ -404,7 +404,7 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 				drsq = dx*dx + dy*dy;
 				dr   = sqrt(drsq);
 
-				temp_tran = gsl_sf_exprel(- drsq / (2*srsq_macro)) * common_para;
+				temp_tran = gsl_sf_exprel(- drsq / (2*srsq_macro)) * common;
 
 				field.Ex_ind(i, j, k) += temp_tran * dx;
 				field.Ey_ind(i, j, k) += temp_tran * dy;
