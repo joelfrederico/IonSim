@@ -371,7 +371,7 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 	double sr_macro;
 	double srsq_macro;
 
-	sr_macro   = 0.26 / n_resolve;
+	sr_macro   = 0.26 / pow(n_resolve, 1./3.);
 	srsq_macro = sr_macro * sr_macro;
 
 	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*srsq_macro*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
