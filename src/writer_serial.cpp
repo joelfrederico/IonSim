@@ -125,6 +125,28 @@ int WriterSerial::writedata(long step, const std::string &group_str, const std::
 	return 0;
 }
 
+hid_t _write_grid(hid_t loc_id, std::string attr_name, double *attr_array, const hsize_t size)
+{
+	herr_t status;
+	hid_t attr_id;
+	double *buf;
+	buf = new double[51];
+	buf[0] = 10;
+
+	DataspaceCreate x_grid_space(H5S_SCALAR);
+	status = H5Sset_extent_simple(x_grid_space.dataspace_id, 1, &size, NULL);
+
+	std::cout << "extent status: "      << status << std::endl;
+	
+	attr_id = H5Acreate(loc_id, attr_name.c_str(), H5T_NATIVE_DOUBLE, x_grid_space.dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+
+	status = H5Awrite(attr_id, H5T_NATIVE_DOUBLE, attr_array);
+
+	H5Aclose(attr_id);
+
+	return status;
+}
+
 int WriterSerial::writedata(long step, Field_Data &field)
 {
 	// ==================================
@@ -153,6 +175,13 @@ int WriterSerial::writedata(long step, Field_Data &field)
 	GroupStepAccess step_group = GroupStepAccess(file_id, step);
 
 	GroupAccess group = GroupAccess(step_group.group_id, group_str);
+
+	// ==================================
+	// Write field attributes
+	// ==================================
+	_write_grid(group.group_id, "x_grid", field.x_grid, field.x_pts);
+	_write_grid(group.group_id, "y_grid", field.y_grid, field.y_pts);
+	_write_grid(group.group_id, "z_grid", field.z_grid, field.z_pts);
 
 	// ==================================
 	// Create dataset
