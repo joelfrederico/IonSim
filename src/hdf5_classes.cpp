@@ -1,11 +1,17 @@
 #include "hdf5_classes.h"
 #include <typeinfo>
 
+// ==================================
+// Debug
+// ==================================
 Debug::Debug(const bool debug_flag) :
 	debug(debug_flag)
 {
 }
 
+// ==================================
+// GroupAccess
+// ==================================
 GroupAccess::GroupAccess(hid_t &loc_id, std::string group_str) :
 	Debug(false),
 	_group_str(group_str)
@@ -45,6 +51,9 @@ GroupAccess::~GroupAccess()
 	}
 }
 
+// ==================================
+// GroupStepAccess
+// ==================================
 std::string _getstep(unsigned int step)
 {
 	std::string out;
@@ -59,6 +68,9 @@ GroupStepAccess::GroupStepAccess(hid_t &loc_id, unsigned int step) :
 {
 }
 
+// ==================================
+// DatasetAccess
+// ==================================
 DatasetAccess::DatasetAccess(hid_t &loc_id, std::string dataset_str, int rank, hsize_t *count) :
 	Debug(true),
 	_dataset_str(dataset_str)
@@ -80,6 +92,9 @@ DatasetAccess::~DatasetAccess()
 	delete dataspace;
 }
 
+// ==================================
+// DataspaceCreate
+// ==================================
 DataspaceCreate::DataspaceCreate(int rank, hsize_t *count) :
 	Debug(true)
 {
@@ -97,6 +112,9 @@ DataspaceCreate::~DataspaceCreate()
 	H5Sclose(dataspace_id);
 }
 
+// ==================================
+// PlistCreate
+// ==================================
 PlistCreate::PlistCreate(hid_t cls_id) :
 	Debug(true)
 {
@@ -109,7 +127,11 @@ PlistCreate::~PlistCreate()
 	H5Pclose(plist_id);
 }
 
+// ==================================
+// AttributeCreate
+// ==================================
 AttributeCreate::~AttributeCreate()
 {
 	H5Aclose(attr_id);
+	delete _dataspace;
 }
