@@ -109,7 +109,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 				zp[i] = gsl_ran_gaussian(r, z_end);
 
 				srsq = x_cov(0, 0);
-				n_resolve = -(_simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE / qpp) / (pow(2*M_PI, 1.5) * srsq * z_end * gsl_sf_expm1(-4.5));
+				n_resolve = -(_simparams.n_e) / (pow(2*M_PI, 1.5) * srsq * z_end * gsl_sf_expm1(-4.5));
 
 				break;
 			case Z_DIST_GAUSS:
@@ -375,9 +375,12 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 
 	sr_macro   = 0.23475 / sqrt(n_resolve * dz);
 	/* sr_macro   = 0.26 / n_resolve; */
-	std::cout << "sr_macro: " << sr_macro << std::endl;
-	srsq_macro = sr_macro * sr_macro;
 
+	std::cout << "sr_macro: "  << sr_macro  << std::endl;
+	std::cout << "n_resolve: " << n_resolve << std::endl;
+	std::cout << "dz: "        << dz        << std::endl;
+
+	srsq_macro = sr_macro * sr_macro;
 
 	const double common = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	double temp_tran;
