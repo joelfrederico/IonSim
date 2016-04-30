@@ -6,6 +6,7 @@ import argparse
 
 
 def runcommand(command, **kwargs):
+    print("Running: " + command)
     subprocess.run(shlex.split(command), **kwargs)
 
 
