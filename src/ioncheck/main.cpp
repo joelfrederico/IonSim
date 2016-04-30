@@ -4,6 +4,7 @@
 #include <iomanip>
 /* #include <argp.h> */
 #include <string>
+#include <stdlib.h>
 
 const char *argp_program_version = "v0.1";
 static char args_doc[] = "FILE";
