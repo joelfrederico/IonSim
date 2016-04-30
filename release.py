@@ -19,7 +19,7 @@ def update(part):
     
     runcommand("autoreconf -fiv")
 
-    runcommand("git add Makefile.in config.h.in~ configure")
+    runcommand("git add Makefile.in config.h.in~ configure aclocal.m4 ltmain.sh src/Makefile.in src/ioncheck/Makefile.in tests/Makefile.in")
     
     runcommand("git checkout configure.ac .bumpversion.cfg")
 
