@@ -94,9 +94,10 @@ int main(int argc, char **argv)
 	attr_type = H5Aget_type(attr_id);
 	status = H5Aread(attr_id, attr_type, &version);
 	H5Aclose(attr_id);
-	free(version);
 
 	std::cout << std::left << std::setw(25) << "File version: " << version << std::endl;
+
+	free(version);
 
 	// ==================================
 	// Write out attributes
