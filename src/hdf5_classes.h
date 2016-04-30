@@ -81,6 +81,8 @@ class AttributeCreate : public Debug
 		hid_t _loc_id;
 		hid_t type_id;
 		const std::string _attr_name;
+		DataspaceCreate * _dataspace;
+
 	public:
 		hid_t attr_id;
 
@@ -112,14 +114,13 @@ class AttributeCreate : public Debug
 			// ==================================
 			// Create an appropriate dataspace
 			// ==================================
-			/* dataspace_id = H5Screate(H5S_SCALAR); */
-			DataspaceCreate dataspace(H5S_SCALAR);
-			status = H5Sset_extent_none(dataspace.dataspace_id);
+			_dataspace = new DataspaceCreate(H5S_SCALAR);
+			status = H5Sset_extent_none(_dataspace->dataspace_id);
 
 			// ==================================
 			// Create and write attribute
 			// ==================================
-			attr_id = H5Acreate(loc_id, attr_name.c_str(), type_id, dataspace.dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+			attr_id = H5Acreate(loc_id, attr_name.c_str(), type_id, _dataspace->dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
 
 			if (attr_id < 0) {
 				std::cout << "Attribute not created!" << std::endl;
