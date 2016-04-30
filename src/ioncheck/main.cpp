@@ -10,11 +10,11 @@ static char args_doc[] = "FILE";
 
 herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void *opdata)
 {
-	hid_t attr_id;
-	hid_t attr_type;
+	hid_t attr_id, attr_type;
 	herr_t status;
 	int i_buf;
 	double d_buf;
+	char *c_buf;
 
 	attr_id   = H5Aopen(loc_id, name, H5P_DEFAULT);
 	attr_type = H5Aget_type(attr_id);
@@ -25,10 +25,22 @@ herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void 
 			status = H5Aread(attr_id, attr_type, &i_buf);
 			std::cout << std::left << std::setw(15) << name << ": " << i_buf << std::endl;
 			break;
+
 		case H5T_FLOAT:
 			status = H5Aread(attr_id, attr_type, &d_buf);
 			std::cout << std::left << std::setw(15) << name << ": " << d_buf << std::endl;
 			break;
+
+		case H5T_STRING:
+			status = H5Aread(attr_id, attr_type, &c_buf);
+
+			std::cout << std::left << std::setw(15) << name << ": \"" << c_buf << "\"" << std::endl;
+
+			/* delete c_buf; */
+			free(c_buf);
+
+			break;
+
 		default:
 			std::cout << std::left << std::setw(15) << name << ": " << "(attribute type not known)" << std::endl;
 	}
@@ -38,57 +50,26 @@ herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void 
 	return 0;
 }
 
-/* struct arguments */
-/* { */
-/* 	std::string file; */
-/* }; */
-
-/* error_t myparser(int key, char *arg, struct argp_state *state) */
-/* { */
-/* 	struct arguments *arguments; */
-/* 	arguments = (struct arguments*)state->input; */
-
-/* 	switch (key) */
-/* 	{ */
-/* 		case ARGP_KEY_ARG: */
-/* 			arguments->file = arg; */
-/* 			break; */
-/* 		default: */
-/* 			return ARGP_ERR_UNKNOWN; */
-/* 	} */
-
-/* 	return 0; */
-/* } */
-
 int main(int argc, char **argv)
 {
-	/* int arg_err; */
-
-	/* struct arguments args; */
-	/* args.file = "output.h5"; */
-
-	/* struct argp argp = {0, myparser, args_doc, 0}; */
-	/* argp_parse(&argp, argc, argv, 0, 0, &args); */
-
-	/* if (arg_err != 0) */
-	/* { */
-	/* 	std::cout << "Error: " << arg_err << std::endl; */
-	/* 	return arg_err; */
-	/* } */
-
 	const char *file;
+	char *version;
 
+	// ==================================
+	// Determine whether to open default
+	// ==================================
 	if (argc == 2)
 	{
 		file = argv[1];
-		std::cout << "Checking file: " << file << std::endl;
+		std::cout << std::left << std::setw(25) << "Checking file: " << file << std::endl;
 	} else {
 		file = "output.h5";
-		std::cout << "Checking default file: " << file << std::endl;
+		std::cout << std::left << std::setw(25) << "Checking default file: " << file << std::endl;
 	}
 
-	std::cout << "=========================================" << std::endl;
-
+	// ==================================
+	// Try to open file
+	// ==================================
 	hid_t file_id, root_obj;
 	herr_t status;
 	H5O_info_t root_info;
@@ -103,12 +84,33 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
+	// ==================================
+	// Print version
+	// ==================================
+	hid_t attr_id, attr_type;
+
+	attr_id   = H5Aopen(file_id, "version", H5P_DEFAULT);
+	attr_type = H5Aget_type(attr_id);
+	status = H5Aread(attr_id, attr_type, &version);
+	H5Aclose(attr_id);
+	free(version);
+
+	std::cout << std::left << std::setw(25) << "File version: " << version << std::endl;
+
+	// ==================================
+	// Write out attributes
+	// ==================================
+	std::cout << "=========================================" << std::endl;
+
 	status = H5Oget_info(file_id, &root_info);
 
 	std::cout << "Number of Attrs: " << root_info.num_attrs << std::endl;
 	std::cout << "-----------------------------------------" << std::endl;
 	H5Aiterate(file_id, H5_INDEX_NAME, H5_ITER_INC, &n, print_attrs, NULL);
 
+	// ==================================
+	// Close file
+	// ==================================
 	H5Fclose(file_id);
 
 	return 0;
