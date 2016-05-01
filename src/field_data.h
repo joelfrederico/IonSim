@@ -53,9 +53,13 @@ class Field_Data
 		const double y_edge_mag;
 		const double z_edge_mag;
 
-		double *x_data;
-		double *y_data;
-		double *z_data;
+		double *Ex_data;
+		double *Ey_data;
+		double *Ez_data;
+
+		double *Bx_data;
+		double *By_data;
+		double *Bz_data;
 
 		double *x_grid;
 		double *y_grid;
@@ -66,15 +70,21 @@ class Field_Data
 		// ==================================
 		double &Ex_ind(long i, long j, long k);
 		double &Ex_ind(long ind);
-		/* double Ex_ind(long i, long j, long k) const; */
 
 		double &Ey_ind(long i, long j, long k);
 		double &Ey_ind(long ind);
-		double Ey_ind(long i, long j, long k) const;
 
 		double &Ez_ind(long i, long j, long k);
 		double &Ez_ind(long ind);
-		double Ez_ind(long i, long j, long k) const;
+
+		double &Bx_ind(long i, long j, long k);
+		double &Bx_ind(long ind);
+
+		double &By_ind(long i, long j, long k);
+		double &By_ind(long ind);
+
+		double &Bz_ind(long i, long j, long k);
+		double &Bz_ind(long ind);
 
 		// ==================================
 		// Operators

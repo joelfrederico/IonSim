@@ -36,6 +36,10 @@ void FieldTest::custom_init()
 				field.Ex_ind(i, j, k) = count;
 				field.Ey_ind(i, j, k) = -count;
 				field.Ez_ind(i, j, k) = count*count;
+
+				field.Bx_ind(i, j, k) = count;
+				field.By_ind(i, j, k) = -count;
+				field.Bz_ind(i, j, k) = count*count;
 				count++;
 			}
 		}
@@ -60,6 +64,10 @@ TEST_F(FieldTest, IsZeroInitially)
 				EXPECT_EQ(field.Ex_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
 				EXPECT_EQ(field.Ey_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
 				EXPECT_EQ(field.Ez_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
+
+				EXPECT_EQ(field.Bx_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
+				EXPECT_EQ(field.By_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
+				EXPECT_EQ(field.Bz_ind(i, j, k), 0) << "At location i=" << i << ", j=" << j << ", k=" << k;
 			}
 		}
 	}
@@ -76,6 +84,10 @@ TEST_F(FieldTest, AssigmentWorks)
 				field.Ex_ind(i, j, k) = i*j*k;
 				field.Ey_ind(i, j, k) = i*j*k*2;
 				field.Ez_ind(i, j, k) = i*j*k*3;
+
+				field.Bx_ind(i, j, k) = i*j*k;
+				field.By_ind(i, j, k) = i*j*k*2;
+				field.Bz_ind(i, j, k) = i*j*k*3;
 			}
 		}
 	}
@@ -89,6 +101,10 @@ TEST_F(FieldTest, AssigmentWorks)
 				EXPECT_EQ(field.Ex_ind(i, j, k), i*j*k)   << "At location i=" << i << ", k=" << j << ", k=" << k;
 				EXPECT_EQ(field.Ey_ind(i, j, k), i*j*k*2) << "At location i=" << i << ", k=" << j << ", k=" << k;
 				EXPECT_EQ(field.Ez_ind(i, j, k), i*j*k*3) << "At location i=" << i << ", k=" << j << ", k=" << k;
+
+				EXPECT_EQ(field.Bx_ind(i, j, k), i*j*k)   << "At location i=" << i << ", k=" << j << ", k=" << k;
+				EXPECT_EQ(field.By_ind(i, j, k), i*j*k*2) << "At location i=" << i << ", k=" << j << ", k=" << k;
+				EXPECT_EQ(field.Bz_ind(i, j, k), i*j*k*3) << "At location i=" << i << ", k=" << j << ", k=" << k;
 			}
 		}
 	}
@@ -99,28 +115,15 @@ TEST_F(FieldTest, IndicesAreGood)
 	custom_init();
 	for (int i=0; i < x_size*y_size; i++)
 	{
-		EXPECT_EQ(field.x_data[i], i);
-		EXPECT_EQ(field.y_data[i], -i);
-		EXPECT_EQ(field.z_data[i], i*i);
+		EXPECT_EQ(field.Ex_data[i], i);
+		EXPECT_EQ(field.Ey_data[i], -i);
+		EXPECT_EQ(field.Ez_data[i], i*i);
+
+		EXPECT_EQ(field.Bx_data[i], i);
+		EXPECT_EQ(field.By_data[i], -i);
+		EXPECT_EQ(field.Bz_data[i], i*i);
 	}
 }
-
-/*
-TEST_F(FieldTest, InterpWorks)
-{
-	custom_init();
-	double Ex, Ey, dEx, dEy;
-
-	Ex = field.Ex(13e-6, -5e-6);
-	Ey = field.Ey(13e-6, -5e-6);
-
-	dEx = std::abs(84.4333 - Ex);
-	dEy = std::abs(-84.4333 - Ey);
-
-	EXPECT_LT(dEx, 4e-5);
-	EXPECT_LT(dEy, 4e-5);
-}
-*/
 
 TEST_F(FieldTest, CopyWorks)
 {
@@ -128,8 +131,11 @@ TEST_F(FieldTest, CopyWorks)
 	Field_Data tempfield = field;
 	for (int i=0; i < field.x_pts*field.y_pts; i++)
 	{
-		EXPECT_EQ(tempfield.x_data[i], field.x_data[i]);
-		EXPECT_EQ(tempfield.y_data[i], field.y_data[i]);
+		EXPECT_EQ(tempfield.Ex_data[i], field.Ex_data[i]);
+		EXPECT_EQ(tempfield.Ey_data[i], field.Ey_data[i]);
+
+		EXPECT_EQ(tempfield.Bx_data[i], field.Bx_data[i]);
+		EXPECT_EQ(tempfield.By_data[i], field.By_data[i]);
 	}
 }
 

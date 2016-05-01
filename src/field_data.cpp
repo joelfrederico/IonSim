@@ -22,9 +22,13 @@ bool Field_Data::_samedim(const Field_Data &rhs) const
 
 int Field_Data::_init()
 {
-	x_data = new double[n_pts];
-	y_data = new double[n_pts];
-	z_data = new double[n_pts];
+	Ex_data = new double[n_pts];
+	Ey_data = new double[n_pts];
+	Ez_data = new double[n_pts];
+
+	Bx_data = new double[n_pts];
+	By_data = new double[n_pts];
+	Bz_data = new double[n_pts];
 
 	x_grid = new double[x_pts];
 	y_grid = new double[y_pts];
@@ -32,9 +36,13 @@ int Field_Data::_init()
 
 	for (long i=0; i < n_pts; i++)
 	{
-		x_data[i] = double(0);
-		y_data[i] = double(0);
-		z_data[i] = double(0);
+		Ex_data[i] = double(0);
+		Ey_data[i] = double(0);
+		Ez_data[i] = double(0);
+
+		Bx_data[i] = double(0);
+		By_data[i] = double(0);
+		Bz_data[i] = double(0);
 	}
 
 	dxdi = x_edge_mag * 2 / (x_pts-1);
@@ -92,9 +100,13 @@ Field_Data::Field_Data(const Field_Data &rhs) :
 	_init();
 	for (int i=0; i < n_pts; i++)
 	{
-		x_data[i] = rhs.x_data[i];
-		y_data[i] = rhs.y_data[i];
-		z_data[i] = rhs.z_data[i];
+		Ex_data[i] = rhs.Ex_data[i];
+		Ey_data[i] = rhs.Ey_data[i];
+		Ez_data[i] = rhs.Ez_data[i];
+
+		Bx_data[i] = rhs.Bx_data[i];
+		By_data[i] = rhs.By_data[i];
+		Bz_data[i] = rhs.Bz_data[i];
 	}
 }
 
@@ -124,9 +136,13 @@ Field_Data::Field_Data(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag
 
 Field_Data::~Field_Data()
 {
-	delete[] x_data;
-	delete[] y_data;
-	delete[] z_data;
+	delete[] Ex_data;
+	delete[] Ey_data;
+	delete[] Ez_data;
+
+	delete[] Bx_data;
+	delete[] By_data;
+	delete[] Bz_data;
 
 	delete[] x_grid;
 	delete[] y_grid;
@@ -140,54 +156,74 @@ Field_Data::~Field_Data()
 double &Field_Data::Ex_ind(long i, long j, long k)
 {
 	splines_valid = false;
-	return x_data[_index(i, j, k)];
+	return Ex_data[_index(i, j, k)];
 }
 
 double &Field_Data::Ex_ind(long ind)
 {
 	splines_valid = false;
-	return x_data[ind];
+	return Ex_data[ind];
 }
-
-/* double Field_Data::Ex_ind(long i, long j, long k) const */
-/* { */
-/* 	return x_data[_index(i, j, k)]; */
-/* } */
 
 double &Field_Data::Ey_ind(long i, long j, long k)
 {
 	splines_valid = false;
-	return y_data[_index(i, j, k)];
+	return Ey_data[_index(i, j, k)];
 }
 
 double &Field_Data::Ey_ind(long ind)
 {
 	splines_valid = false;
-	return y_data[ind];
-}
-
-double Field_Data::Ey_ind(long i, long j, long k) const
-{
-	return y_data[_index(i, j, k)];
+	return Ey_data[ind];
 }
 
 double &Field_Data::Ez_ind(long i, long j, long k)
 {
 	splines_valid = false;
-	return z_data[_index(i, j, k)];
+	return Ez_data[_index(i, j, k)];
 }
 
 double &Field_Data::Ez_ind(long ind)
 {
 	splines_valid = false;
-	return z_data[ind];
+	return Ez_data[ind];
 }
 
-double Field_Data::Ez_ind(long i, long j, long k) const
+double &Field_Data::Bx_ind(long i, long j, long k)
 {
-	return z_data[_index(i, j, k)];
+	splines_valid = false;
+	return Bx_data[_index(i, j, k)];
 }
 
+double &Field_Data::Bx_ind(long ind)
+{
+	splines_valid = false;
+	return Bx_data[ind];
+}
+
+double &Field_Data::By_ind(long i, long j, long k)
+{
+	splines_valid = false;
+	return By_data[_index(i, j, k)];
+}
+
+double &Field_Data::By_ind(long ind)
+{
+	splines_valid = false;
+	return By_data[ind];
+}
+
+double &Field_Data::Bz_ind(long i, long j, long k)
+{
+	splines_valid = false;
+	return Bz_data[_index(i, j, k)];
+}
+
+double &Field_Data::Bz_ind(long ind)
+{
+	splines_valid = false;
+	return Bz_data[ind];
+}
 
 // ==================================
 // Operators
@@ -196,8 +232,11 @@ Field_Data &Field_Data::operator+=(const Field_Data &rhs)
 {
 	if ( (*this)._samedim(rhs) )
 	{
-		*(*this).x_data += *rhs.x_data;
-		*(*this).y_data += *rhs.y_data;
+		*(*this).Ex_data += *rhs.Ex_data;
+		*(*this).Ey_data += *rhs.Ey_data;
+
+		*(*this).Bx_data += *rhs.Bx_data;
+		*(*this).By_data += *rhs.By_data;
 	} else {
 		throw "Cannot add fields of different sizes";
 	}
@@ -208,8 +247,11 @@ Field_Data &Field_Data::operator-=(const Field_Data &rhs)
 {
 	if ( (*this)._samedim(rhs) )
 	{
-		*(*this).x_data -= *rhs.x_data;
-		*(*this).y_data -= *rhs.y_data;
+		*(*this).Ex_data -= *rhs.Ex_data;
+		*(*this).Ey_data -= *rhs.Ey_data;
+
+		*(*this).Bx_data -= *rhs.Bx_data;
+		*(*this).By_data -= *rhs.By_data;
 	} else {
 		throw "Cannot subtract fields of different sizes";
 	}

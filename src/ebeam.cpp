@@ -382,8 +382,14 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 
 	srsq_macro = sr_macro * sr_macro;
 
-	const double common = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	const double common   = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro);
+
+	const double common_E = common / GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
+	const double common_B = common * GSL_CONST_MKSA_SPEED_OF_LIGHT * GSL_CONST_MKSA_VACUUM_PERMEABILITY;
+
 	double temp_tran;
+	double temp_tran_E;
+	double temp_tran_B;
 
 
 	for (int n=0; n < n_pts; n++) {
@@ -407,10 +413,16 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 				drsq = dx*dx + dy*dy;
 				dr   = sqrt(drsq);
 
-				temp_tran = gsl_sf_exprel(- drsq / (2*srsq_macro)) * common;
+				temp_tran = gsl_sf_exprel(- drsq / (2*srsq_macro));
 
-				field.Ex_ind(i, j, k) += temp_tran * dx;
-				field.Ey_ind(i, j, k) += temp_tran * dy;
+				temp_tran_E = temp_tran * common_E;
+				temp_tran_B = temp_tran * common_B;
+
+				field.Ex_ind(i, j, k) += temp_tran_E * dx;
+				field.Ey_ind(i, j, k) += temp_tran_E * dy;
+
+				field.Bx_ind(i, j, k) += -temp_tran_B * dy;
+				field.By_ind(i, j, k) +=  temp_tran_B * dx;
 			}
 		}
 	}
