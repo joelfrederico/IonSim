@@ -51,9 +51,9 @@ int Field_Comm::recv_field_others_add(Field_Data &field_recv)
 				field_recv.Ey_ind(ind) += Eybuf[ind];
 				field_recv.Ez_ind(ind) += Ezbuf[ind];
 
-				field_recv.Ex_ind(ind) += Bxbuf[ind];
-				field_recv.Ey_ind(ind) += Bybuf[ind];
-				field_recv.Ez_ind(ind) += Bzbuf[ind];
+				field_recv.Bx_ind(ind) += Bxbuf[ind];
+				field_recv.By_ind(ind) += Bybuf[ind];
+				field_recv.Bz_ind(ind) += Bzbuf[ind];
 			}
 		}
 	}

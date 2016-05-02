@@ -129,15 +129,10 @@ hid_t _write_grid(hid_t loc_id, std::string attr_name, double *attr_array, const
 {
 	herr_t status;
 	hid_t attr_id;
-	double *buf;
-	buf = new double[51];
-	buf[0] = 10;
 
 	DataspaceCreate x_grid_space(H5S_SCALAR);
 	status = H5Sset_extent_simple(x_grid_space.dataspace_id, 1, &size, NULL);
 
-	std::cout << "extent status: "      << status << std::endl;
-	
 	attr_id = H5Acreate(loc_id, attr_name.c_str(), H5T_NATIVE_DOUBLE, x_grid_space.dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
 
 	status = H5Awrite(attr_id, H5T_NATIVE_DOUBLE, attr_array);
@@ -147,33 +142,69 @@ hid_t _write_grid(hid_t loc_id, std::string attr_name, double *attr_array, const
 	return status;
 }
 
-int WriterSerial::writedata(long step, Field_Data &field)
+int write_data(GroupAccess *group, Field_Data *field, double *buf, std::string dataset_str)
 {
+	std::cout << "Creating field: " << dataset_str << std::endl;
 	// ==================================
 	// Initialize all variables
 	// ==================================
-	double *xbuf;
-	double *ybuf;
-	double *zbuf;
-	std::string x_dataset_str, y_dataset_str, z_dataset_str;
-	long x_len = field.x_pts;
-	long y_len = field.y_pts;
-	long z_len = field.z_pts;
-	const std::string group_str = "field"; 
-
-	int n_write = MAX_N_WRITE;
-
+	double *_buf;
 	hsize_t count[3];
 	hsize_t offset[3];
 	std::string temp_str;
 	herr_t status;
 
+	// ==================================
+	// Create dataset
+	// ==================================
+	// The total array of particles is (n_pts*num_processes, 6) in size
+	// Remember that each slave has n_pts of different particles!
+	int rank = 3;
+	int x_len = field->x_pts;
+	int y_len = field->y_pts;
+	int z_len = field->z_pts;
+
+	count[0] = x_len;
+	count[1] = y_len;
+	count[2] = z_len;
+	DatasetAccess dataset(group->group_id, dataset_str, rank, count); // Updates dataspace_id
+	DataspaceCreate memspace(rank, count);
+
+	// ==================================
+	// Write dataset rows
+	// ==================================
+	_buf = new double[x_len*y_len*z_len];
+
+	for (int i=0; i < x_len; i++) {
+		for (int j=0; j < y_len; j++) {
+			for (int k=0; k < z_len; k++) {
+				_buf[k + z_len*(i + j*x_len)] = buf[field->_index(i, j, k)];
+			}
+		}
+	}
+	status = H5Dwrite(dataset.dataset_id, H5T_NATIVE_DOUBLE, memspace.dataspace_id, dataset.dataspace_id, H5P_DEFAULT, _buf);
+
+	if (status > 0) std::cout << "Something bad" << std::endl;
+
+	delete [] _buf;
+
+	return 0;
+}
+
+int WriterSerial::writedata(long step, Field_Data &field)
+{
+	// ==================================
+	// Initialize all variables
+	// ==================================
+	long x_len = field.x_pts;
+	long y_len = field.y_pts;
+	long z_len = field.z_pts;
+	const std::string group_str = "field"; 
 
 	// ==================================
 	// Access or create a new group
 	// ==================================
 	GroupStepAccess step_group = GroupStepAccess(file_id, step);
-
 	GroupAccess group = GroupAccess(step_group.group_id, group_str);
 
 	// ==================================
@@ -183,58 +214,13 @@ int WriterSerial::writedata(long step, Field_Data &field)
 	_write_grid(group.group_id, "y_grid", field.y_grid, field.y_pts);
 	_write_grid(group.group_id, "z_grid", field.z_grid, field.z_pts);
 
-	// ==================================
-	// Create dataset
-	// ==================================
-	// The total array of particles is (n_pts*num_processes, 6) in size
-	// Remember that each slave has n_pts of different particles!
-	int rank = 3;
-	count[0] = x_len;
-	count[1] = y_len;
-	count[2] = z_len;
-	x_dataset_str = "Ex";
-	DatasetAccess x_dataset(group.group_id, x_dataset_str, rank, count); // Updates dataspace_id
-	DataspaceCreate x_memspace(rank, count);
+	write_data(&group, &field, field.Ex_data, "Ex");
+	write_data(&group, &field, field.Ey_data, "Ey");
+	write_data(&group, &field, field.Ez_data, "Ez");
 
-	count[0] = x_len;
-	count[1] = y_len;
-	count[2] = z_len;
-	y_dataset_str = "Ey";
-	DatasetAccess y_dataset(group.group_id, y_dataset_str, rank, count); // Updates dataspace_id
-	DataspaceCreate y_memspace(rank, count);
-
-	count[0] = x_len;
-	count[1] = y_len;
-	count[2] = z_len;
-	z_dataset_str = "Ez";
-	DatasetAccess z_dataset(group.group_id, z_dataset_str, rank, count); // Updates dataspace_id
-	DataspaceCreate z_memspace(rank, count);
-
-	// ==================================
-	// Write dataset rows
-	// ==================================
-	xbuf = new double[x_len*y_len*z_len];
-	ybuf = new double[x_len*y_len*z_len];
-	zbuf = new double[x_len*y_len*z_len];
-
-	for (int i=0; i < x_len; i++) {
-		for (int j=0; j < y_len; j++) {
-			for (int k=0; k < z_len; k++) {
-				xbuf[k + z_len*(i + j*x_len)] = field.Ex_ind(i, j, k);
-				ybuf[k + z_len*(i + j*x_len)] = field.Ey_ind(i, j, k);
-				zbuf[k + z_len*(i + j*x_len)] = field.Ez_ind(i, j, k);
-			}
-		}
-	}
-	status = H5Dwrite(x_dataset.dataset_id, H5T_NATIVE_DOUBLE, x_memspace.dataspace_id, x_dataset.dataspace_id, H5P_DEFAULT, xbuf);
-	status = H5Dwrite(y_dataset.dataset_id, H5T_NATIVE_DOUBLE, y_memspace.dataspace_id, y_dataset.dataspace_id, H5P_DEFAULT, ybuf);
-	status = H5Dwrite(z_dataset.dataset_id, H5T_NATIVE_DOUBLE, z_memspace.dataspace_id, z_dataset.dataspace_id, H5P_DEFAULT, zbuf);
-
-	if (status > 0) std::cout << "Something bad" << std::endl;
-
-	delete [] xbuf;
-	delete [] ybuf;
-	delete [] zbuf;
+	write_data(&group, &field, field.Bx_data, "Bx");
+	write_data(&group, &field, field.By_data, "By");
+	write_data(&group, &field, field.Bz_data, "Bz");
 
 	return 0;
 }

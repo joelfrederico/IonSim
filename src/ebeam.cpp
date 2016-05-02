@@ -374,7 +374,6 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 	dz = z_end / field.z_pts;
 
 	sr_macro   = 0.23475 / sqrt(n_resolve * dz);
-	/* sr_macro   = 0.26 / n_resolve; */
 
 	std::cout << "sr_macro: "  << sr_macro  << std::endl;
 	std::cout << "n_resolve: " << n_resolve << std::endl;
@@ -402,6 +401,9 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 
 		field.Ez_ind(k, k, 0) ++;
 		field.Ez_ind(3, 3, 0) ++;
+
+		field.Bz_ind(k, k, 0) ++;
+		field.Bz_ind(3, 3, 0) ++;
 
 		for (int i=0; i < field.x_pts; i++)
 		{

@@ -24,7 +24,6 @@ class Field_Data
 		bool _init_splines();
 		bool _samedim(const Field_Data &rhs) const;
 		int _init();
-		long _index(long i, long j, long k) const;
 
 	protected:
 
@@ -68,6 +67,8 @@ class Field_Data
 		// ==================================
 		// Methods
 		// ==================================
+		long _index(long i, long j, long k) const;
+
 		double &Ex_ind(long i, long j, long k);
 		double &Ex_ind(long ind);
 
