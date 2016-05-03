@@ -144,7 +144,6 @@ hid_t _write_grid(hid_t loc_id, std::string attr_name, double *attr_array, const
 
 int write_data(GroupAccess *group, Field_Data *field, double *buf, std::string dataset_str)
 {
-	std::cout << "Creating field: " << dataset_str << std::endl;
 	// ==================================
 	// Initialize all variables
 	// ==================================
@@ -214,6 +213,9 @@ int WriterSerial::writedata(long step, Field_Data &field)
 	_write_grid(group.group_id, "y_grid", field.y_grid, field.y_pts);
 	_write_grid(group.group_id, "z_grid", field.z_grid, field.z_pts);
 
+	// ==================================
+	// Write field
+	// ==================================
 	write_data(&group, &field, field.Ex_data, "Ex");
 	write_data(&group, &field, field.Ey_data, "Ey");
 	write_data(&group, &field, field.Ez_data, "Ez");

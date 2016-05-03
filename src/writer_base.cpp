@@ -23,7 +23,7 @@ WriterBase::~WriterBase()
 		obj_id_list = new hid_t[num_open];
 		H5Fget_obj_ids(file_id, H5F_OBJ_ALL, num_open, obj_id_list);
 
-		std::cout << "ERROR: COULD NOT CLOSE FILE." << std::endl;
+		std::cout << "ERROR: (" << status << "). COULD NOT CLOSE FILE." << std::endl;
 		std::cout << "Open obj count: " << num_open << std::endl;
 
 		for (int i=0; i < num_open; i++)
@@ -70,6 +70,7 @@ int WriterBase::write_attributes(const SimParams &simparams) const
 	AttributeCreate n_field_x ( file_id , "n_field_x" , simparams.n_field_x ) ;
 	AttributeCreate n_field_y ( file_id , "n_field_y" , simparams.n_field_y ) ;
 	AttributeCreate n_field_z ( file_id , "n_field_z" , simparams.n_field_z ) ;
+	AttributeCreate z_end     ( file_id , "z_end"     , simparams.z_end     ) ;
 
 	return 0;
 }

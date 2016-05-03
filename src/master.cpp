@@ -50,6 +50,7 @@ int master(bool verbose)
 	long n_field_x          = 51;
 	long n_field_y          = 51;
 	long n_field_z          = 21;
+	double z_end            = sz;
 
 	const SimParams simparams(
 		E,
@@ -70,6 +71,7 @@ int master(bool verbose)
 		n_field_x,
 		n_field_y,
 		n_field_z,
+		z_end,
 		n_ions,
 		filename
 		);
@@ -101,17 +103,17 @@ int master(bool verbose)
 	{
 		printf("Step: %d\n", step);
 		// ==============================
-		// Write electrons
-		// ==============================
-		loopcomm.instruct(LOOP_DUMP_E);
-		loopcomm.send_slaves(step);
-
-		// ==============================
 		// Get fields from slaves
 		// ==============================
 		loopcomm.instruct(LOOP_GET_EFIELD);
 		field = new Field_Data(simparams);
 		fieldcomm.recv_field_others_add(*field);
+
+		// ==============================
+		// Write electrons
+		// ==============================
+		loopcomm.instruct(LOOP_DUMP_E);
+		loopcomm.send_slaves(step);
 
 		// ==============================
 		// Write total field

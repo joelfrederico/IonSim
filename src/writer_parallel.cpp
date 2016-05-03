@@ -1,9 +1,10 @@
-#include "writer_parallel.h"
-#include <mpi.h>
-#include "support_func.h"
-#include "loop_comm.h"
+#include "ebeam.h"
 #include "hdf5_classes.h"
+#include "loop_comm.h"
+#include "support_func.h"
+#include "writer_parallel.h"
 #include <hdf5.h>
+#include <mpi.h>
 
 WriterParallel::WriterParallel(const std::string &filename, const MPI_Comm comm_id) :
 	WriterBase(filename)
@@ -65,7 +66,7 @@ int WriterParallel::overwrite_file_parallel()
 	return 0;
 }
 
-int WriterParallel::_writedata(hid_t &loc_id, const std::string &dataset_str, const Parts &parts, unsigned int step)
+int WriterParallel::_writedata(DatasetAccess *&dataset, hid_t &loc_id, const std::string &dataset_str, const Parts &parts, unsigned int step)
 {
 	long n_pts  = parts.n_pts;
 	int n_write = MAX_N_WRITE;
@@ -94,9 +95,10 @@ int WriterParallel::_writedata(hid_t &loc_id, const std::string &dataset_str, co
 	count[1] = 6;
 
 	// Creates new dataset_id, dataspace_id
-	DatasetAccess dataset = DatasetAccess(loc_id, dataset_str, rank, count);
+	/* DatasetAccess dataset = DatasetAccess(loc_id, dataset_str, rank, count); */
+	dataset = new DatasetAccess(loc_id, dataset_str, rank, count);
 
-	AttributeCreate attribute(dataset.dataset_id, "Step", step);
+	AttributeCreate attribute(dataset->dataset_id, "Step", step);
 
 	// ==================================
 	// Write dataset rows
@@ -131,7 +133,7 @@ int WriterParallel::_writedata(hid_t &loc_id, const std::string &dataset_str, co
 		offset[1] = 0;
 
 
-		status1 = H5Sselect_hyperslab(dataset.dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
+		status1 = H5Sselect_hyperslab(dataset->dataspace_id, H5S_SELECT_SET, offset, NULL, count, NULL);
 
 		for (int k=0; k < n_write; k++)
 		{
@@ -144,19 +146,19 @@ int WriterParallel::_writedata(hid_t &loc_id, const std::string &dataset_str, co
 			i++;
 		}
 
-		status = H5Dwrite(dataset.dataset_id, H5T_NATIVE_DOUBLE, (*memspace).dataspace_id, dataset.dataspace_id, plist_dx.plist_id, buf);
+		status = H5Dwrite(dataset->dataset_id, H5T_NATIVE_DOUBLE, memspace->dataspace_id, dataset->dataspace_id, plist_dx.plist_id, buf);
 		if ((status < 0) && (loopcomm.id == 1))
 		{
 			std::cout << "==================================" << std::endl;
 
 			std::cout << "PROBLEM"       << std::endl;
-			std::cout << "status: "      << status                   << std::endl;
-			std::cout << "status1: "     << status1                  << std::endl;
-			std::cout << "memspace_id: " << (*memspace).dataspace_id << std::endl;
-			std::cout << "dataset_id: "  << dataset.dataset_id       << std::endl;
-			std::cout << "dataset_str: " << dataset_str              << std::endl;
-			std::cout << "x[0]: "        << (*_x)[0]                 << std::endl;
-			std::cout << "buf[0]: "      << (*_x)[0]                 << std::endl;
+			std::cout << "status: "      << status                 << std::endl;
+			std::cout << "status1: "     << status1                << std::endl;
+			std::cout << "memspace_id: " << memspace->dataspace_id << std::endl;
+			std::cout << "dataset_id: "  << dataset->dataset_id    << std::endl;
+			std::cout << "dataset_str: " << dataset->_dataset_str  << std::endl;
+			std::cout << "x[0]: "        << (*_x)[0]               << std::endl;
+			std::cout << "buf[0]: "      << (*_x)[0]               << std::endl;
 
 			std::cout << "==================================" << std::endl;
 		}
@@ -164,24 +166,47 @@ int WriterParallel::_writedata(hid_t &loc_id, const std::string &dataset_str, co
 	}
 	delete [] buf;
 
+	/* delete dataset; */
+
 	return 0;
 }
 
 int WriterParallel::writedata(unsigned int step, const std::string &dataset_str, const Parts &parts)
 {
+	DatasetAccess *dataset;
 	GroupStepAccess step_group = GroupStepAccess(file_id, step);
 
-	_writedata(step_group.group_id, dataset_str, parts, step);
+	_writedata(dataset, step_group.group_id, dataset_str, parts, step);
+
+	delete dataset;
+
+	return 0;
+}
+
+int WriterParallel::writedata(unsigned int step, const std::string &dataset_str, const Ebeam &ebeam)
+{
+	DatasetAccess *dataset;
+	GroupStepAccess step_group = GroupStepAccess(file_id, step);
+
+	_writedata(dataset, step_group.group_id, dataset_str, ebeam, step);
+
+	AttributeCreate n_resolve(dataset->dataset_id, "n_resolve", ebeam.n_resolve);
+	AttributeCreate sr_macro(dataset->dataset_id, "sr_macro", ebeam.sr_macro);
+
+	delete dataset;
 
 	return 0;
 }
 
 int WriterParallel::writedata_substep(unsigned int step, unsigned int substep, const std::string &dataset_str, const std::string &subgroup, const Parts &parts)
 {
+	DatasetAccess *dataset;
+
 	GroupStepAccess step_group = GroupStepAccess(file_id, step);
 	GroupAccess sub_group = GroupAccess(step_group.group_id, subgroup);
 
-	_writedata(sub_group.group_id, dataset_str, parts, substep);
+	_writedata(dataset, sub_group.group_id, dataset_str, parts, substep);
 
+	delete dataset;
 	return 0;
 }

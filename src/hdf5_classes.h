@@ -15,6 +15,8 @@ class Debug
 
 	public:
 		Debug(const bool debug);
+
+		herr_t close(herr_t (*f)(hid_t), hid_t attr_id, std::string name);
 };
 
 class GroupAccess : public Debug
@@ -43,9 +45,9 @@ class DatasetAccess : public Debug
 		hid_t _loc_id;
 		DataspaceCreate *dataspace;
 
+	public:
 		const std::string _dataset_str;
 
-	public:
 		hid_t dataspace_id;
 		hid_t dataset_id;
 
@@ -88,7 +90,8 @@ class AttributeCreate : public Debug
 
 		template <class T>
 		AttributeCreate(hid_t loc_id, const std::string &attr_name, T attr_value) :
-			Debug(true)
+			Debug(false),
+			_attr_name(attr_name)
 		{
 			herr_t status;
 

@@ -22,7 +22,6 @@ class Ebeam : public Parts
 		const Cov _y_cov;
 		const Cov _z_cov;
 
-		double n_resolve;
 		double srsq;
 
 	public:
@@ -47,7 +46,8 @@ class Ebeam : public Parts
 		// Member data
 		// ==================================
 		double qpp;
-		double z_end;
+		double n_resolve;
+		double sr_macro;
 
 		// ==================================
 		// Member methods

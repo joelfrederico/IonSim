@@ -26,6 +26,7 @@ SimParams::SimParams(
 	long _n_field_x,
 	long _n_field_y,
 	long _n_field_z,
+	double _z_end,
 	long _n_ions,
 	std::string _filename
 	)
@@ -48,6 +49,7 @@ SimParams::SimParams(
 	n_field_x  = _n_field_x;
 	n_field_y  = _n_field_y;
 	n_field_z  = _n_field_z;
+	z_end      = _z_end;
 	n_ions     = _n_ions;
 	filename   = _filename;
 
@@ -87,10 +89,11 @@ int SimParams::bcast_send() const
 	bcast_send_wrap(t_tot      );
 	bcast_send_wrap(n_steps    );
 	bcast_send_wrap(dt         );
-	bcast_send_wrap(pushmethod);
+	bcast_send_wrap(pushmethod );
 	bcast_send_wrap(n_field_x  );
 	bcast_send_wrap(n_field_y  );
 	bcast_send_wrap(n_field_z  );
+	bcast_send_wrap(z_end      );
 
 	// Send string
 
@@ -129,6 +132,7 @@ int SimParams::bcast_receive()
 	MPI_Bcast(&n_field_x  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_field_y  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_field_z  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&z_end      , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
 
 	// Receive string
 

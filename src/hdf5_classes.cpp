@@ -9,6 +9,25 @@ Debug::Debug(const bool debug_flag) :
 {
 }
 
+herr_t Debug::close(herr_t (*f)(hid_t), hid_t attr_id, std::string name)
+{
+	herr_t status;
+
+	status = f(attr_id);
+	if (debug)
+	{
+		if (status < 0)
+		{
+			std::cout << "Couldn't close: " << name << std::endl;
+		} else {
+			std::cout << "Successfully closed: " << name << std::endl;
+		}
+	}
+
+	return status;
+}
+
+
 // ==================================
 // GroupAccess
 // ==================================
@@ -36,19 +55,11 @@ GroupAccess::GroupAccess(hid_t &loc_id, std::string group_str) :
 
 GroupAccess::~GroupAccess()
 {
-	herr_t status;
+	/* herr_t status; */
 
-	status = H5Gclose(group_id);
+	/* status = H5Gclose(group_id); */
 
-	if (debug)
-	{
-		if (status < 0)
-		{
-			std::cout << "Failed to close group: " << _group_str << std::endl;
-		} else {
-			std::cout << "Successfully closed: " << _group_str << std::endl;
-		}
-	}
+	close(&H5Gclose, group_id, _group_str);
 }
 
 // ==================================
@@ -72,7 +83,7 @@ GroupStepAccess::GroupStepAccess(hid_t &loc_id, unsigned int step) :
 // DatasetAccess
 // ==================================
 DatasetAccess::DatasetAccess(hid_t &loc_id, std::string dataset_str, int rank, hsize_t *count) :
-	Debug(true),
+	Debug(false),
 	_dataset_str(dataset_str)
 {
 	_loc_id = loc_id;
@@ -88,7 +99,8 @@ DatasetAccess::DatasetAccess(hid_t &loc_id, std::string dataset_str, int rank, h
 
 DatasetAccess::~DatasetAccess()
 {
-	H5Dclose(dataset_id);
+	close(&H5Dclose, dataset_id, _dataset_str);
+
 	delete dataspace;
 }
 
@@ -96,27 +108,27 @@ DatasetAccess::~DatasetAccess()
 // DataspaceCreate
 // ==================================
 DataspaceCreate::DataspaceCreate(int rank, hsize_t *count) :
-	Debug(true)
+	Debug(false)
 {
 	dataspace_id = H5Screate_simple(rank, count, NULL);
 }
 
 DataspaceCreate::DataspaceCreate(H5S_class_t type) :
-	Debug(true)
+	Debug(false)
 {
 	dataspace_id = H5Screate(type);
 }
 
 DataspaceCreate::~DataspaceCreate()
 {
-	H5Sclose(dataspace_id);
+	close(&H5Sclose, dataspace_id, "dataspace");
 }
 
 // ==================================
 // PlistCreate
 // ==================================
 PlistCreate::PlistCreate(hid_t cls_id) :
-	Debug(true)
+	Debug(false)
 {
 	_cls_id = cls_id;
 	plist_id = H5Pcreate(cls_id);
@@ -132,6 +144,7 @@ PlistCreate::~PlistCreate()
 // ==================================
 AttributeCreate::~AttributeCreate()
 {
-	H5Aclose(attr_id);
+	close(&H5Aclose, attr_id, _attr_name);
+
 	delete _dataspace;
 }

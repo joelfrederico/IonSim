@@ -19,7 +19,7 @@
 Cov z_cov(SimParams simparams)
 {
 	Cov out;
-	out(0, 0) = simparams.sz;
+	out(0, 0) = simparams.sz * simparams.sz;
 	out(0, 1) = out(1, 0) = 0;
 	out(1, 1) = simparams.sdelta;
 
@@ -31,44 +31,11 @@ Cov z_cov(SimParams simparams)
 // ==================================
 Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams), _x_cov(x_beam.cov()), _y_cov(y_beam.cov()), _z_cov(z_cov(simparams))
 {
-	// ==================================
-	// Save things
-	// ==================================
-	/* _x_beam = x_beam; */
-	/* _y_beam = y_beam; */
-
-	// ==================================
-	// Get covariances for x and y
-	// ==================================
-	/* x_beam.cov(_x_cov); */
-	/* y_beam.cov(_y_cov); */
-
-	/* _z_cov[0][0] = simparams.sz; */
-	/* _z_cov[0][1] = _z_cov[1][0] = 0; */
-	/* _z_cov[1][1] = simparams.sdelta; */
-
 	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
 }
 
 Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams), _x_cov(sx*sx, 0, 0, syp*syp), _y_cov(sy*sy, 0, 0, syp*syp), _z_cov(z_cov(simparams))
 {
-	// ==================================
-	// Initialize local variables
-	// ==================================
-	/* double x_cov[2][2]; */
-	/* double y_cov[2][2]; */
-	/* double z_cov[2][2]; */
-
-	// ==================================
-	// Get covariances for x and y
-	// ==================================
-	/* _x_cov[0][0] = sx; */
-	/* _y_cov[0][0] = sy; */
-
-	/* _z_cov[0][0] = simparams.sz; */
-	/* _z_cov[0][1] = _z_cov[1][0] = 0; */
-	/* _z_cov[1][1] = simparams.sdelta; */
-
 	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
 }
 
@@ -76,6 +43,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 {
 	double* rho_x;
 	double* rho_y;
+	double z_len;
 	// ==================================
 	// Set random number generator
 	// ==================================
@@ -92,8 +60,6 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 	rho_x = &x_cov(0, 1);
 	rho_y = &y_cov(0, 1);
 
-	/* std::cout << "zdist: " << _simparams.zdist << std::endl; */
-
 	for (int i=0; i < n_pts; i++)
 	{
 
@@ -103,13 +69,13 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 		switch (_simparams.zdist)
 		{
 			case Z_DIST_FLAT:
-				z_end = sqrt(z_cov(0, 0));
+				z_len = _simparams.sz;
 
-				z[i] = gsl_ran_flat(r, 0, z_end);
-				zp[i] = gsl_ran_gaussian(r, z_end);
+				z[i] = gsl_ran_flat(r, 0, z_len);
+				zp[i] = gsl_ran_gaussian(r, z_len);
 
 				srsq = x_cov(0, 0);
-				n_resolve = -(_simparams.n_e) / (pow(2*M_PI, 1.5) * srsq * z_end * gsl_sf_expm1(-4.5));
+				n_resolve = -(_simparams.n_e) / (pow(2*M_PI, 1.5) * srsq * z_len * gsl_sf_expm1(-4.5));
 
 				break;
 			case Z_DIST_GAUSS:
@@ -368,16 +334,11 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 	int k;
-	double sr_macro;
 	double srsq_macro;
 
-	dz = z_end / field.z_pts;
+	dz = _simparams.z_end / field.z_pts;
 
 	sr_macro   = 0.23475 / sqrt(n_resolve * dz);
-
-	std::cout << "sr_macro: "  << sr_macro  << std::endl;
-	std::cout << "n_resolve: " << n_resolve << std::endl;
-	std::cout << "dz: "        << dz        << std::endl;
 
 	srsq_macro = sr_macro * sr_macro;
 
@@ -397,7 +358,6 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 		z_e = z[n];
 
 		k = floor(z_e / dz);
-		/* k=0; */
 
 		field.Ez_ind(k, k, 0) ++;
 		field.Ez_ind(3, 3, 0) ++;
@@ -428,6 +388,7 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 			}
 		}
 	}
+
 
 	return 0;
 }

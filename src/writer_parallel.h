@@ -5,6 +5,7 @@
 #include <mpi.h>
 #include "parts.h"
 #include "loop_comm.h"
+#include "ebeam.h"
 
 class WriterParallel : public WriterBase
 {
@@ -12,7 +13,7 @@ class WriterParallel : public WriterBase
 		const LoopComm loopcomm;
 
 		int _init(const std::string &filename, bool overwrite);
-		int _writedata(hid_t &group_id, const std::string &dataset_str, const Parts &parts, unsigned int step);
+		int _writedata(DatasetAccess *&dataset, hid_t &group_id, const std::string &dataset_str, const Parts &parts, unsigned int step);
 
 	public:
 		WriterParallel(const std::string &filename, const MPI_Comm comm_id);
@@ -20,7 +21,10 @@ class WriterParallel : public WriterBase
 
 		int open_file();
 		int overwrite_file_parallel();
+
 		int writedata(unsigned int step, const std::string &dataset_str, const Parts &parts);
+		int writedata(unsigned int step, const std::string &dataset_str, const Ebeam &ebeam);
+
 		int writedata_substep(unsigned int step, unsigned int substep, const std::string &dataset_str, const std::string &subgroup, const Parts &parts);
 
 };
