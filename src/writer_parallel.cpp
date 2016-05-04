@@ -190,8 +190,9 @@ int WriterParallel::writedata(unsigned int step, const std::string &dataset_str,
 
 	_writedata(dataset, step_group.group_id, dataset_str, ebeam, step);
 
-	AttributeCreate n_resolve(dataset->dataset_id, "n_resolve", ebeam.n_resolve);
-	AttributeCreate sr_macro(dataset->dataset_id, "sr_macro", ebeam.sr_macro);
+	AttributeCreate n_resolve ( dataset->dataset_id , "n_resolve" , ebeam.n_resolve );
+	AttributeCreate sr_macro  ( dataset->dataset_id , "sr_macro"  , ebeam.sr_macro  );
+	AttributeCreate qpp       ( dataset->dataset_id , "qpp"       , ebeam.qpp       );
 
 	delete dataset;
 
