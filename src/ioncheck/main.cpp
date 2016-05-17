@@ -8,6 +8,7 @@
 
 const char *argp_program_version = "v0.1";
 static char args_doc[] = "FILE";
+const int WIDTH = 17;
 
 herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void *opdata)
 {
@@ -24,18 +25,18 @@ herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void 
 	{
 		case H5T_INTEGER:
 			status = H5Aread(attr_id, attr_type, &i_buf);
-			std::cout << std::left << std::setw(15) << name << ": " << i_buf << std::endl;
+			std::cout << std::left << std::setw(WIDTH) << name << ": " << i_buf << std::endl;
 			break;
 
 		case H5T_FLOAT:
 			status = H5Aread(attr_id, attr_type, &d_buf);
-			std::cout << std::left << std::setw(15) << name << ": " << d_buf << std::endl;
+			std::cout << std::left << std::setw(WIDTH) << name << ": " << d_buf << std::endl;
 			break;
 
 		case H5T_STRING:
 			status = H5Aread(attr_id, attr_type, &c_buf);
 
-			std::cout << std::left << std::setw(15) << name << ": \"" << c_buf << "\"" << std::endl;
+			std::cout << std::left << std::setw(WIDTH) << name << ": \"" << c_buf << "\"" << std::endl;
 
 			/* delete c_buf; */
 			free(c_buf);
@@ -43,7 +44,7 @@ herr_t print_attrs(hid_t loc_id, const char *name, const H5A_info_t *info, void 
 			break;
 
 		default:
-			std::cout << std::left << std::setw(15) << name << ": " << "(attribute type not known)" << std::endl;
+			std::cout << std::left << std::setw(WIDTH) << name << ": " << "(attribute type not known)" << std::endl;
 	}
 
 	H5Tclose(attr_type);
