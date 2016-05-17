@@ -26,32 +26,34 @@ SimParams::SimParams(
 	long _n_field_x,
 	long _n_field_y,
 	long _n_field_z,
+	double _field_trans_wind,
 	double _z_end,
 	long _n_ions,
 	std::string _filename
 	)
 {
-	E          = _E;
-	dt         = _dt;
-	emit_n     = _emit_n;
-	length     = _length;
-	m_ion_amu  = _m_ion_amu;
-	n_p_cgs    = _n_p_cgs;
-	q_tot      = _q_tot;
-	radius     = _radius;
-	sz         = _sz;
-	sdelta     = _sdelta;
-	zdist      = _zdist;
-	t_tot      = _t_tot;
-	n_steps    = _n_steps;
-	pushmethod = _pushmethod;
-	n_e        = _n_e;
-	n_field_x  = _n_field_x;
-	n_field_y  = _n_field_y;
-	n_field_z  = _n_field_z;
-	z_end      = _z_end;
-	n_ions     = _n_ions;
-	filename   = _filename;
+	E                = _E;
+	dt               = _dt;
+	emit_n           = _emit_n;
+	length           = _length;
+	m_ion_amu        = _m_ion_amu;
+	n_p_cgs          = _n_p_cgs;
+	q_tot            = _q_tot;
+	radius           = _radius;
+	sz               = _sz;
+	sdelta           = _sdelta;
+	zdist            = _zdist;
+	t_tot            = _t_tot;
+	n_steps          = _n_steps;
+	pushmethod       = _pushmethod;
+	n_e              = _n_e;
+	n_field_x        = _n_field_x;
+	n_field_y        = _n_field_y;
+	n_field_z        = _n_field_z;
+	field_trans_wind = _field_trans_wind;
+	z_end            = _z_end;
+	n_ions           = _n_ions;
+	filename         = _filename;
 
 	gamma_rel   = ionsim::GeV2gamma(_E);
 

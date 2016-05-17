@@ -36,6 +36,7 @@ class SimParams
 			long _n_field_x,
 			long _n_field_y,
 			long _n_field_z,
+			double _field_trans_wind,
 			double _z_end,
 			long _n_ions,
 			std::string _filename
@@ -86,6 +87,7 @@ class SimParams
 		long n_field_x;
 		long n_field_y;
 		long n_field_z;
+		double field_trans_wind;
 		double z_end;
 
 		long n_ions;

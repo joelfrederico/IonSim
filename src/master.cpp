@@ -50,6 +50,7 @@ int master(bool verbose)
 	long n_field_x          = 51;
 	long n_field_y          = 51;
 	long n_field_z          = 21;
+	double field_trans_wind = radius * 5;
 	double z_end            = sz;
 
 	const SimParams simparams(
@@ -71,6 +72,7 @@ int master(bool verbose)
 		n_field_x,
 		n_field_y,
 		n_field_z,
+		field_trans_wind,
 		z_end,
 		n_ions,
 		filename

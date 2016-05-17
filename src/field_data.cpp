@@ -115,8 +115,8 @@ Field_Data::Field_Data(const SimParams &simparams) :
 	y_pts(simparams.n_field_y),
 	z_pts(simparams.n_field_z),
 	n_pts(simparams.n_field_x*simparams.n_field_y*simparams.n_field_z),
-	x_edge_mag(simparams.radius * 3),
-	y_edge_mag(simparams.radius * 3),
+	x_edge_mag(simparams.field_trans_wind),
+	y_edge_mag(simparams.field_trans_wind),
 	z_edge_mag(simparams.length)
 {
 	_init();
