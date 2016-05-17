@@ -76,26 +76,27 @@ int SimParams::bcast_send() const
 	long cbuf_l;
 
 	// Send numerical parameters
-	bcast_send_wrap(n_e        );
-	bcast_send_wrap(n_ions     );
-	bcast_send_wrap(q_tot      );
-	bcast_send_wrap(radius     );
-	bcast_send_wrap(length     );
-	bcast_send_wrap(E          );
-	bcast_send_wrap(emit_n     );
-	bcast_send_wrap(n_p_cgs    );
-	bcast_send_wrap(m_ion_amu  );
-	bcast_send_wrap(sz         );
-	bcast_send_wrap(sdelta     );
-	bcast_send_wrap(zdist      );
-	bcast_send_wrap(t_tot      );
-	bcast_send_wrap(n_steps    );
-	bcast_send_wrap(dt         );
-	bcast_send_wrap(pushmethod );
-	bcast_send_wrap(n_field_x  );
-	bcast_send_wrap(n_field_y  );
-	bcast_send_wrap(n_field_z  );
-	bcast_send_wrap(z_end      );
+	bcast_send_wrap(n_e              );
+	bcast_send_wrap(n_ions           );
+	bcast_send_wrap(q_tot            );
+	bcast_send_wrap(radius           );
+	bcast_send_wrap(length           );
+	bcast_send_wrap(E                );
+	bcast_send_wrap(emit_n           );
+	bcast_send_wrap(n_p_cgs          );
+	bcast_send_wrap(m_ion_amu        );
+	bcast_send_wrap(sz               );
+	bcast_send_wrap(sdelta           );
+	bcast_send_wrap(zdist            );
+	bcast_send_wrap(t_tot            );
+	bcast_send_wrap(n_steps          );
+	bcast_send_wrap(dt               );
+	bcast_send_wrap(pushmethod       );
+	bcast_send_wrap(n_field_x        );
+	bcast_send_wrap(n_field_y        );
+	bcast_send_wrap(n_field_z        );
+	bcast_send_wrap(field_trans_wind );
+	bcast_send_wrap(z_end            );
 
 	// Send string
 
@@ -115,26 +116,27 @@ int SimParams::bcast_receive()
 	char *cbuf;
 
 	// Receive numerical parameters
-	MPI_Bcast(&n_e        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_ions     , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&q_tot      , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&radius     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&length     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&E          , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&emit_n     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_p_cgs    , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&m_ion_amu  , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&sz         , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&sdelta     , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&zdist      , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&t_tot      , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_steps    , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&dt         , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&pushmethod , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_x  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_y  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_z  , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&z_end      , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_e              , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_ions           , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&q_tot            , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&radius           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&length           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&E                , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&emit_n           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_p_cgs          , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&m_ion_amu        , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&sz               , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&sdelta           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&zdist            , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&t_tot            , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_steps          , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&dt               , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&pushmethod       , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_x        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_y        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_z        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&field_trans_wind , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&z_end            , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
 
 	// Receive string
 
