@@ -79,7 +79,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 
 				break;
 			case Z_DIST_GAUSS:
-				gsl_ran_bivariate_gaussian(r , sqrt(z_cov(0, 0)) , sqrt(z_cov(1, 1)) , 0      , &z[i] , &zp[i]);
+				gsl_ran_bivariate_gaussian(r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z[i], &zp[i]);
 				break;
 		}
 	}
@@ -360,10 +360,10 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 		k = floor(z_e / dz);
 
 		field.Ez_ind(k, k, 0) ++;
-		field.Ez_ind(3, 3, 0) ++;
+		/* field.Ez_ind(3, 3, 0) ++; */
 
 		field.Bz_ind(k, k, 0) ++;
-		field.Bz_ind(3, 3, 0) ++;
+		/* field.Bz_ind(3, 3, 0) ++; */
 
 		for (int i=0; i < field.x_pts; i++)
 		{

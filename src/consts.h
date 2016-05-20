@@ -17,6 +17,25 @@ typedef std::complex<double> complex_double;
 typedef int zdist_t;
 
 // ==================================
+// Define classes
+// ==================================
+const pushmethod_t PUSH_RUNGE_KUTTA = 1;
+const pushmethod_t PUSH_SIMPLE      = 2;
+const pushmethod_t PUSH_FIELD       = 3;
+
+class PushMethod
+{
+	private:
+		const int _PUSH_TYPE;
+
+	public:
+		PushMethod(int PUSH_TYPE);
+		bool operator==(const PushMethod &other) const;
+
+		std::string name;
+};
+
+// ==================================
 // Loop flags
 // ==================================
 const zdist_t Z_DIST_FLAT  = 0;
@@ -52,13 +71,6 @@ const double ELECTRON_REST_ENERGY = GSL_CONST_MKSA_MASS_ELECTRON * GSL_CONST_MKS
 // ==================================
 const parttype_t PARTS_E   = 2;
 const parttype_t PARTS_ION = 1;
-
-// ==================================
-// Push types
-// ==================================
-const pushmethod_t PUSH_RUNGE_KUTTA = 1;
-const pushmethod_t PUSH_SIMPLE      = 2;
-const pushmethod_t PUSH_FIELD       = 3;
 
 // ==================================
 // HDF5 consts

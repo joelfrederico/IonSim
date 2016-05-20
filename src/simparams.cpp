@@ -9,7 +9,6 @@
 // ==================================
 SimParams::SimParams(
 	double _E,
-	double _dt,
 	double _emit_n,
 	double _length,
 	double _m_ion_amu,
@@ -19,7 +18,6 @@ SimParams::SimParams(
 	double _sz,
 	double _sdelta,
 	zdist_t _zdist,
-	double _t_tot,
 	int _n_steps,
 	pushmethod_t _pushmethod,
 	long _n_e,
@@ -33,7 +31,6 @@ SimParams::SimParams(
 	)
 {
 	E                = _E;
-	dt               = _dt;
 	emit_n           = _emit_n;
 	length           = _length;
 	m_ion_amu        = _m_ion_amu;
@@ -43,7 +40,6 @@ SimParams::SimParams(
 	sz               = _sz;
 	sdelta           = _sdelta;
 	zdist            = _zdist;
-	t_tot            = _t_tot;
 	n_steps          = _n_steps;
 	pushmethod       = _pushmethod;
 	n_e              = _n_e;
@@ -65,9 +61,46 @@ SimParams::SimParams()
 	_init();
 }
 
+/*
+SimParams::SimParams(const SimParams &obj) :
+	E(obj.E),
+	emit_n(obj.emit_n),
+	length(obj.length),
+	m_ion_amu(obj.m_ion_amu),
+	n_p_cgs(obj.n_p_cgs),
+	q_tot(obj.q_tot),
+	radius(obj.radius),
+	sz(obj.sz),
+	sdelta(obj.sdelta),
+	zdist(obj.zdist),
+	n_steps(obj.n_steps),
+	pushmethod(obj.pushmethod),
+	n_e(obj.n_e),
+	n_field_x(obj.n_field_x),
+	n_field_y(obj.n_field_y),
+	n_field_z(obj.n_field_z),
+	field_trans_wind(obj.field_trans_wind),
+	z_end(obj.z_end),
+
+	n_ions(obj.n_ions),
+	filename(obj.filename),
+	gamma_rel(obj.gamma_rel)
+{
+	// _dt = new double;
+}
+*/
+
 int SimParams::_init()
 {
+	/* _dt = new double; */
+	/* *_dt = -1; */
 	return 0;
+}
+
+SimParams::~SimParams()
+{
+	/* delete _dt; */
+	/* std::cout << "Destructed _dt" << std::endl; */
 }
 
 int SimParams::bcast_send() const
@@ -88,9 +121,7 @@ int SimParams::bcast_send() const
 	bcast_send_wrap(sz               );
 	bcast_send_wrap(sdelta           );
 	bcast_send_wrap(zdist            );
-	bcast_send_wrap(t_tot            );
 	bcast_send_wrap(n_steps          );
-	bcast_send_wrap(dt               );
 	bcast_send_wrap(pushmethod       );
 	bcast_send_wrap(n_field_x        );
 	bcast_send_wrap(n_field_y        );
@@ -128,9 +159,7 @@ int SimParams::bcast_receive()
 	MPI_Bcast(&sz               , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&sdelta           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&zdist            , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&t_tot            , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_steps          , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&dt               , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&pushmethod       , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_field_x        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_field_y        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
@@ -166,4 +195,16 @@ int SimParams::z_cov(double (&out)[2][2])
 double SimParams::ion_mass() const
 {
 	return m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS;
+}
+
+double SimParams::dt() const
+{
+	return ( z_end / ((n_field_z-1) * GSL_CONST_MKSA_SPEED_OF_LIGHT) );
+	return 0;
+	if (*_dt == -1)
+	{
+		*_dt = ( z_end / ((n_field_z-1) * GSL_CONST_MKSA_SPEED_OF_LIGHT) );
+	}
+
+	return *_dt;
 }

@@ -19,7 +19,9 @@ gtest_SOURCES = gtest.cpp \
 		../src/field_comm.cpp \
 		../src/hdf5_classes.cpp \
 		../src/loop_comm.cpp \
-		../src/support_func.cpp
+		../src/support_func.cpp \
+		../src/emit.cpp \
+		../src/beam.cpp
 
 gtest_LDADD = libgtest.la $(MYLDADD)
 

@@ -119,7 +119,8 @@ am_gtest_OBJECTS = gtest-gtest.$(OBJEXT) \
 	../src/gtest-field_comm.$(OBJEXT) \
 	../src/gtest-hdf5_classes.$(OBJEXT) \
 	../src/gtest-loop_comm.$(OBJEXT) \
-	../src/gtest-support_func.$(OBJEXT)
+	../src/gtest-support_func.$(OBJEXT) \
+	../src/gtest-emit.$(OBJEXT) ../src/gtest-beam.$(OBJEXT)
 gtest_OBJECTS = $(am_gtest_OBJECTS)
 am__DEPENDENCIES_1 =
 gtest_DEPENDENCIES = libgtest.la $(am__DEPENDENCIES_1)
@@ -557,7 +558,9 @@ gtest_SOURCES = gtest.cpp \
 		../src/field_comm.cpp \
 		../src/hdf5_classes.cpp \
 		../src/loop_comm.cpp \
-		../src/support_func.cpp
+		../src/support_func.cpp \
+		../src/emit.cpp \
+		../src/beam.cpp
 
 gtest_LDADD = libgtest.la $(MYLDADD)
 gtest_LDFLAGS = -pthread -L/opt/local/lib
@@ -647,6 +650,10 @@ clean-checkPROGRAMS:
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-support_func.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
+../src/gtest-emit.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/gtest-beam.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 
 gtest$(EXEEXT): $(gtest_OBJECTS) $(gtest_DEPENDENCIES) $(EXTRA_gtest_DEPENDENCIES) 
 	@rm -f gtest$(EXEEXT)
@@ -666,6 +673,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@../googletest/googletest/src/$(DEPDIR)/libgtest_la-gtest-all.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-beam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-emit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-hdf5_classes.Po@am__quote@
@@ -788,6 +797,34 @@ gtest-gtest.obj: gtest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/gtest-support_func.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
+
+../src/gtest-emit.o: ../src/emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-emit.o -MD -MP -MF ../src/$(DEPDIR)/gtest-emit.Tpo -c -o ../src/gtest-emit.o `test -f '../src/emit.cpp' || echo '$(srcdir)/'`../src/emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-emit.Tpo ../src/$(DEPDIR)/gtest-emit.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/emit.cpp' object='../src/gtest-emit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-emit.o `test -f '../src/emit.cpp' || echo '$(srcdir)/'`../src/emit.cpp
+
+../src/gtest-emit.obj: ../src/emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-emit.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-emit.Tpo -c -o ../src/gtest-emit.obj `if test -f '../src/emit.cpp'; then $(CYGPATH_W) '../src/emit.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/emit.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-emit.Tpo ../src/$(DEPDIR)/gtest-emit.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/emit.cpp' object='../src/gtest-emit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-emit.obj `if test -f '../src/emit.cpp'; then $(CYGPATH_W) '../src/emit.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/emit.cpp'; fi`
+
+../src/gtest-beam.o: ../src/beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-beam.o -MD -MP -MF ../src/$(DEPDIR)/gtest-beam.Tpo -c -o ../src/gtest-beam.o `test -f '../src/beam.cpp' || echo '$(srcdir)/'`../src/beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-beam.Tpo ../src/$(DEPDIR)/gtest-beam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/beam.cpp' object='../src/gtest-beam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-beam.o `test -f '../src/beam.cpp' || echo '$(srcdir)/'`../src/beam.cpp
+
+../src/gtest-beam.obj: ../src/beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-beam.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-beam.Tpo -c -o ../src/gtest-beam.obj `if test -f '../src/beam.cpp'; then $(CYGPATH_W) '../src/beam.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/beam.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-beam.Tpo ../src/$(DEPDIR)/gtest-beam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/beam.cpp' object='../src/gtest-beam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-beam.obj `if test -f '../src/beam.cpp'; then $(CYGPATH_W) '../src/beam.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/beam.cpp'; fi`
 
 mpi_gtest-mpi_gtest.o: mpi_gtest.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mpi_gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mpi_gtest-mpi_gtest.o -MD -MP -MF $(DEPDIR)/mpi_gtest-mpi_gtest.Tpo -c -o mpi_gtest-mpi_gtest.o `test -f 'mpi_gtest.cpp' || echo '$(srcdir)/'`mpi_gtest.cpp

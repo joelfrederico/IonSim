@@ -25,9 +25,15 @@ class Field_Interp
 		gsl_interp_accel *Ez_xacc;
 		gsl_interp_accel *Ez_yacc;
 
+		/*
 		gsl_spline2d *splinex;
 		gsl_spline2d *spliney;
 		gsl_spline2d *splinez;
+		*/
+
+		gsl_interp2d *interp2d_x;
+		gsl_interp2d *interp2d_y;
+		gsl_interp2d *interp2d_z;
 
 		int _init();
 		int _init_splines(int z_step);

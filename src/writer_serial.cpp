@@ -163,6 +163,10 @@ int write_data(GroupAccess *group, Field_Data *field, double *buf, std::string d
 	int y_len = field->y_pts;
 	int z_len = field->z_pts;
 
+	/* std::cout << "x_len: " << x_len << std::endl; */
+	/* std::cout << "y_len: " << y_len << std::endl; */
+	/* std::cout << "z_len: " << z_len << std::endl; */
+
 	count[0] = x_len;
 	count[1] = y_len;
 	count[2] = z_len;
@@ -212,6 +216,8 @@ int WriterSerial::writedata(long step, Field_Data &field)
 	_write_grid(group.group_id, "x_grid", field.x_grid, field.x_pts);
 	_write_grid(group.group_id, "y_grid", field.y_grid, field.y_pts);
 	_write_grid(group.group_id, "z_grid", field.z_grid, field.z_pts);
+
+	AttributeCreate z_pts(group.group_id, "z_pts"          , field.z_pts);
 
 	// ==================================
 	// Write field

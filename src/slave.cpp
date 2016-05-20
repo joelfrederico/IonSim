@@ -1,4 +1,5 @@
 #include "mpi.h"
+#include "emit.h"
 #include <math.h>
 #include <gsl/gsl_const.h>
 #include "ebeam.h"
@@ -69,11 +70,12 @@ int slave(bool verbose)
 	emit.set_emit_n(simparams.emit_n, simparams.E);
 	Plasma plas(simparams.n_p_cgs, simparams.m_ion_amu);
 	Match mat(plas, simparams.E, emit);
+
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
 
-	sr = x_beam.sigma();
-	nb_0 = simparams.q_tot / (pow(2*M_PI, 1.5) * simparams.sz * sr * sr);
+	sr = ionsim::nb_0(simparams.q_tot, simparams.sz, simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu);
+	nb_0 = ionsim::nb_0(simparams.q_tot, simparams.sz, sr);
 
 	Ebeam ebeam(simparams, x_beam, y_beam, loopcomm.id + 1);
 	// Fix for having less charge per particle with more processors
@@ -82,7 +84,7 @@ int slave(bool verbose)
 	// ==================================
 	// Generate ions
 	// ==================================
-	Ions ions(simparams, plas, simparams.n_ions, simparams.radius, simparams.length);
+	Ions ions(&simparams, plas, simparams.n_ions, simparams.radius, simparams.length);
 
 	// ==================================
 	// Slave loop
@@ -140,13 +142,13 @@ int slave(bool verbose)
 				switch (simparams.pushmethod)
 				{
 					case PUSH_RUNGE_KUTTA:
-						ions.push(simparams.dt, nb_0, sr);
+						ions.push(nb_0, sr);
 						break;
 					case PUSH_SIMPLE:
-						ions.push_simple(simparams.dt, nb_0, sr);
+						ions.push_simple(nb_0, sr);
 						break;
 					case PUSH_FIELD:
-						ions.push_field(simparams.dt, *field, step_buf);
+						ions.push_field(*field, step_buf);
 
 						break;
 				}

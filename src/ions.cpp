@@ -14,7 +14,7 @@
 // ==============================
 // Ions
 // ==============================
-Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(simparams, PARTS_ION)
+Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(*simparams, PARTS_ION), _simparams(simparams)
 {
 	_plasma      = &plasma;
 	_radius      = radius;
@@ -46,7 +46,8 @@ Ions::Ions(const SimParams &simparams, Plasma &plasma, int n_pts, double radius,
 				if (x[i] > radius) printf("Radius: %0.6e", x[i]);
 			}
 		}
-		z[i]  = gsl_ran_flat(r, 0, length);
+		/* z[i]  = gsl_ran_flat(r, 0, length); */
+		z[i] = 0;
 		xp[i] = 0;
 		yp[i] = 0;
 		zp[i] = 0;
@@ -93,8 +94,9 @@ int func(double t, const double y[], double dydt[], void * params)
 	return GSL_SUCCESS;
 }
 
-int Ions::push(double dt, double nb_0, double sig_r)
+int Ions::push(double nb_0, double sig_r)
 {
+	double dt = _simparams->dt();
 	std::complex<double> F;
 	double params[3] = {nb_0, sig_r, mass};
 	double t = 0;
@@ -128,8 +130,9 @@ int Ions::push(double dt, double nb_0, double sig_r)
 	return 0;
 }
 
-int Ions::push_simple(double dt, double nb_0, double sig_r)
+int Ions::push_simple(double nb_0, double sig_r)
 {
+	double dt = _simparams->dt();
 	std::complex<double> F;
 	for (int i=0; i < n_pts; i++)
 	{
@@ -146,15 +149,17 @@ int Ions::push_simple(double dt, double nb_0, double sig_r)
 	return 0;
 }
 
-int Ions::push_field(double dt, Field_Data &field, int z_step)
+int Ions::push_field(Field_Data &field, int z_step)
 {
-	Field_Interp fieldinterp(field, *gsl_interp2d_bicubic);
+	double dt = _simparams->dt();
+	/* Field_Interp fieldinterp(field, *gsl_interp2d_bicubic); */
+	Field_Interp fieldinterp(field, *gsl_interp2d_bilinear);
 	double Fx, Fy;
 
 	for (int i=0; i < n_pts; i++)
 	{
-		Fx = fieldinterp.Ex(x[i], y[i], z_step);
-		Fy = fieldinterp.Ey(x[i], y[i], z_step);
+		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * fieldinterp.Ex(x[i], y[i], z_step);
+		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * fieldinterp.Ey(x[i], y[i], z_step);
 
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;

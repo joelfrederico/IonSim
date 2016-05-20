@@ -30,32 +30,37 @@ int master(bool verbose)
 	// ==============================
 	// Generate beam
 	// ==============================
-	long n_e                = 1e7;
+	long n_e                = 1e4;
 	long n_ions             = 1e5;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
+	double sz               = 30e-6;
 	double length           = 100e-6;
 	double E                = 20.35;
 	double emit_n           = 50e-6;
 	double n_p_cgs          = 1e17;
 	double m_ion_amu        = 1.00794;
-	double sz               = 30e-6;
 	double sdelta           = 0.04;
 	zdist_t zdist           = Z_DIST_FLAT;
-	double t_tot            = 1.58631e-12*10;
 	int n_steps             = 1;
-	double dt               = t_tot/n_steps;
 	std::string filename    = "output.h5";
-	pushmethod_t pushmethod = PUSH_SIMPLE;
+	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
+	pushmethod_t pushmethod = PUSH_FIELD;
 	long n_field_x          = 51;
 	long n_field_y          = 51;
 	long n_field_z          = 21;
-	double field_trans_wind = radius * 5;
-	double z_end            = sz;
+	double field_trans_wind = radius * 10;
+
+	double sr = ionsim::nb_0(q_tot, sz, emit_n, E, n_p_cgs, m_ion_amu);
+	double nb_0 = ionsim::nb_0(q_tot, sz, sr);
+
+	double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0);
+
+	q_tot *= z_end / sz;
+	sz = z_end;
 
 	const SimParams simparams(
 		E,
-		dt,
 		emit_n,
 		length,
 		m_ion_amu,
@@ -65,7 +70,6 @@ int master(bool verbose)
 		sz,
 		sdelta,
 		zdist,
-		t_tot,
 		n_steps,
 		pushmethod,
 		n_e,
@@ -103,12 +107,16 @@ int master(bool verbose)
 	// ==============================
 	for (int step=0; step < n_steps; step++)
 	{
+		// ==============================
+		// Allocate for this loop
+		// ==============================
+		field = new Field_Data(simparams);
 		printf("Step: %d\n", step);
+
 		// ==============================
 		// Get fields from slaves
 		// ==============================
 		loopcomm.instruct(LOOP_GET_EFIELD);
-		field = new Field_Data(simparams);
 		fieldcomm.recv_field_others_add(*field);
 
 		// ==============================
@@ -121,7 +129,7 @@ int master(bool verbose)
 		// Write total field
 		// ==============================
 		writer_s = new WriterSerial(filename);
-		(*writer_s).writedata(step, *field);
+		writer_s->writedata(step, *field);
 		delete writer_s;
 
 		// ==============================
@@ -133,11 +141,6 @@ int master(bool verbose)
 			fieldcomm.send_field(*field, id);
 		}
 
-		// ==============================
-		// Delete field
-		// ==============================
-		delete field;
-		
 		// ==============================
 		// Integrate ion motion
 		// ==============================
@@ -154,6 +157,11 @@ int master(bool verbose)
 			loopcomm.send_slaves(z_step+1);
 
 		}
+
+		// ==============================
+		// Deallocate for this loop
+		// ==============================
+		delete field;
 	}
 
 	loopcomm.instruct(LOOP_KILL);

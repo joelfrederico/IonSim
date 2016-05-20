@@ -1,6 +1,8 @@
 #ifndef __SIMPARAMS_H_INCLUDED__
 #define __SIMPARAMS_H_INCLUDED__
 
+#include "beam.h"
+#include "emit.h"
 #include <string>
 #include <mpi.h>
 #include "consts.h"
@@ -10,8 +12,8 @@
 class SimParams
 {
 	private:
-		const LoopComm loopcomm;
 		int _init();
+		double *_dt;
 
 	public:
 		// ==================================
@@ -19,7 +21,6 @@ class SimParams
 		// ==================================
 		SimParams(
 			double _E,
-			double _dt,
 			double _emit_n,
 			double _length,
 			double _m_ion_amu,
@@ -29,7 +30,6 @@ class SimParams
 			double _sz,
 			double _sdelta,
 			zdist_t _zdist,
-			double _t_tot,
 			int _n_steps,
 			pushmethod_t _pushmethod,
 			long _n_e,
@@ -43,6 +43,8 @@ class SimParams
 			);
 
 		SimParams();
+		/* SimParams(const SimParams &obj); */
+		~SimParams();
 
 		// ==================================
 		// Communications
@@ -70,7 +72,6 @@ class SimParams
 		// Data
 		// ==================================
 		double E;
-		double dt;
 		double emit_n;
 		double length;
 		double m_ion_amu;
@@ -80,7 +81,6 @@ class SimParams
 		double sz;
 		double sdelta;
 		zdist_t zdist;
-		double t_tot;
 		int n_steps;
 		pushmethod_t pushmethod;
 		long n_e;
@@ -99,6 +99,7 @@ class SimParams
 		// ==================================
 		int z_cov(double (&out)[2][2]);
 		double ion_mass() const;
+		double dt() const;
 };
 
 #endif

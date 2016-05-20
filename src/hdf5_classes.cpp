@@ -49,7 +49,10 @@ GroupAccess::GroupAccess(hid_t &loc_id, std::string group_str) :
 	{
 		group_id = H5Gcreate(loc_id, _group_str.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Gget_info_by_name(loc_id, _group_str.c_str(), &objinfo, H5P_DEFAULT);
-		if ((status < 0) || (group_id < 0)) printf("WARNING\n");
+		if ((status < 0) || (group_id < 0))
+		{
+			std::cout << "Warning: could not create " << _group_str << std::endl;
+		}
 	}
 }
 
