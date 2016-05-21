@@ -74,7 +74,7 @@ int slave(bool verbose)
 	Beam x_beam(mat.beta(), mat.alpha(), emit);
 	Beam y_beam(mat.beta(), mat.alpha(), emit);
 
-	sr = ionsim::nb_0(simparams.q_tot, simparams.sz, simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu);
+	sr = ionsim::sr(simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu);
 	nb_0 = ionsim::nb_0(simparams.q_tot, simparams.sz, sr);
 
 	Ebeam ebeam(simparams, x_beam, y_beam, loopcomm.id + 1);

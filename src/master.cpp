@@ -51,7 +51,7 @@ int master(bool verbose)
 	long n_field_z          = 21;
 	double field_trans_wind = radius * 10;
 
-	double sr = ionsim::nb_0(q_tot, sz, emit_n, E, n_p_cgs, m_ion_amu);
+	double sr = ionsim::sr(emit_n, E, n_p_cgs, m_ion_amu);
 	double nb_0 = ionsim::nb_0(q_tot, sz, sr);
 
 	double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0);
