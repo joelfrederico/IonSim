@@ -98,13 +98,13 @@ int Field_Comm::recv_field_copy(Field_Data &field_recv, int sender_id)
 
 	for (int j=0; j < field_recv.n_pts; j++)
 	{
-		field_recv.Ex_ind(j) = Exbuf[j];
-		field_recv.Ey_ind(j) = Eybuf[j];
-		field_recv.Ez_ind(j) = Ezbuf[j];
+		field_recv.Ex_data[j] = Exbuf[j];
+		field_recv.Ey_data[j] = Eybuf[j];
+		field_recv.Ez_data[j] = Ezbuf[j];
 
-		field_recv.Ex_ind(j) = Bxbuf[j];
-		field_recv.Ey_ind(j) = Bybuf[j];
-		field_recv.Ez_ind(j) = Bzbuf[j];
+		field_recv.Bx_data[j] = Bxbuf[j];
+		field_recv.By_data[j] = Bybuf[j];
+		field_recv.Bz_data[j] = Bzbuf[j];
 	}
 
 	delete [] Exbuf;
