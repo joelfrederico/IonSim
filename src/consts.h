@@ -29,10 +29,10 @@ class PushMethod
 		const int _PUSH_TYPE;
 
 	public:
-		PushMethod(int PUSH_TYPE);
+		PushMethod(const pushmethod_t PUSH_TYPE);
 		bool operator==(const PushMethod &other) const;
 
-		std::string name;
+		const std::string name;
 };
 
 // ==================================
@@ -40,6 +40,17 @@ class PushMethod
 // ==================================
 const zdist_t Z_DIST_FLAT  = 0;
 const zdist_t Z_DIST_GAUSS = 1;
+
+class zDist
+{
+	private:
+		const zdist_t _Z_DIST;
+
+	public:
+		zDist(const zdist_t Z_DIST);
+
+		const std::string name;
+};
 
 // ==================================
 // Loop flags

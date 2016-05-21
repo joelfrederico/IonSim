@@ -44,8 +44,8 @@ int master(bool verbose)
 	zdist_t zdist           = Z_DIST_FLAT;
 	int n_steps             = 1;
 	std::string filename    = "output.h5";
-	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
-	pushmethod_t pushmethod = PUSH_FIELD;
+	pushmethod_t pushmethod = PUSH_SIMPLE;
+	/* pushmethod_t pushmethod = PUSH_FIELD; */
 	long n_field_x          = 51;
 	long n_field_y          = 51;
 	long n_field_z          = 21;

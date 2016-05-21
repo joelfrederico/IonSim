@@ -64,7 +64,6 @@ int WriterBase::write_attributes(const SimParams &simparams) const
 	AttributeCreate m_ion_amu        ( file_id , "m_ion_amu"        , simparams.m_ion_amu        );
 	AttributeCreate sz               ( file_id , "sz"               , simparams.sz               );
 	AttributeCreate sdelta           ( file_id , "sdelta"           , simparams.sdelta           );
-	AttributeCreate zdist            ( file_id , "zdist"            , simparams.zdist            );
 	AttributeCreate dt               ( file_id , "dt"               , simparams.dt()             );
 	AttributeCreate n_steps          ( file_id , "n_steps"          , simparams.n_steps          );
 	AttributeCreate n_field_x        ( file_id , "n_field_x"        , simparams.n_field_x        );
@@ -72,9 +71,15 @@ int WriterBase::write_attributes(const SimParams &simparams) const
 	AttributeCreate n_field_z        ( file_id , "n_field_z"        , simparams.n_field_z        );
 	AttributeCreate field_trans_wind ( file_id , "field_trans_wind" , simparams.field_trans_wind );
 	AttributeCreate z_end            ( file_id , "z_end"            , simparams.z_end            );
+
 	AttributeCreate pushmethod_int   ( file_id , "pushmethod_int"   , simparams.pushmethod       );
 	PushMethod pushmeth(simparams.pushmethod);
 	AttributeCreate pushmethod_name  ( file_id , "pushmethod_name"  , pushmeth.name.c_str()      );
+
+	AttributeCreate zdist_int        ( file_id , "zdist_int"        , simparams.zdist            );
+	zDist zdist(simparams.zdist);
+	AttributeCreate zdist_name  ( file_id , "zdist_name"  , zdist.name.c_str()      );
+
 
 	return 0;
 }
