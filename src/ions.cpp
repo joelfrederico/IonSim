@@ -33,6 +33,13 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius,
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
 
+	/* x[0]  = 3e-6; */
+	/* xp[0] = 0; */
+	/* y[0]  = 0; */
+	/* yp[0] = 0; */
+	/* z[0]  = 0; */
+	/* zp[0] = 0; */
+
 	for (int i=0; i < n_pts; i++)
 	{
 		keep_looking = true;
@@ -143,8 +150,10 @@ int Ions::push_simple(double nb_0, double sig_r)
 		xp[i] += F.real() * dt / mass;
 		yp[i] += F.imag() * dt / mass;
 
-		z[i]  = F.real();
-		zp[i] = F.imag();
+		/* z[i]  = F.real(); */
+		/* zp[i] = F.imag(); */
+		z[i] = F.real();
+		zp[i] = F.real()/GSL_CONST_MKSA_ELECTRON_CHARGE;
 	}
 	return 0;
 }
@@ -154,12 +163,21 @@ int Ions::push_field(Field_Data &field, int z_step)
 	double dt = _simparams->dt();
 	/* Field_Interp fieldinterp(field, *gsl_interp2d_bicubic); */
 	Field_Interp fieldinterp(field, *gsl_interp2d_bilinear);
-	double Fx, Fy;
+	double Fx, Fy, Ex, Ey;
+	int x_ind, y_ind;
 
 	for (int i=0; i < n_pts; i++)
 	{
-		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * fieldinterp.Ex(x[i], y[i], z_step);
-		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * fieldinterp.Ey(x[i], y[i], z_step);
+		Ex = fieldinterp.Ex(x[i], y[i], z_step);
+		Ey = fieldinterp.Ey(x[i], y[i], z_step);
+
+		/* x_ind = round(x[i] / field.dxdi) + ( (field.x_pts-1)/2 ); */
+		/* y_ind = round(y[i] / field.dydj) + ( (field.y_pts-1)/2 ); */
+		/* Ex = field.Ex_ind(x_ind, y_ind, z_step); */
+		/* Ey = field.Ey_ind(x_ind, y_ind, z_step); */
+
+		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ex;
+		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ey;
 
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;
@@ -167,8 +185,11 @@ int Ions::push_field(Field_Data &field, int z_step)
 		xp[i] += Fx * dt / mass;
 		yp[i] += Fy * dt / mass;
 
-		z[i]  = Fx;
-		zp[i] = Fy;
+		/* z[i]  = x_ind; */
+		/* zp[i] = y_ind; */
+
+		z[i]  = Ex;
+		zp[i] = Ey;
 	}
 	/* printf("Updated\n"); */
 	return 0;

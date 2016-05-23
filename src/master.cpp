@@ -30,8 +30,8 @@ int master(bool verbose)
 	// ==============================
 	// Generate beam
 	// ==============================
-	long n_e                = 1e4;
-	long n_ions             = 1e5;
+	long n_e                = 1e6;
+	long n_ions             = 1e4;
 	double q_tot            = 2e10;
 	double radius           = 2.4276628847185805e-06;
 	double sz               = 30e-6;
@@ -44,14 +44,15 @@ int master(bool verbose)
 	zdist_t zdist           = Z_DIST_FLAT;
 	int n_steps             = 1;
 	std::string filename    = "output.h5";
-	pushmethod_t pushmethod = PUSH_SIMPLE;
-	/* pushmethod_t pushmethod = PUSH_FIELD; */
-	long n_field_x          = 51;
-	long n_field_y          = 51;
-	long n_field_z          = 21;
-	double field_trans_wind = radius * 10;
+	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
+	pushmethod_t pushmethod = PUSH_FIELD;
+	long n_field_x          = 101;
+	long n_field_y          = 101;
+	long n_field_z          = 51;
+	double field_trans_wind = radius;
 
 	double sr = ionsim::sr(emit_n, E, n_p_cgs, m_ion_amu);
+	std::cout << "Sr: " << sr << std::endl;
 	double nb_0 = ionsim::nb_0(q_tot, sz, sr);
 
 	double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0);
