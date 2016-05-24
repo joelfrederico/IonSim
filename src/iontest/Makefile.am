@@ -1,0 +1,9 @@
+# AM_CPPFLAGS=$(GSL_CFLAGS) $(HDF5_CPPFLAGS)
+AM_CPPFLAGS=$(MYAM_CPPFLAGS)
+
+bin_PROGRAMS = iontest
+
+iontest_SOURCES=\
+		 main.cpp
+
+iontest_LDADD = $(MYLDADD)
