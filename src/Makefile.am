@@ -1,4 +1,4 @@
-SUBDIRS = ioncheck
+SUBDIRS = ioncheck iontest
 AM_CPPFLAGS=$(MYAM_CPPFLAGS)
 
 bin_PROGRAMS=ionsim

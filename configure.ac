@@ -40,6 +40,7 @@ AC_SUBST(MYAM_CPPFLAGS,[$MYAM_CPPFLAGS])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 src/ioncheck/Makefile
+		 src/iontest/Makefile
 		 tests/Makefile
 		 ])
 AC_OUTPUT

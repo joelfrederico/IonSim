@@ -33,14 +33,15 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius,
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
 
-	/* x[0]  = 3e-6; */
-	/* xp[0] = 0; */
-	/* y[0]  = 0; */
-	/* yp[0] = 0; */
-	/* z[0]  = 0; */
-	/* zp[0] = 0; */
+	x[0]  = 3e-6;
+	xp[0] = 0;
+	y[0]  = 0;
+	yp[0] = 0;
+	z[0]  = 0;
+	zp[0] = 0;
 
-	for (int i=0; i < n_pts; i++)
+	for (int i=1; i < n_pts; i++)
+	/* for (int i=0; i < n_pts; i++) */
 	{
 		keep_looking = true;
 		while (keep_looking)

@@ -16,9 +16,7 @@
 int slave(bool verbose)
 {
 	std::stringstream streamme;
-	char charbuf[10];
 	std::string subgroup;
-	std::string dataset;
 	int buf, step_buf, substep_buf;
 	bool loop_alive;
 	SimParams simparams_temp;
