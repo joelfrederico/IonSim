@@ -104,7 +104,13 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_iontest_OBJECTS = main.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_iontest_OBJECTS = iontest-main.$(OBJEXT) ../iontest-ions.$(OBJEXT) \
+	../iontest-field_interp.$(OBJEXT) \
+	../iontest-field_data.$(OBJEXT) ../iontest-parts.$(OBJEXT) \
+	../iontest-beam.$(OBJEXT) ../iontest-emit.$(OBJEXT) \
+	../iontest-support_func.$(OBJEXT) \
+	../iontest-simparams.$(OBJEXT)
 iontest_OBJECTS = $(am_iontest_OBJECTS)
 am__DEPENDENCIES_1 =
 iontest_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -318,9 +324,18 @@ top_srcdir = @top_srcdir@
 # AM_CPPFLAGS=$(GSL_CFLAGS) $(HDF5_CPPFLAGS)
 AM_CPPFLAGS = $(MYAM_CPPFLAGS)
 iontest_SOURCES = \
-		 main.cpp
+		 main.cpp \
+		 ../ions.cpp \
+		 ../field_interp.cpp \
+		 ../field_data.cpp \
+		 ../parts.cpp \
+		 ../beam.cpp \
+		 ../emit.cpp \
+		 ../support_func.cpp \
+		 ../simparams.cpp
 
 iontest_LDADD = $(MYLDADD)
+iontest_CPPFLAGS = -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -403,6 +418,28 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../$(am__dirstamp):
+	@$(MKDIR_P) ..
+	@: > ../$(am__dirstamp)
+../$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../$(DEPDIR)
+	@: > ../$(DEPDIR)/$(am__dirstamp)
+../iontest-ions.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-field_interp.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-field_data.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-parts.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-beam.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-emit.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-support_func.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../iontest-simparams.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 
 iontest$(EXEEXT): $(iontest_OBJECTS) $(iontest_DEPENDENCIES) $(EXTRA_iontest_DEPENDENCIES) 
 	@rm -f iontest$(EXEEXT)
@@ -410,11 +447,20 @@ iontest$(EXEEXT): $(iontest_OBJECTS) $(iontest_DEPENDENCIES) $(EXTRA_iontest_DEP
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-beam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-emit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-field_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-field_interp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-ions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-parts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-simparams.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-support_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iontest-main.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -439,6 +485,132 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+iontest-main.o: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT iontest-main.o -MD -MP -MF $(DEPDIR)/iontest-main.Tpo -c -o iontest-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/iontest-main.Tpo $(DEPDIR)/iontest-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='iontest-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o iontest-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+
+iontest-main.obj: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT iontest-main.obj -MD -MP -MF $(DEPDIR)/iontest-main.Tpo -c -o iontest-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/iontest-main.Tpo $(DEPDIR)/iontest-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='iontest-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o iontest-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
+
+../iontest-ions.o: ../ions.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-ions.o -MD -MP -MF ../$(DEPDIR)/iontest-ions.Tpo -c -o ../iontest-ions.o `test -f '../ions.cpp' || echo '$(srcdir)/'`../ions.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-ions.Tpo ../$(DEPDIR)/iontest-ions.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../ions.cpp' object='../iontest-ions.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-ions.o `test -f '../ions.cpp' || echo '$(srcdir)/'`../ions.cpp
+
+../iontest-ions.obj: ../ions.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-ions.obj -MD -MP -MF ../$(DEPDIR)/iontest-ions.Tpo -c -o ../iontest-ions.obj `if test -f '../ions.cpp'; then $(CYGPATH_W) '../ions.cpp'; else $(CYGPATH_W) '$(srcdir)/../ions.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-ions.Tpo ../$(DEPDIR)/iontest-ions.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../ions.cpp' object='../iontest-ions.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-ions.obj `if test -f '../ions.cpp'; then $(CYGPATH_W) '../ions.cpp'; else $(CYGPATH_W) '$(srcdir)/../ions.cpp'; fi`
+
+../iontest-field_interp.o: ../field_interp.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-field_interp.o -MD -MP -MF ../$(DEPDIR)/iontest-field_interp.Tpo -c -o ../iontest-field_interp.o `test -f '../field_interp.cpp' || echo '$(srcdir)/'`../field_interp.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-field_interp.Tpo ../$(DEPDIR)/iontest-field_interp.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../field_interp.cpp' object='../iontest-field_interp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-field_interp.o `test -f '../field_interp.cpp' || echo '$(srcdir)/'`../field_interp.cpp
+
+../iontest-field_interp.obj: ../field_interp.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-field_interp.obj -MD -MP -MF ../$(DEPDIR)/iontest-field_interp.Tpo -c -o ../iontest-field_interp.obj `if test -f '../field_interp.cpp'; then $(CYGPATH_W) '../field_interp.cpp'; else $(CYGPATH_W) '$(srcdir)/../field_interp.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-field_interp.Tpo ../$(DEPDIR)/iontest-field_interp.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../field_interp.cpp' object='../iontest-field_interp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-field_interp.obj `if test -f '../field_interp.cpp'; then $(CYGPATH_W) '../field_interp.cpp'; else $(CYGPATH_W) '$(srcdir)/../field_interp.cpp'; fi`
+
+../iontest-field_data.o: ../field_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-field_data.o -MD -MP -MF ../$(DEPDIR)/iontest-field_data.Tpo -c -o ../iontest-field_data.o `test -f '../field_data.cpp' || echo '$(srcdir)/'`../field_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-field_data.Tpo ../$(DEPDIR)/iontest-field_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../field_data.cpp' object='../iontest-field_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-field_data.o `test -f '../field_data.cpp' || echo '$(srcdir)/'`../field_data.cpp
+
+../iontest-field_data.obj: ../field_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-field_data.obj -MD -MP -MF ../$(DEPDIR)/iontest-field_data.Tpo -c -o ../iontest-field_data.obj `if test -f '../field_data.cpp'; then $(CYGPATH_W) '../field_data.cpp'; else $(CYGPATH_W) '$(srcdir)/../field_data.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-field_data.Tpo ../$(DEPDIR)/iontest-field_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../field_data.cpp' object='../iontest-field_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-field_data.obj `if test -f '../field_data.cpp'; then $(CYGPATH_W) '../field_data.cpp'; else $(CYGPATH_W) '$(srcdir)/../field_data.cpp'; fi`
+
+../iontest-parts.o: ../parts.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-parts.o -MD -MP -MF ../$(DEPDIR)/iontest-parts.Tpo -c -o ../iontest-parts.o `test -f '../parts.cpp' || echo '$(srcdir)/'`../parts.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-parts.Tpo ../$(DEPDIR)/iontest-parts.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../parts.cpp' object='../iontest-parts.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-parts.o `test -f '../parts.cpp' || echo '$(srcdir)/'`../parts.cpp
+
+../iontest-parts.obj: ../parts.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-parts.obj -MD -MP -MF ../$(DEPDIR)/iontest-parts.Tpo -c -o ../iontest-parts.obj `if test -f '../parts.cpp'; then $(CYGPATH_W) '../parts.cpp'; else $(CYGPATH_W) '$(srcdir)/../parts.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-parts.Tpo ../$(DEPDIR)/iontest-parts.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../parts.cpp' object='../iontest-parts.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-parts.obj `if test -f '../parts.cpp'; then $(CYGPATH_W) '../parts.cpp'; else $(CYGPATH_W) '$(srcdir)/../parts.cpp'; fi`
+
+../iontest-beam.o: ../beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-beam.o -MD -MP -MF ../$(DEPDIR)/iontest-beam.Tpo -c -o ../iontest-beam.o `test -f '../beam.cpp' || echo '$(srcdir)/'`../beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-beam.Tpo ../$(DEPDIR)/iontest-beam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../beam.cpp' object='../iontest-beam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-beam.o `test -f '../beam.cpp' || echo '$(srcdir)/'`../beam.cpp
+
+../iontest-beam.obj: ../beam.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-beam.obj -MD -MP -MF ../$(DEPDIR)/iontest-beam.Tpo -c -o ../iontest-beam.obj `if test -f '../beam.cpp'; then $(CYGPATH_W) '../beam.cpp'; else $(CYGPATH_W) '$(srcdir)/../beam.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-beam.Tpo ../$(DEPDIR)/iontest-beam.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../beam.cpp' object='../iontest-beam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-beam.obj `if test -f '../beam.cpp'; then $(CYGPATH_W) '../beam.cpp'; else $(CYGPATH_W) '$(srcdir)/../beam.cpp'; fi`
+
+../iontest-emit.o: ../emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-emit.o -MD -MP -MF ../$(DEPDIR)/iontest-emit.Tpo -c -o ../iontest-emit.o `test -f '../emit.cpp' || echo '$(srcdir)/'`../emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-emit.Tpo ../$(DEPDIR)/iontest-emit.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../emit.cpp' object='../iontest-emit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-emit.o `test -f '../emit.cpp' || echo '$(srcdir)/'`../emit.cpp
+
+../iontest-emit.obj: ../emit.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-emit.obj -MD -MP -MF ../$(DEPDIR)/iontest-emit.Tpo -c -o ../iontest-emit.obj `if test -f '../emit.cpp'; then $(CYGPATH_W) '../emit.cpp'; else $(CYGPATH_W) '$(srcdir)/../emit.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-emit.Tpo ../$(DEPDIR)/iontest-emit.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../emit.cpp' object='../iontest-emit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-emit.obj `if test -f '../emit.cpp'; then $(CYGPATH_W) '../emit.cpp'; else $(CYGPATH_W) '$(srcdir)/../emit.cpp'; fi`
+
+../iontest-support_func.o: ../support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-support_func.o -MD -MP -MF ../$(DEPDIR)/iontest-support_func.Tpo -c -o ../iontest-support_func.o `test -f '../support_func.cpp' || echo '$(srcdir)/'`../support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-support_func.Tpo ../$(DEPDIR)/iontest-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../support_func.cpp' object='../iontest-support_func.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-support_func.o `test -f '../support_func.cpp' || echo '$(srcdir)/'`../support_func.cpp
+
+../iontest-support_func.obj: ../support_func.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-support_func.obj -MD -MP -MF ../$(DEPDIR)/iontest-support_func.Tpo -c -o ../iontest-support_func.obj `if test -f '../support_func.cpp'; then $(CYGPATH_W) '../support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../support_func.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-support_func.Tpo ../$(DEPDIR)/iontest-support_func.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../support_func.cpp' object='../iontest-support_func.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-support_func.obj `if test -f '../support_func.cpp'; then $(CYGPATH_W) '../support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../support_func.cpp'; fi`
+
+../iontest-simparams.o: ../simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-simparams.o -MD -MP -MF ../$(DEPDIR)/iontest-simparams.Tpo -c -o ../iontest-simparams.o `test -f '../simparams.cpp' || echo '$(srcdir)/'`../simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-simparams.Tpo ../$(DEPDIR)/iontest-simparams.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../simparams.cpp' object='../iontest-simparams.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-simparams.o `test -f '../simparams.cpp' || echo '$(srcdir)/'`../simparams.cpp
+
+../iontest-simparams.obj: ../simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-simparams.obj -MD -MP -MF ../$(DEPDIR)/iontest-simparams.Tpo -c -o ../iontest-simparams.obj `if test -f '../simparams.cpp'; then $(CYGPATH_W) '../simparams.cpp'; else $(CYGPATH_W) '$(srcdir)/../simparams.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-simparams.Tpo ../$(DEPDIR)/iontest-simparams.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../simparams.cpp' object='../iontest-simparams.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-simparams.obj `if test -f '../simparams.cpp'; then $(CYGPATH_W) '../simparams.cpp'; else $(CYGPATH_W) '$(srcdir)/../simparams.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -561,6 +733,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -570,7 +744,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -616,7 +790,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

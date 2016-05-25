@@ -136,6 +136,7 @@ int slave(bool verbose)
 				// ==================================
 				// Push ions
 				// ==================================
+				MPI_Barrier(MPI_COMM_WORLD);
 				loopcomm.recv_master(&step_buf);
 				switch (simparams.pushmethod)
 				{

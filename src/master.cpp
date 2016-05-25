@@ -43,12 +43,23 @@ int master(bool verbose)
 	double sdelta           = 0.04;
 	zdist_t zdist           = Z_DIST_FLAT;
 	int n_steps             = 1;
-	std::string filename    = "output.h5";
-	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
-	pushmethod_t pushmethod = PUSH_FIELD;
+	std::string filename;
+	/* std::string filename    = "output.h5"; */
+	pushmethod_t pushmethod = PUSH_SIMPLE;
+	/* pushmethod_t pushmethod = PUSH_FIELD; */
+
+	if (pushmethod == PUSH_SIMPLE)
+	{
+		filename = "simple.h5";
+	} else if (pushmethod == PUSH_FIELD) {
+		filename = "field.h5";
+	} else {
+		filename = "output.h5";
+	}
+
 	long n_field_x          = 101;
 	long n_field_y          = 101;
-	long n_field_z          = 51;
+	long n_field_z          = 501;
 	double field_trans_wind = radius;
 
 	double sr = ionsim::sr(emit_n, E, n_p_cgs, m_ion_amu);
@@ -150,7 +161,9 @@ int master(bool verbose)
 		loopcomm.send_slaves(0);
 		for (int z_step=0; z_step < n_field_z; z_step++)
 		{
+			std::cout << "Ion step: " << z_step << std::endl;
 			loopcomm.instruct(LOOP_PUSH_IONS);
+			MPI_Barrier(MPI_COMM_WORLD);
 			loopcomm.send_slaves(step);
 
 			loopcomm.instruct(LOOP_DUMP_IONS);
@@ -166,6 +179,8 @@ int master(bool verbose)
 	}
 
 	loopcomm.instruct(LOOP_KILL);
+
+	std::cout << "Output file is: " << filename << std::endl;
 
 	return 0;
 }

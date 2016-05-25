@@ -7,6 +7,7 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_odeiv2.h>
+#include <gsl/gsl_sf_exp.h>
 #include "support_func.h"
 #include "simparams.h"
 #include "loop_comm.h"
@@ -33,7 +34,7 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius,
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
 
-	x[0]  = 3e-6;
+	x[0]  = 2e-6;
 	xp[0] = 0;
 	y[0]  = 0;
 	yp[0] = 0;
@@ -62,17 +63,20 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius,
 	}
 }
 
-std::complex<double> F_r(double x, double y, double nb_0, double sig_r)
+std::complex<double> F_r(double x, double y, const SimParams &simparams)
 {
-	double r = gsl_hypot(x, y);
 	double Er_factor;
 	double Er;
 	double theta;
 
-	Er_factor = GSL_CONST_MKSA_ELECTRON_CHARGE*GSL_CONST_MKSA_ELECTRON_CHARGE*nb_0*sig_r*sig_r / (2*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
-	Er = Er_factor * gsl_expm1(-r*r / (2*sig_r*sig_r)) / r;
+	double sr = ionsim::sr(simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu);
 
-	return std::complex<double>(Er * x/r, Er* y/r);
+	/* Er_factor = simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*simparams.sz*sr*sr); */
+	/* Er = Er_factor * gsl_sf_exprel(-(x*x+y*y) / (2*sr*sr)); */
+
+	Er = (simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE) / (4 * M_PI * GSL_CONST_MKSA_VACUUM_PERMITTIVITY * simparams.sz * sr * sr);
+
+	return std::complex<double>(Er * x, Er* y);
 }
 
 int func(double t, const double y[], double dydt[], void * params)
@@ -86,13 +90,14 @@ int func(double t, const double y[], double dydt[], void * params)
 	sig_r = ((double *)params)[1];
 	mass  = ((double *)params)[2];
 
+
 	x0  = &y[0];
 	xp0 = &y[2];
 	y0  = &y[1];
 	yp0 = &y[3];
 
 
-	F = F_r(*x0, *y0, nb_0, sig_r);
+	/* F = F_r(*x0, *y0, nb_0, sig_r); */
 
 	dydt[0] = y[2];
 	dydt[2] = F.real() / mass;
@@ -126,7 +131,7 @@ int Ions::push(double nb_0, double sig_r)
 		y[i]  = y[1];
 		yp[i] = y[3];
 
-		F = F_r(x[i], y[i], nb_0, sig_r);
+		/* F = F_r(x[i], y[i], nb_0, sig_r); */
 		z[i]  = std::abs(F);
 		zp[i] = mass;
 	}
@@ -147,14 +152,14 @@ int Ions::push_simple(double nb_0, double sig_r)
 		x[i] += xp[i] * dt;
 		y[i] += yp[i] * dt;
 
-		F = F_r(x[i], y[i], nb_0, sig_r);
+		F = F_r(x[i], y[i], *_simparams);
 		xp[i] += F.real() * dt / mass;
 		yp[i] += F.imag() * dt / mass;
 
 		/* z[i]  = F.real(); */
 		/* zp[i] = F.imag(); */
 		z[i] = F.real();
-		zp[i] = F.real()/GSL_CONST_MKSA_ELECTRON_CHARGE;
+		zp[i] = -F.real()/GSL_CONST_MKSA_ELECTRON_CHARGE;
 	}
 	return 0;
 }
@@ -162,8 +167,8 @@ int Ions::push_simple(double nb_0, double sig_r)
 int Ions::push_field(Field_Data &field, int z_step)
 {
 	double dt = _simparams->dt();
-	/* Field_Interp fieldinterp(field, *gsl_interp2d_bicubic); */
-	Field_Interp fieldinterp(field, *gsl_interp2d_bilinear);
+	Field_Interp fieldinterp(field, *gsl_interp2d_bicubic);
+	/* Field_Interp fieldinterp(field, *gsl_interp2d_bilinear); */
 	double Fx, Fy, Ex, Ey;
 	int x_ind, y_ind;
 
@@ -189,8 +194,8 @@ int Ions::push_field(Field_Data &field, int z_step)
 		/* z[i]  = x_ind; */
 		/* zp[i] = y_ind; */
 
-		z[i]  = Ex;
-		zp[i] = Ey;
+		z[i]  = Fx;
+		zp[i] = Ex;
 	}
 	/* printf("Updated\n"); */
 	return 0;

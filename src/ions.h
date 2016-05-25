@@ -7,6 +7,8 @@
 #include "beam.h"
 #include "field_data.h"
 
+std::complex<double> F_r(double x, double y, const SimParams &simparams);
+
 class Ions : public Parts
 {
 	private:
