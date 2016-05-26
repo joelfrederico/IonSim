@@ -45,8 +45,8 @@ int master(bool verbose)
 	int n_steps             = 1;
 	std::string filename;
 	/* std::string filename    = "output.h5"; */
-	pushmethod_t pushmethod = PUSH_SIMPLE;
-	/* pushmethod_t pushmethod = PUSH_FIELD; */
+	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
+	pushmethod_t pushmethod = PUSH_FIELD;
 
 	if (pushmethod == PUSH_SIMPLE)
 	{
@@ -59,8 +59,8 @@ int master(bool verbose)
 
 	std::cout << "Output file is: " << filename << std::endl;
 
-	long n_field_x          = 11;
-	long n_field_y          = 11;
+	long n_field_x          = 101;
+	long n_field_y          = 101;
 	long n_field_z          = 101;
 	double field_trans_wind = radius;
 
@@ -68,7 +68,9 @@ int master(bool verbose)
 	std::cout << "Sr: " << sr << std::endl;
 	double nb_0 = ionsim::nb_0(q_tot, sz, sr);
 
-	double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0);
+	/* double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0); */
+	double n_cycles = 1./2.;
+	double z_end = n_cycles * 2*M_PI * sqrt(( 4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sr*sr*sz*m_ion_amu*GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS*GSL_CONST_MKSA_SPEED_OF_LIGHT*GSL_CONST_MKSA_SPEED_OF_LIGHT) / (q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE*GSL_CONST_MKSA_ELECTRON_CHARGE));
 
 	q_tot *= z_end / sz;
 	sz = z_end;
