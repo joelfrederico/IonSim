@@ -10,7 +10,6 @@ IonsTest::IonsTest()
 TEST_F(IonsTest, FieldForce)
 {
 	std::complex<double> Fr = F_r(2e-6, 2e-6, simparams);
-	EXPECT_EQ(Fr.real(), 0);
-	EXPECT_EQ(Fr.imag(), 0);
+	EXPECT_NEAR(Fr.real(), -3.76203e-08, 1e-12);
+	EXPECT_NEAR(Fr.imag(), -3.76203e-08, 1e-12);
 }
-
