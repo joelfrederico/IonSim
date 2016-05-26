@@ -114,13 +114,16 @@ am__v_lt_1 =
 libgtest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libgtest_la_LDFLAGS) $(LDFLAGS) -o $@
-am_gtest_OBJECTS = gtest-gtest.$(OBJEXT) \
+am_gtest_OBJECTS = gtest-gtest.$(OBJEXT) gtest-fieldtest.$(OBJEXT) \
+	gtest-hdf5test.$(OBJEXT) gtest-ionstest.$(OBJEXT) \
+	gtest-simparamstest.$(OBJEXT) gtest-support.$(OBJEXT) \
 	../src/gtest-field_data.$(OBJEXT) \
 	../src/gtest-field_comm.$(OBJEXT) \
 	../src/gtest-hdf5_classes.$(OBJEXT) \
-	../src/gtest-loop_comm.$(OBJEXT) \
+	../src/gtest-ions.$(OBJEXT) ../src/gtest-loop_comm.$(OBJEXT) \
 	../src/gtest-support_func.$(OBJEXT) \
-	../src/gtest-emit.$(OBJEXT) ../src/gtest-beam.$(OBJEXT)
+	../src/gtest-simparams.$(OBJEXT) ../src/gtest-emit.$(OBJEXT) \
+	../src/gtest-beam.$(OBJEXT)
 gtest_OBJECTS = $(am_gtest_OBJECTS)
 am__DEPENDENCIES_1 =
 gtest_DEPENDENCIES = libgtest.la $(am__DEPENDENCIES_1)
@@ -554,11 +557,18 @@ libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
 libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest $(MYAM_CPPFLAGS)
 libgtest_la_LDFLAGS = -pthread
 gtest_SOURCES = gtest.cpp \
+		fieldtest.cpp \
+		hdf5test.cpp \
+		ionstest.cpp \
+		simparamstest.cpp \
+		support.cpp \
 		../src/field_data.cpp \
 		../src/field_comm.cpp \
 		../src/hdf5_classes.cpp \
+		../src/ions.cpp \
 		../src/loop_comm.cpp \
 		../src/support_func.cpp \
+		../src/simparams.cpp \
 		../src/emit.cpp \
 		../src/beam.cpp
 
@@ -646,9 +656,13 @@ clean-checkPROGRAMS:
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-hdf5_classes.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
+../src/gtest-ions.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-loop_comm.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-support_func.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/gtest-simparams.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-emit.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
@@ -678,9 +692,16 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-hdf5_classes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-loop_comm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-support_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-fieldtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-gtest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-hdf5test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-ionstest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-simparamstest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi_gtest-mpi_gtest.Po@am__quote@
 
 .cc.o:
@@ -728,6 +749,76 @@ gtest-gtest.obj: gtest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-gtest.obj `if test -f 'gtest.cpp'; then $(CYGPATH_W) 'gtest.cpp'; else $(CYGPATH_W) '$(srcdir)/gtest.cpp'; fi`
 
+gtest-fieldtest.o: fieldtest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-fieldtest.o -MD -MP -MF $(DEPDIR)/gtest-fieldtest.Tpo -c -o gtest-fieldtest.o `test -f 'fieldtest.cpp' || echo '$(srcdir)/'`fieldtest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-fieldtest.Tpo $(DEPDIR)/gtest-fieldtest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fieldtest.cpp' object='gtest-fieldtest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-fieldtest.o `test -f 'fieldtest.cpp' || echo '$(srcdir)/'`fieldtest.cpp
+
+gtest-fieldtest.obj: fieldtest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-fieldtest.obj -MD -MP -MF $(DEPDIR)/gtest-fieldtest.Tpo -c -o gtest-fieldtest.obj `if test -f 'fieldtest.cpp'; then $(CYGPATH_W) 'fieldtest.cpp'; else $(CYGPATH_W) '$(srcdir)/fieldtest.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-fieldtest.Tpo $(DEPDIR)/gtest-fieldtest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fieldtest.cpp' object='gtest-fieldtest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-fieldtest.obj `if test -f 'fieldtest.cpp'; then $(CYGPATH_W) 'fieldtest.cpp'; else $(CYGPATH_W) '$(srcdir)/fieldtest.cpp'; fi`
+
+gtest-hdf5test.o: hdf5test.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-hdf5test.o -MD -MP -MF $(DEPDIR)/gtest-hdf5test.Tpo -c -o gtest-hdf5test.o `test -f 'hdf5test.cpp' || echo '$(srcdir)/'`hdf5test.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-hdf5test.Tpo $(DEPDIR)/gtest-hdf5test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='hdf5test.cpp' object='gtest-hdf5test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-hdf5test.o `test -f 'hdf5test.cpp' || echo '$(srcdir)/'`hdf5test.cpp
+
+gtest-hdf5test.obj: hdf5test.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-hdf5test.obj -MD -MP -MF $(DEPDIR)/gtest-hdf5test.Tpo -c -o gtest-hdf5test.obj `if test -f 'hdf5test.cpp'; then $(CYGPATH_W) 'hdf5test.cpp'; else $(CYGPATH_W) '$(srcdir)/hdf5test.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-hdf5test.Tpo $(DEPDIR)/gtest-hdf5test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='hdf5test.cpp' object='gtest-hdf5test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-hdf5test.obj `if test -f 'hdf5test.cpp'; then $(CYGPATH_W) 'hdf5test.cpp'; else $(CYGPATH_W) '$(srcdir)/hdf5test.cpp'; fi`
+
+gtest-ionstest.o: ionstest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-ionstest.o -MD -MP -MF $(DEPDIR)/gtest-ionstest.Tpo -c -o gtest-ionstest.o `test -f 'ionstest.cpp' || echo '$(srcdir)/'`ionstest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-ionstest.Tpo $(DEPDIR)/gtest-ionstest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ionstest.cpp' object='gtest-ionstest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-ionstest.o `test -f 'ionstest.cpp' || echo '$(srcdir)/'`ionstest.cpp
+
+gtest-ionstest.obj: ionstest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-ionstest.obj -MD -MP -MF $(DEPDIR)/gtest-ionstest.Tpo -c -o gtest-ionstest.obj `if test -f 'ionstest.cpp'; then $(CYGPATH_W) 'ionstest.cpp'; else $(CYGPATH_W) '$(srcdir)/ionstest.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-ionstest.Tpo $(DEPDIR)/gtest-ionstest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ionstest.cpp' object='gtest-ionstest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-ionstest.obj `if test -f 'ionstest.cpp'; then $(CYGPATH_W) 'ionstest.cpp'; else $(CYGPATH_W) '$(srcdir)/ionstest.cpp'; fi`
+
+gtest-simparamstest.o: simparamstest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-simparamstest.o -MD -MP -MF $(DEPDIR)/gtest-simparamstest.Tpo -c -o gtest-simparamstest.o `test -f 'simparamstest.cpp' || echo '$(srcdir)/'`simparamstest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-simparamstest.Tpo $(DEPDIR)/gtest-simparamstest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='simparamstest.cpp' object='gtest-simparamstest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-simparamstest.o `test -f 'simparamstest.cpp' || echo '$(srcdir)/'`simparamstest.cpp
+
+gtest-simparamstest.obj: simparamstest.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-simparamstest.obj -MD -MP -MF $(DEPDIR)/gtest-simparamstest.Tpo -c -o gtest-simparamstest.obj `if test -f 'simparamstest.cpp'; then $(CYGPATH_W) 'simparamstest.cpp'; else $(CYGPATH_W) '$(srcdir)/simparamstest.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-simparamstest.Tpo $(DEPDIR)/gtest-simparamstest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='simparamstest.cpp' object='gtest-simparamstest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-simparamstest.obj `if test -f 'simparamstest.cpp'; then $(CYGPATH_W) 'simparamstest.cpp'; else $(CYGPATH_W) '$(srcdir)/simparamstest.cpp'; fi`
+
+gtest-support.o: support.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-support.o -MD -MP -MF $(DEPDIR)/gtest-support.Tpo -c -o gtest-support.o `test -f 'support.cpp' || echo '$(srcdir)/'`support.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-support.Tpo $(DEPDIR)/gtest-support.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='support.cpp' object='gtest-support.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-support.o `test -f 'support.cpp' || echo '$(srcdir)/'`support.cpp
+
+gtest-support.obj: support.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gtest-support.obj -MD -MP -MF $(DEPDIR)/gtest-support.Tpo -c -o gtest-support.obj `if test -f 'support.cpp'; then $(CYGPATH_W) 'support.cpp'; else $(CYGPATH_W) '$(srcdir)/support.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtest-support.Tpo $(DEPDIR)/gtest-support.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='support.cpp' object='gtest-support.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-support.obj `if test -f 'support.cpp'; then $(CYGPATH_W) 'support.cpp'; else $(CYGPATH_W) '$(srcdir)/support.cpp'; fi`
+
 ../src/gtest-field_data.o: ../src/field_data.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-field_data.o -MD -MP -MF ../src/$(DEPDIR)/gtest-field_data.Tpo -c -o ../src/gtest-field_data.o `test -f '../src/field_data.cpp' || echo '$(srcdir)/'`../src/field_data.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-field_data.Tpo ../src/$(DEPDIR)/gtest-field_data.Po
@@ -770,6 +861,20 @@ gtest-gtest.obj: gtest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-hdf5_classes.obj `if test -f '../src/hdf5_classes.cpp'; then $(CYGPATH_W) '../src/hdf5_classes.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/hdf5_classes.cpp'; fi`
 
+../src/gtest-ions.o: ../src/ions.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-ions.o -MD -MP -MF ../src/$(DEPDIR)/gtest-ions.Tpo -c -o ../src/gtest-ions.o `test -f '../src/ions.cpp' || echo '$(srcdir)/'`../src/ions.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-ions.Tpo ../src/$(DEPDIR)/gtest-ions.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/ions.cpp' object='../src/gtest-ions.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-ions.o `test -f '../src/ions.cpp' || echo '$(srcdir)/'`../src/ions.cpp
+
+../src/gtest-ions.obj: ../src/ions.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-ions.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-ions.Tpo -c -o ../src/gtest-ions.obj `if test -f '../src/ions.cpp'; then $(CYGPATH_W) '../src/ions.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/ions.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-ions.Tpo ../src/$(DEPDIR)/gtest-ions.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/ions.cpp' object='../src/gtest-ions.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-ions.obj `if test -f '../src/ions.cpp'; then $(CYGPATH_W) '../src/ions.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/ions.cpp'; fi`
+
 ../src/gtest-loop_comm.o: ../src/loop_comm.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-loop_comm.o -MD -MP -MF ../src/$(DEPDIR)/gtest-loop_comm.Tpo -c -o ../src/gtest-loop_comm.o `test -f '../src/loop_comm.cpp' || echo '$(srcdir)/'`../src/loop_comm.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-loop_comm.Tpo ../src/$(DEPDIR)/gtest-loop_comm.Po
@@ -797,6 +902,20 @@ gtest-gtest.obj: gtest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/support_func.cpp' object='../src/gtest-support_func.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-support_func.obj `if test -f '../src/support_func.cpp'; then $(CYGPATH_W) '../src/support_func.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/support_func.cpp'; fi`
+
+../src/gtest-simparams.o: ../src/simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-simparams.o -MD -MP -MF ../src/$(DEPDIR)/gtest-simparams.Tpo -c -o ../src/gtest-simparams.o `test -f '../src/simparams.cpp' || echo '$(srcdir)/'`../src/simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-simparams.Tpo ../src/$(DEPDIR)/gtest-simparams.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/simparams.cpp' object='../src/gtest-simparams.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-simparams.o `test -f '../src/simparams.cpp' || echo '$(srcdir)/'`../src/simparams.cpp
+
+../src/gtest-simparams.obj: ../src/simparams.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-simparams.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-simparams.Tpo -c -o ../src/gtest-simparams.obj `if test -f '../src/simparams.cpp'; then $(CYGPATH_W) '../src/simparams.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/simparams.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-simparams.Tpo ../src/$(DEPDIR)/gtest-simparams.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/simparams.cpp' object='../src/gtest-simparams.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-simparams.obj `if test -f '../src/simparams.cpp'; then $(CYGPATH_W) '../src/simparams.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/simparams.cpp'; fi`
 
 ../src/gtest-emit.o: ../src/emit.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-emit.o -MD -MP -MF ../src/$(DEPDIR)/gtest-emit.Tpo -c -o ../src/gtest-emit.o `test -f '../src/emit.cpp' || echo '$(srcdir)/'`../src/emit.cpp

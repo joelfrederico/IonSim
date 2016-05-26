@@ -66,17 +66,17 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius,
 std::complex<double> F_r(double x, double y, const SimParams &simparams)
 {
 	double Er_factor;
-	double Er;
+	double Fr;
 	double theta;
 
 	double sr = ionsim::sr(simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu);
 
-	/* Er_factor = simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*simparams.sz*sr*sr); */
-	/* Er = Er_factor * gsl_sf_exprel(-(x*x+y*y) / (2*sr*sr)); */
+	Er_factor = simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*simparams.sz*sr*sr);
+	Fr = -GSL_CONST_MKSA_ELECTRON_CHARGE * Er_factor * gsl_sf_exprel(-(x*x+y*y) / (2*sr*sr));
 
-	Er = (simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE) / (4 * M_PI * GSL_CONST_MKSA_VACUUM_PERMITTIVITY * simparams.sz * sr * sr);
+	/* Er = (simparams.q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE) / (4 * M_PI * GSL_CONST_MKSA_VACUUM_PERMITTIVITY * simparams.sz * sr * sr); */
 
-	return std::complex<double>(Er * x, Er* y);
+	return std::complex<double>(Fr * x, Fr* y);
 }
 
 int func(double t, const double y[], double dydt[], void * params)
@@ -147,14 +147,14 @@ int Ions::push_simple(double nb_0, double sig_r)
 {
 	double dt = _simparams->dt();
 	std::complex<double> F;
-	for (int i=0; i < n_pts-1; i++)
+	for (int i=0; i < n_pts; i++)
 	{
 		F = F_r(x[i], y[i], *_simparams);
-		xp[i+1] = xp[i] + F.real() * dt / mass;
-		yp[i+1] = yp[i] + F.imag() * dt / mass;
+		xp[i] = xp[i] + F.real() * dt / mass;
+		yp[i] = yp[i] + F.imag() * dt / mass;
 
-		x[i+1] = x[i] + xp[i+1] * dt;
-		y[i+1] = y[i] + yp[i+1] * dt;
+		x[i] = x[i] + xp[i] * dt;
+		y[i] = y[i] + yp[i] * dt;
 
 		/* z[i]  = F.real(); */
 		/* zp[i] = F.imag(); */

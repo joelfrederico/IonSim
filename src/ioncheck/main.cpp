@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 	const char *file;
 	char *version;
 
+	std::cout << "=========================================" << std::endl;
 	// ==================================
 	// Determine whether to open default
 	// ==================================

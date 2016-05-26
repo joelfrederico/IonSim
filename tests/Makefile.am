@@ -11,15 +11,21 @@ libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
 libgtest_la_CPPFLAGS =-I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest $(MYAM_CPPFLAGS)
 libgtest_la_LDFLAGS =-pthread
 
-# check_PROGRAMS = gtest 
 check_PROGRAMS = gtest mpi_gtest
 
 gtest_SOURCES = gtest.cpp \
+		fieldtest.cpp \
+		hdf5test.cpp \
+		ionstest.cpp \
+		simparamstest.cpp \
+		support.cpp \
 		../src/field_data.cpp \
 		../src/field_comm.cpp \
 		../src/hdf5_classes.cpp \
+		../src/ions.cpp \
 		../src/loop_comm.cpp \
 		../src/support_func.cpp \
+		../src/simparams.cpp \
 		../src/emit.cpp \
 		../src/beam.cpp
 
@@ -35,18 +41,4 @@ mpi_gtest_LDADD = libgtest.la $(MYLDADD)
 mpi_gtest_LDFLAGS = -pthread -L/opt/local/lib
 mpi_gtest_CPPFLAGS =-I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/src $(MYAM_CPPFLAGS)
  
-# demo_SOURCES = demo.cpp \
-# 	       ../src/faddeeva/Faddeeva.cc \
-# 	       ../src/beam.cpp \
-# 	       ../src/ebeam.cpp \
-# 	       ../src/emit.cpp \
-# 	       ../src/fields.cpp \
-# 	       ../src/parts.cpp \
-# 	       ../src/simparams.cpp \
-# 	       ../src/support_func.cpp
-# 
-# demo_CPPFLAGS =-I$(top_srcdir)/src $(MYAM_CPPFLAGS)
-# 
-# demo_LDADD =$(MYLDADD)
-
 TESTS = gtest

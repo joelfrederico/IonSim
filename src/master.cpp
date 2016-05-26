@@ -45,8 +45,8 @@ int master(bool verbose)
 	int n_steps             = 1;
 	std::string filename;
 	/* std::string filename    = "output.h5"; */
-	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
-	pushmethod_t pushmethod = PUSH_FIELD;
+	pushmethod_t pushmethod = PUSH_SIMPLE;
+	/* pushmethod_t pushmethod = PUSH_FIELD; */
 
 	if (pushmethod == PUSH_SIMPLE)
 	{
@@ -59,8 +59,8 @@ int master(bool verbose)
 
 	std::cout << "Output file is: " << filename << std::endl;
 
-	long n_field_x          = 101;
-	long n_field_y          = 101;
+	long n_field_x          = 11;
+	long n_field_y          = 11;
 	long n_field_z          = 101;
 	double field_trans_wind = radius;
 
