@@ -147,14 +147,14 @@ int Ions::push_simple(double nb_0, double sig_r)
 {
 	double dt = _simparams->dt();
 	std::complex<double> F;
-	for (int i=0; i < n_pts; i++)
+	for (int i=0; i < n_pts-1; i++)
 	{
-		x[i] += xp[i] * dt;
-		y[i] += yp[i] * dt;
-
 		F = F_r(x[i], y[i], *_simparams);
-		xp[i] += F.real() * dt / mass;
-		yp[i] += F.imag() * dt / mass;
+		xp[i+1] = xp[i] + F.real() * dt / mass;
+		yp[i+1] = yp[i] + F.imag() * dt / mass;
+
+		x[i+1] = x[i] + xp[i+1] * dt;
+		y[i+1] = y[i] + yp[i+1] * dt;
 
 		/* z[i]  = F.real(); */
 		/* zp[i] = F.imag(); */
@@ -167,12 +167,12 @@ int Ions::push_simple(double nb_0, double sig_r)
 int Ions::push_field(Field_Data &field, int z_step)
 {
 	double dt = _simparams->dt();
-	Field_Interp fieldinterp(field, *gsl_interp2d_bicubic);
-	/* Field_Interp fieldinterp(field, *gsl_interp2d_bilinear); */
+	/* Field_Interp fieldinterp(field, *gsl_interp2d_bicubic); */
+	Field_Interp fieldinterp(field, *gsl_interp2d_bilinear);
 	double Fx, Fy, Ex, Ey;
 	int x_ind, y_ind;
 
-	for (int i=0; i < n_pts; i++)
+	for (int i=0; i < n_pts-1; i++)
 	{
 		Ex = fieldinterp.Ex(x[i], y[i], z_step);
 		Ey = fieldinterp.Ey(x[i], y[i], z_step);
@@ -185,11 +185,11 @@ int Ions::push_field(Field_Data &field, int z_step)
 		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ex;
 		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ey;
 
-		x[i] += xp[i] * dt;
-		y[i] += yp[i] * dt;
+		xp[i+1] = xp[i] + Fx * dt / mass;
+		yp[i+1] = yp[i] + Fy * dt / mass;
 
-		xp[i] += Fx * dt / mass;
-		yp[i] += Fy * dt / mass;
+		x[i+1] = x[i] + xp[i+1] * dt;
+		y[i+1] = y[i] + yp[i+1] * dt;
 
 		/* z[i]  = x_ind; */
 		/* zp[i] = y_ind; */
