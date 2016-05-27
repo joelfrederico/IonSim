@@ -1,3 +1,6 @@
 [submodule "googletest"]
 	path = googletest
 	url = https://github.com/google/googletest.git
+[submodule "src/pugixml"]
+	path = src/pugixml
+	url = git@github.com:zeux/pugixml.git
