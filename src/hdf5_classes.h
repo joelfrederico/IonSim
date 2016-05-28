@@ -104,6 +104,8 @@ class AttributeCreate : public Debug
 				type_id = H5T_NATIVE_INT;
 			} else if (typeid(attr_value) == typeid(long)) {
 				type_id = H5T_NATIVE_LONG;
+			} else if (typeid(attr_value) == typeid(long long)) {
+				type_id = H5T_NATIVE_LLONG;
 			} else if (typeid(attr_value) == typeid(unsigned int)) {
 				type_id = H5T_NATIVE_UINT;
 			} else if (typeid(attr_value) == typeid(const char *)) {
