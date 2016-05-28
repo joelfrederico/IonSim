@@ -88,7 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = ionsim$(EXEEXT)
+bin_PROGRAMS = ionsim$(EXEEXT) iontemp$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -105,14 +105,15 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_ionsim_OBJECTS = beam.$(OBJEXT) consts.$(OBJEXT) ebeam.$(OBJEXT) \
-	emit.$(OBJEXT) faddeeva/Faddeeva.$(OBJEXT) \
+am_ionsim_OBJECTS = faddeeva/Faddeeva.$(OBJEXT) \
+	pugixml/src/pugixml.$(OBJEXT) beam.$(OBJEXT) consts.$(OBJEXT) \
+	ebeam.$(OBJEXT) emit.$(OBJEXT) field_comm.$(OBJEXT) \
 	field_data.$(OBJEXT) field_interp.$(OBJEXT) \
-	field_comm.$(OBJEXT) hdf5_classes.$(OBJEXT) ions.$(OBJEXT) \
-	loop_comm.$(OBJEXT) main.$(OBJEXT) master.$(OBJEXT) \
-	parts.$(OBJEXT) simparams.$(OBJEXT) slave.$(OBJEXT) \
-	support_func.$(OBJEXT) writer_base.$(OBJEXT) \
-	writer_serial.$(OBJEXT) writer_parallel.$(OBJEXT)
+	hdf5_classes.$(OBJEXT) ions.$(OBJEXT) loop_comm.$(OBJEXT) \
+	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
+	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
+	writer_base.$(OBJEXT) writer_parallel.$(OBJEXT) \
+	writer_serial.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -120,6 +121,11 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_iontemp_OBJECTS = pugixml/src/pugixml.$(OBJEXT) beam.$(OBJEXT) \
+	emit.$(OBJEXT) iontemp.$(OBJEXT) simparams.$(OBJEXT) \
+	support_func.$(OBJEXT)
+iontemp_OBJECTS = $(am_iontemp_OBJECTS)
+iontemp_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -154,8 +160,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(ionsim_SOURCES)
-DIST_SOURCES = $(ionsim_SOURCES)
+SOURCES = $(ionsim_SOURCES) $(iontemp_SOURCES)
+DIST_SOURCES = $(ionsim_SOURCES) $(iontemp_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -367,28 +373,38 @@ top_srcdir = @top_srcdir@
 SUBDIRS = ioncheck iontest
 AM_CPPFLAGS = $(MYAM_CPPFLAGS)
 ionsim_SOURCES = \
-		 beam.cpp             \
-		 consts.cpp           \
-		 ebeam.cpp            \
-		 emit.cpp             \
-		 faddeeva/Faddeeva.cc \
-		 field_data.cpp       \
-		 field_interp.cpp     \
-		 field_comm.cpp       \
-		 hdf5_classes.cpp     \
-		 ions.cpp             \
-		 loop_comm.cpp        \
-		 main.cpp             \
-		 master.cpp           \
-		 parts.cpp            \
-		 simparams.cpp        \
-		 slave.cpp            \
-		 support_func.cpp     \
-		 writer_base.cpp      \
-		 writer_serial.cpp    \
-		 writer_parallel.cpp
+		 faddeeva/Faddeeva.cc    \
+		 pugixml/src/pugixml.cpp \
+		 beam.cpp                \
+		 consts.cpp              \
+		 ebeam.cpp               \
+		 emit.cpp                \
+		 field_comm.cpp          \
+		 field_data.cpp          \
+		 field_interp.cpp        \
+		 hdf5_classes.cpp        \
+		 ions.cpp                \
+		 loop_comm.cpp           \
+		 main.cpp                \
+		 master.cpp              \
+		 parts.cpp               \
+		 simparams.cpp           \
+		 slave.cpp               \
+		 support_func.cpp        \
+		 writer_base.cpp         \
+		 writer_parallel.cpp     \
+		 writer_serial.cpp
 
 ionsim_LDADD = $(MYLDADD)
+iontemp_SOURCES = \
+		  pugixml/src/pugixml.cpp \
+		  beam.cpp                \
+		  emit.cpp                \
+		  iontemp.cpp             \
+		  simparams.cpp           \
+		  support_func.cpp
+
+iontemp_LDADD = $(MYLDADD)
 all: all-recursive
 
 .SUFFIXES:
@@ -479,14 +495,27 @@ faddeeva/$(DEPDIR)/$(am__dirstamp):
 	@: > faddeeva/$(DEPDIR)/$(am__dirstamp)
 faddeeva/Faddeeva.$(OBJEXT): faddeeva/$(am__dirstamp) \
 	faddeeva/$(DEPDIR)/$(am__dirstamp)
+pugixml/src/$(am__dirstamp):
+	@$(MKDIR_P) pugixml/src
+	@: > pugixml/src/$(am__dirstamp)
+pugixml/src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) pugixml/src/$(DEPDIR)
+	@: > pugixml/src/$(DEPDIR)/$(am__dirstamp)
+pugixml/src/pugixml.$(OBJEXT): pugixml/src/$(am__dirstamp) \
+	pugixml/src/$(DEPDIR)/$(am__dirstamp)
 
 ionsim$(EXEEXT): $(ionsim_OBJECTS) $(ionsim_DEPENDENCIES) $(EXTRA_ionsim_DEPENDENCIES) 
 	@rm -f ionsim$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ionsim_OBJECTS) $(ionsim_LDADD) $(LIBS)
 
+iontemp$(EXEEXT): $(iontemp_OBJECTS) $(iontemp_DEPENDENCIES) $(EXTRA_iontemp_DEPENDENCIES) 
+	@rm -f iontemp$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(iontemp_OBJECTS) $(iontemp_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f faddeeva/*.$(OBJEXT)
+	-rm -f pugixml/src/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -500,6 +529,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_interp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hdf5_classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iontemp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@
@@ -511,6 +541,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_parallel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_serial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@faddeeva/$(DEPDIR)/Faddeeva.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pugixml/src/$(DEPDIR)/pugixml.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -756,6 +787,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f faddeeva/$(DEPDIR)/$(am__dirstamp)
 	-rm -f faddeeva/$(am__dirstamp)
+	-rm -f pugixml/src/$(DEPDIR)/$(am__dirstamp)
+	-rm -f pugixml/src/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -765,7 +798,7 @@ clean: clean-recursive
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR) faddeeva/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) faddeeva/$(DEPDIR) pugixml/src/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -811,7 +844,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR) faddeeva/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) faddeeva/$(DEPDIR) pugixml/src/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

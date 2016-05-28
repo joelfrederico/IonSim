@@ -12,14 +12,14 @@ class Parts
 		// ==============================
 		// Constructors
 		// ==============================
-		Parts(double _mass, long _n_pts, parttype_t _type);
+		Parts(double _mass, long long _n_pts, parttype_t _type);
 		Parts(const SimParams &simparams, parttype_t _type);
 
 		// ==============================
 		// Data members
 		// ==============================
 		const double mass;
-		const long n_pts;
+		const long long n_pts;
 		const parttype_t type;
 
 		double_vec x;

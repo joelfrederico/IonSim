@@ -49,7 +49,7 @@ int WriterSerial::writedata(long step, const std::string &group_str, const std::
 	// ==================================
 	// Initialize all variables
 	// ==================================
-	long n_pts             = parts.n_pts;
+	long long n_pts             = parts.n_pts;
 	const double_vec * _x  = &parts.x;
 	const double_vec * _xp = &parts.xp;
 	const double_vec * _y  = &parts.y;
@@ -199,9 +199,9 @@ int WriterSerial::writedata(long step, Field_Data &field)
 	// ==================================
 	// Initialize all variables
 	// ==================================
-	long x_len = field.x_pts;
-	long y_len = field.y_pts;
-	long z_len = field.z_pts;
+	int x_len = field.x_pts;
+	int y_len = field.y_pts;
+	int z_len = field.z_pts;
 	const std::string group_str = "field"; 
 
 	// ==================================

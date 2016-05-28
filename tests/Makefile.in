@@ -117,6 +117,7 @@ libgtest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am_gtest_OBJECTS = gtest-fieldtest.$(OBJEXT) gtest-gtest.$(OBJEXT) \
 	gtest-hdf5test.$(OBJEXT) gtest-ionstest.$(OBJEXT) \
 	gtest-simparamstest.$(OBJEXT) gtest-support.$(OBJEXT) \
+	../src/pugixml/src/gtest-pugixml.$(OBJEXT) \
 	../src/gtest-beam.$(OBJEXT) ../src/gtest-emit.$(OBJEXT) \
 	../src/gtest-field_comm.$(OBJEXT) \
 	../src/gtest-field_data.$(OBJEXT) \
@@ -564,6 +565,7 @@ gtest_SOURCES = \
 		ionstest.cpp \
 		simparamstest.cpp \
 		support.cpp \
+		../src/pugixml/src/pugixml.cpp \
 		../src/beam.cpp \
 		../src/emit.cpp \
 		../src/field_comm.cpp \
@@ -648,6 +650,15 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../src/pugixml/src/$(am__dirstamp):
+	@$(MKDIR_P) ../src/pugixml/src
+	@: > ../src/pugixml/src/$(am__dirstamp)
+../src/pugixml/src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../src/pugixml/src/$(DEPDIR)
+	@: > ../src/pugixml/src/$(DEPDIR)/$(am__dirstamp)
+../src/pugixml/src/gtest-pugixml.$(OBJEXT):  \
+	../src/pugixml/src/$(am__dirstamp) \
+	../src/pugixml/src/$(DEPDIR)/$(am__dirstamp)
 ../src/$(am__dirstamp):
 	@$(MKDIR_P) ../src
 	@: > ../src/$(am__dirstamp)
@@ -690,6 +701,7 @@ mostlyclean-compile:
 	-rm -f ../googletest/googletest/src/*.$(OBJEXT)
 	-rm -f ../googletest/googletest/src/*.lo
 	-rm -f ../src/*.$(OBJEXT)
+	-rm -f ../src/pugixml/src/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -706,6 +718,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-parts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-support_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-fieldtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-gtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtest-hdf5test.Po@am__quote@
@@ -828,6 +841,20 @@ gtest-support.obj: support.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='support.cpp' object='gtest-support.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gtest-support.obj `if test -f 'support.cpp'; then $(CYGPATH_W) 'support.cpp'; else $(CYGPATH_W) '$(srcdir)/support.cpp'; fi`
+
+../src/pugixml/src/gtest-pugixml.o: ../src/pugixml/src/pugixml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/pugixml/src/gtest-pugixml.o -MD -MP -MF ../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Tpo -c -o ../src/pugixml/src/gtest-pugixml.o `test -f '../src/pugixml/src/pugixml.cpp' || echo '$(srcdir)/'`../src/pugixml/src/pugixml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Tpo ../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/pugixml/src/pugixml.cpp' object='../src/pugixml/src/gtest-pugixml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/pugixml/src/gtest-pugixml.o `test -f '../src/pugixml/src/pugixml.cpp' || echo '$(srcdir)/'`../src/pugixml/src/pugixml.cpp
+
+../src/pugixml/src/gtest-pugixml.obj: ../src/pugixml/src/pugixml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/pugixml/src/gtest-pugixml.obj -MD -MP -MF ../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Tpo -c -o ../src/pugixml/src/gtest-pugixml.obj `if test -f '../src/pugixml/src/pugixml.cpp'; then $(CYGPATH_W) '../src/pugixml/src/pugixml.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/pugixml/src/pugixml.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Tpo ../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/pugixml/src/pugixml.cpp' object='../src/pugixml/src/gtest-pugixml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/pugixml/src/gtest-pugixml.obj `if test -f '../src/pugixml/src/pugixml.cpp'; then $(CYGPATH_W) '../src/pugixml/src/pugixml.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/pugixml/src/pugixml.cpp'; fi`
 
 ../src/gtest-beam.o: ../src/beam.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-beam.o -MD -MP -MF ../src/$(DEPDIR)/gtest-beam.Tpo -c -o ../src/gtest-beam.o `test -f '../src/beam.cpp' || echo '$(srcdir)/'`../src/beam.cpp
@@ -1312,6 +1339,8 @@ distclean-generic:
 	-rm -f ../googletest/googletest/src/$(am__dirstamp)
 	-rm -f ../src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ../src/$(am__dirstamp)
+	-rm -f ../src/pugixml/src/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../src/pugixml/src/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1322,7 +1351,7 @@ clean-am: clean-checkLTLIBRARIES clean-checkPROGRAMS clean-generic \
 	clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ../src/pugixml/src/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1368,7 +1397,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../googletest/googletest/src/$(DEPDIR) ../src/$(DEPDIR) ../src/pugixml/src/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

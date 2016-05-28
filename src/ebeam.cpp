@@ -163,7 +163,7 @@ Ebeam Ebeam::between(double z0, double z1)
 	// Check and xfer particles
 	// ==================================
 	int reserve_length = 0;
-	for (long i=0; i < n_pts; i++)
+	for (long long i=0; i < n_pts; i++)
 	{
 		if ( (z0 < z[i]) && (z[i] < z1) ) {
 			reserve_length++;
@@ -177,8 +177,8 @@ Ebeam Ebeam::between(double z0, double z1)
 	z_out.reserve(reserve_length);
 	zp_out.reserve(reserve_length);
 
-	long ind = 0;
-	for (long i=0; i < n_pts; i++)
+	long long ind = 0;
+	for (long long i=0; i < n_pts; i++)
 	{
 		if ( (z0 < z[i]) && (z[i] < z1) )
 		{
@@ -234,7 +234,7 @@ int Ebeam::field_BE(Field_Data &field)
 
 	int k = 0;
 
-	for (long i=0; i < field.x_pts; i++)
+	for (int i=0; i < field.x_pts; i++)
 	{
 		xt = field.x_grid[i];
 		if (sx_bigger)
@@ -244,7 +244,7 @@ int Ebeam::field_BE(Field_Data &field)
 			yy = xt;
 		}
 
-		for (long j=0; j < field.y_pts; j++)
+		for (int j=0; j < field.y_pts; j++)
 		{
 			yt = field.y_grid[j];
 			if (sx_bigger)

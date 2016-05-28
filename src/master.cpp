@@ -30,10 +30,10 @@ int master(bool verbose)
 	// ==============================
 	// Generate beam
 	// ==============================
-	long n_e                = 1e6;
-	long n_ions             = 1e4;
+	long long n_e                = 1e6;
+	long long n_ions             = 1e4;
 	double q_tot            = 2e10;
-	double radius           = 2.4276628847185805e-06;
+	double radius           = 2.4276628847185805e-06*3;
 	double sz               = 30e-6;
 	double length           = 100e-6;
 	double E                = 20.35;
@@ -41,7 +41,8 @@ int master(bool verbose)
 	double n_p_cgs          = 1e17;
 	double m_ion_amu        = 1.00794;
 	double sdelta           = 0.04;
-	zdist_t zdist           = Z_DIST_FLAT;
+	/* zdist_t zdist           = Z_DIST_FLAT; */
+	zdist_t zdist           = Z_DIST_GAUSS;
 	int n_steps             = 1;
 	std::string filename;
 	/* std::string filename    = "output.h5"; */
@@ -57,11 +58,13 @@ int master(bool verbose)
 		filename = "output.h5";
 	}
 
+	filename = "gauss.h5";
+
 	std::cout << "Output file is: " << filename << std::endl;
 
-	long n_field_x          = 101;
-	long n_field_y          = 101;
-	long n_field_z          = 101;
+	int n_field_x          = 201;
+	int n_field_y          = 201;
+	int n_field_z          = 201;
 	double field_trans_wind = radius;
 
 	double sr = ionsim::sr(emit_n, E, n_p_cgs, m_ion_amu);

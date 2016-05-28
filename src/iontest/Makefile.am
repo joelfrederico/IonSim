@@ -4,6 +4,7 @@ AM_CPPFLAGS=$(MYAM_CPPFLAGS)
 bin_PROGRAMS = iontest
 
 iontest_SOURCES=\
+		../pugixml/src/pugixml.cpp \
 		 main.cpp \
 		 ../ions.cpp \
 		 ../field_interp.cpp \

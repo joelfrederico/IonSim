@@ -68,7 +68,7 @@ int WriterParallel::overwrite_file_parallel()
 
 int WriterParallel::_writedata(DatasetAccess *&dataset, hid_t &loc_id, const std::string &dataset_str, const Parts &parts, unsigned int step)
 {
-	long n_pts  = parts.n_pts;
+	long long n_pts  = parts.n_pts;
 	int n_write = MAX_N_WRITE;
 	double *buf;
 

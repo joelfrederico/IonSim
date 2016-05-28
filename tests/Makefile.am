@@ -20,6 +20,7 @@ gtest_SOURCES = \
 		ionstest.cpp \
 		simparamstest.cpp \
 		support.cpp \
+		../src/pugixml/src/pugixml.cpp \
 		../src/beam.cpp \
 		../src/emit.cpp \
 		../src/field_comm.cpp \

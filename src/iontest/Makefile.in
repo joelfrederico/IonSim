@@ -105,7 +105,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_iontest_OBJECTS = iontest-main.$(OBJEXT) ../iontest-ions.$(OBJEXT) \
+am_iontest_OBJECTS = ../pugixml/src/iontest-pugixml.$(OBJEXT) \
+	iontest-main.$(OBJEXT) ../iontest-ions.$(OBJEXT) \
 	../iontest-field_interp.$(OBJEXT) \
 	../iontest-field_data.$(OBJEXT) ../iontest-parts.$(OBJEXT) \
 	../iontest-beam.$(OBJEXT) ../iontest-emit.$(OBJEXT) \
@@ -324,6 +325,7 @@ top_srcdir = @top_srcdir@
 # AM_CPPFLAGS=$(GSL_CFLAGS) $(HDF5_CPPFLAGS)
 AM_CPPFLAGS = $(MYAM_CPPFLAGS)
 iontest_SOURCES = \
+		../pugixml/src/pugixml.cpp \
 		 main.cpp \
 		 ../ions.cpp \
 		 ../field_interp.cpp \
@@ -418,6 +420,15 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../pugixml/src/$(am__dirstamp):
+	@$(MKDIR_P) ../pugixml/src
+	@: > ../pugixml/src/$(am__dirstamp)
+../pugixml/src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../pugixml/src/$(DEPDIR)
+	@: > ../pugixml/src/$(DEPDIR)/$(am__dirstamp)
+../pugixml/src/iontest-pugixml.$(OBJEXT):  \
+	../pugixml/src/$(am__dirstamp) \
+	../pugixml/src/$(DEPDIR)/$(am__dirstamp)
 ../$(am__dirstamp):
 	@$(MKDIR_P) ..
 	@: > ../$(am__dirstamp)
@@ -448,6 +459,7 @@ iontest$(EXEEXT): $(iontest_OBJECTS) $(iontest_DEPENDENCIES) $(EXTRA_iontest_DEP
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f ../*.$(OBJEXT)
+	-rm -f ../pugixml/src/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -460,6 +472,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-parts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-support_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../pugixml/src/$(DEPDIR)/iontest-pugixml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iontest-main.Po@am__quote@
 
 .cpp.o:
@@ -485,6 +498,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+../pugixml/src/iontest-pugixml.o: ../pugixml/src/pugixml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../pugixml/src/iontest-pugixml.o -MD -MP -MF ../pugixml/src/$(DEPDIR)/iontest-pugixml.Tpo -c -o ../pugixml/src/iontest-pugixml.o `test -f '../pugixml/src/pugixml.cpp' || echo '$(srcdir)/'`../pugixml/src/pugixml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../pugixml/src/$(DEPDIR)/iontest-pugixml.Tpo ../pugixml/src/$(DEPDIR)/iontest-pugixml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../pugixml/src/pugixml.cpp' object='../pugixml/src/iontest-pugixml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../pugixml/src/iontest-pugixml.o `test -f '../pugixml/src/pugixml.cpp' || echo '$(srcdir)/'`../pugixml/src/pugixml.cpp
+
+../pugixml/src/iontest-pugixml.obj: ../pugixml/src/pugixml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../pugixml/src/iontest-pugixml.obj -MD -MP -MF ../pugixml/src/$(DEPDIR)/iontest-pugixml.Tpo -c -o ../pugixml/src/iontest-pugixml.obj `if test -f '../pugixml/src/pugixml.cpp'; then $(CYGPATH_W) '../pugixml/src/pugixml.cpp'; else $(CYGPATH_W) '$(srcdir)/../pugixml/src/pugixml.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../pugixml/src/$(DEPDIR)/iontest-pugixml.Tpo ../pugixml/src/$(DEPDIR)/iontest-pugixml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../pugixml/src/pugixml.cpp' object='../pugixml/src/iontest-pugixml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../pugixml/src/iontest-pugixml.obj `if test -f '../pugixml/src/pugixml.cpp'; then $(CYGPATH_W) '../pugixml/src/pugixml.cpp'; else $(CYGPATH_W) '$(srcdir)/../pugixml/src/pugixml.cpp'; fi`
 
 iontest-main.o: main.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT iontest-main.o -MD -MP -MF $(DEPDIR)/iontest-main.Tpo -c -o iontest-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
@@ -735,6 +762,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f ../$(DEPDIR)/$(am__dirstamp)
 	-rm -f ../$(am__dirstamp)
+	-rm -f ../pugixml/src/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../pugixml/src/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -744,7 +773,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../$(DEPDIR) ../pugixml/src/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -790,7 +819,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../$(DEPDIR) ../pugixml/src/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

@@ -185,11 +185,11 @@ int Ions::push_field(Field_Data &field, int z_step)
 		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ex;
 		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ey;
 
-		xp[i+1] = xp[i] + Fx * dt / mass;
-		yp[i+1] = yp[i] + Fy * dt / mass;
+		xp[i] = xp[i] + Fx * dt / mass;
+		yp[i] = yp[i] + Fy * dt / mass;
 
-		x[i+1] = x[i] + xp[i+1] * dt;
-		y[i+1] = y[i] + yp[i+1] * dt;
+		x[i] = x[i] + xp[i] * dt;
+		y[i] = y[i] + yp[i] * dt;
 
 		/* z[i]  = x_ind; */
 		/* zp[i] = y_ind; */

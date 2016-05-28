@@ -8,12 +8,12 @@
 // ==============================
 // Constructors
 // ==============================
-Parts::Parts(double _mass, long _n_pts, parttype_t _type) : mass(_mass), n_pts(_n_pts), type(_type)
+Parts::Parts(double _mass, long long _n_pts, parttype_t _type) : mass(_mass), n_pts(_n_pts), type(_type)
 {
 	_vec_reserve();
 }
 
-long calc_n_pts(const SimParams &simparams, const parttype_t type)
+long long calc_n_pts(const SimParams &simparams, const parttype_t type)
 {
 	switch (type)
 	{

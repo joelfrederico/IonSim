@@ -34,7 +34,7 @@ int Field_Data::_init()
 	y_grid = new double[y_pts];
 	z_grid = new double[z_pts];
 
-	for (long i=0; i < n_pts; i++)
+	for (long long i=0; i < n_pts; i++)
 	{
 		Ex_data[i] = double(0);
 		Ey_data[i] = double(0);
@@ -53,17 +53,17 @@ int Field_Data::_init()
 	mid_j = (y_pts-1) / 2;
 	mid_k = (z_pts-1) / 2;
 
-	for (long i=0; i < x_pts; i++)
+	for (int i=0; i < x_pts; i++)
 	{
 		x_grid[i] = (i-mid_i) * dxdi;
 	}
 
-	for (long j=0; j < y_pts; j++)
+	for (int j=0; j < y_pts; j++)
 	{
 		y_grid[j] = (j-mid_j) * dydj;
 	}
 
-	for (long k=0; k < z_pts; k++)
+	for (int k=0; k < z_pts; k++)
 	{
 		z_grid[k] = (k-mid_k) * dzdk;
 	}
@@ -78,9 +78,9 @@ int Field_Data::_init()
 	return 0;
 }
 
-long Field_Data::_index(long i, long j, long k) const
+long long Field_Data::_index(int i, int j, int k) const
 {
-	long index = i + x_pts*(j + y_pts*k);
+	long long index = i + x_pts*(j + y_pts*k);
 	return index;
 }
 
@@ -122,7 +122,7 @@ Field_Data::Field_Data(const SimParams &simparams) :
 	_init();
 }
 
-Field_Data::Field_Data(long _x_pts, long _y_pts, long _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
+Field_Data::Field_Data(int _x_pts, int _y_pts, int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
 	x_pts(_x_pts),
 	y_pts(_y_pts),
 	z_pts(_z_pts),
@@ -153,73 +153,73 @@ Field_Data::~Field_Data()
 // Public Methods:
 // Facing methods
 // ==================================
-double &Field_Data::Ex_ind(long i, long j, long k)
+double &Field_Data::Ex_ind(int i, int j, int k)
 {
 	splines_valid = false;
 	return Ex_data[_index(i, j, k)];
 }
 
-double &Field_Data::Ex_ind(long ind)
+double &Field_Data::Ex_ind(long long ind)
 {
 	splines_valid = false;
 	return Ex_data[ind];
 }
 
-double &Field_Data::Ey_ind(long i, long j, long k)
+double &Field_Data::Ey_ind(int i, int j, int k)
 {
 	splines_valid = false;
 	return Ey_data[_index(i, j, k)];
 }
 
-double &Field_Data::Ey_ind(long ind)
+double &Field_Data::Ey_ind(long long ind)
 {
 	splines_valid = false;
 	return Ey_data[ind];
 }
 
-double &Field_Data::Ez_ind(long i, long j, long k)
+double &Field_Data::Ez_ind(int i, int j, int k)
 {
 	splines_valid = false;
 	return Ez_data[_index(i, j, k)];
 }
 
-double &Field_Data::Ez_ind(long ind)
+double &Field_Data::Ez_ind(long long ind)
 {
 	splines_valid = false;
 	return Ez_data[ind];
 }
 
-double &Field_Data::Bx_ind(long i, long j, long k)
+double &Field_Data::Bx_ind(int i, int j, int k)
 {
 	splines_valid = false;
 	return Bx_data[_index(i, j, k)];
 }
 
-double &Field_Data::Bx_ind(long ind)
+double &Field_Data::Bx_ind(long long ind)
 {
 	splines_valid = false;
 	return Bx_data[ind];
 }
 
-double &Field_Data::By_ind(long i, long j, long k)
+double &Field_Data::By_ind(int i, int j, int k)
 {
 	splines_valid = false;
 	return By_data[_index(i, j, k)];
 }
 
-double &Field_Data::By_ind(long ind)
+double &Field_Data::By_ind(long long ind)
 {
 	splines_valid = false;
 	return By_data[ind];
 }
 
-double &Field_Data::Bz_ind(long i, long j, long k)
+double &Field_Data::Bz_ind(int i, int j, int k)
 {
 	splines_valid = false;
 	return Bz_data[_index(i, j, k)];
 }
 
-double &Field_Data::Bz_ind(long ind)
+double &Field_Data::Bz_ind(long long ind)
 {
 	splines_valid = false;
 	return Bz_data[ind];

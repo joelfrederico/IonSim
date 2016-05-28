@@ -3,6 +3,78 @@
 #include <math.h>
 #include "support_func.h"
 #include "consts.h"
+#include "pugixml/src/pugixml.hpp"
+#include <stdexcept>
+#include <algorithm>
+
+// ==================================
+// XML Loading
+// ==================================
+std::string getstr(pugi::xml_node node, std::string name)
+{
+	std::string text;
+	text = node.child(name.c_str()).text().as_string();
+
+	text.erase(std::remove_if(text.begin(), text.end(), ::isspace), text.end());
+
+	std::cout << std::left << std::setw(WIDTH) << name << ": " << text << std::endl;
+	return text;
+}
+
+SimParams::SimParams(std::string filename)
+{
+	pugi::xml_text text;
+	std::string string;
+	pugi::xml_document doc;
+
+	pugi::xml_parse_result result = doc.load_file(filename.c_str());
+
+	if (!result) throw std::runtime_error("Couldn't load file");
+
+	pugi::xml_node beam = doc.child("config").child("Beam");
+	pugi::xml_node ions = doc.child("config").child("Ions");
+
+	getdata(beam, "E"         , E         ) ;
+	getdata(beam, "emit_n"    , emit_n    ) ;
+	getdata(beam, "length"    , length    ) ;
+	getdata(beam, "m_ion_amu" , m_ion_amu ) ;
+	getdata(beam, "n_p_cgs"   , n_p_cgs   ) ;
+	getdata(beam, "q_tot"     , q_tot     ) ;
+	getdata(beam, "radius"    , radius    ) ;
+	getdata(beam, "sz"        , sz        ) ;
+	getdata(beam, "sdelta"    , sdelta    ) ;
+
+	string = getstr(beam, "zdist");
+	if (string == "Gauss") {
+		zdist = Z_DIST_GAUSS;
+	} else if (string == "Flat") {
+		zdist = Z_DIST_FLAT;
+	} else {
+		throw std::runtime_error ("Not a valid option for zdist:" + string);
+	}
+
+	getdata(beam, "n_steps", n_steps);
+
+	string = getstr(beam, "pushmethod");
+	if (string == "Simple") {
+		pushmethod = PUSH_SIMPLE;
+	} else if (string == "Field") {
+		pushmethod = PUSH_FIELD;
+	} else if (string == "RungeKutta") {
+		pushmethod = PUSH_RUNGE_KUTTA;
+	} else {
+		throw std::runtime_error ("Not a valid option for zdist:" + string);
+	}
+
+	getdata(beam, "n_e", n_e);
+	getdata(beam, "n_field_x", n_field_x);
+	getdata(beam, "n_field_y", n_field_y);
+	getdata(beam, "n_field_z", n_field_z);
+	getdata(beam, "field_trans_wind", field_trans_wind);
+	getdata(beam, "z_end", z_end);
+
+	filename = getstr(beam, "filename");
+}
 
 // ==================================
 // Constructors, Destructor
@@ -20,13 +92,13 @@ SimParams::SimParams(
 	zdist_t _zdist,
 	int _n_steps,
 	pushmethod_t _pushmethod,
-	long _n_e,
-	long _n_field_x,
-	long _n_field_y,
-	long _n_field_z,
+	long long _n_e,
+	int _n_field_x,
+	int _n_field_y,
+	int _n_field_z,
 	double _field_trans_wind,
 	double _z_end,
-	long _n_ions,
+	long long _n_ions,
 	std::string _filename
 	)
 {
@@ -51,8 +123,6 @@ SimParams::SimParams(
 	n_ions           = _n_ions;
 	filename         = _filename;
 
-	gamma_rel   = ionsim::GeV2gamma(_E);
-
 	_init();
 }
 
@@ -61,39 +131,9 @@ SimParams::SimParams()
 	_init();
 }
 
-/*
-SimParams::SimParams(const SimParams &obj) :
-	E(obj.E),
-	emit_n(obj.emit_n),
-	length(obj.length),
-	m_ion_amu(obj.m_ion_amu),
-	n_p_cgs(obj.n_p_cgs),
-	q_tot(obj.q_tot),
-	radius(obj.radius),
-	sz(obj.sz),
-	sdelta(obj.sdelta),
-	zdist(obj.zdist),
-	n_steps(obj.n_steps),
-	pushmethod(obj.pushmethod),
-	n_e(obj.n_e),
-	n_field_x(obj.n_field_x),
-	n_field_y(obj.n_field_y),
-	n_field_z(obj.n_field_z),
-	field_trans_wind(obj.field_trans_wind),
-	z_end(obj.z_end),
-
-	n_ions(obj.n_ions),
-	filename(obj.filename),
-	gamma_rel(obj.gamma_rel)
-{
-	// _dt = new double;
-}
-*/
-
 int SimParams::_init()
 {
-	/* _dt = new double; */
-	/* *_dt = -1; */
+	gamma_rel = ionsim::GeV2gamma(E);
 	return 0;
 }
 
@@ -147,25 +187,25 @@ int SimParams::bcast_receive()
 	char *cbuf;
 
 	// Receive numerical parameters
-	MPI_Bcast(&n_e              , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_ions           , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&q_tot            , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&radius           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&length           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&E                , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&emit_n           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_p_cgs          , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&m_ion_amu        , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&sz               , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&sdelta           , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&zdist            , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_steps          , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&pushmethod       , 1 , MPI_INT    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_x        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_y        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_z        , 1 , MPI_LONG   , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&field_trans_wind , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&z_end            , 1 , MPI_DOUBLE , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_e              , 1 , MPI_LONG_LONG , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_ions           , 1 , MPI_LONG_LONG , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&q_tot            , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&radius           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&length           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&E                , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&emit_n           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_p_cgs          , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&m_ion_amu        , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&sz               , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&sdelta           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&zdist            , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_steps          , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&pushmethod       , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_x        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_y        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_z        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&field_trans_wind , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&z_end            , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 
 	// Receive string
 
@@ -176,7 +216,7 @@ int SimParams::bcast_receive()
 	filename = std::string(cbuf);
 	delete [] cbuf;
 
-	gamma_rel   = ionsim::GeV2gamma(E);
+	_init();
 
 	return 0;
 }
