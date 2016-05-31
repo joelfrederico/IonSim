@@ -39,6 +39,7 @@ int WriterSerial::overwrite_file_serial()
 	// ==================================
 	// Create a new file
 	// ==================================
+	std::cout << "Filename:" << _filename << "." << std::endl;
 	file_id = H5Fcreate(_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	
 	return 0;

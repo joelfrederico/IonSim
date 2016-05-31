@@ -21,15 +21,15 @@ std::string getstr(pugi::xml_node node, std::string name)
 	return text;
 }
 
-SimParams::SimParams(std::string filename)
+SimParams::SimParams(std::string xmlfile)
 {
 	pugi::xml_text text;
 	std::string string;
 	pugi::xml_document doc;
 
-	pugi::xml_parse_result result = doc.load_file(filename.c_str());
+	pugi::xml_parse_result result = doc.load_file(xmlfile.c_str());
 
-	if (!result) throw std::runtime_error("Couldn't load file: \"" + filename + "\"");
+	if (!result) throw std::runtime_error("Couldn't load file: \"" + xmlfile+ "\"");
 
 	pugi::xml_node beam = doc.child("config").child("Beam");
 	pugi::xml_node ions = doc.child("config").child("Ions");
