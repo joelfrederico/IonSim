@@ -67,6 +67,7 @@ SimParams::SimParams(std::string filename)
 	}
 
 	getdata(beam, "n_e", n_e);
+	getdata(beam, "n_ions", n_ions);
 	getdata(beam, "n_field_x", n_field_x);
 	getdata(beam, "n_field_y", n_field_y);
 	getdata(beam, "n_field_z", n_field_z);

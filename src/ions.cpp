@@ -90,12 +90,10 @@ int func(double t, const double y[], double dydt[], void * params)
 	sig_r = ((double *)params)[1];
 	mass  = ((double *)params)[2];
 
-
 	x0  = &y[0];
 	xp0 = &y[2];
 	y0  = &y[1];
 	yp0 = &y[3];
-
 
 	/* F = F_r(*x0, *y0, nb_0, sig_r); */
 

@@ -25,7 +25,7 @@ void getdata(pugi::xml_node node, std::string key, T &out)
 		if (typeid(out) == typeid(double)) {
 			out = text.as_double();
 		} else if (typeid(out) == typeid(long long)) {
-			out = text.as_llong();
+			out = text.as_double();
 		} else if (typeid(out) == typeid(int)) {
 			out = text.as_int();
 		} else {
