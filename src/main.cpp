@@ -13,7 +13,7 @@
 const int INT_TAG = 1;
 
 DEFINE_bool(verbose, true, "Verbose");
-DEFINE_string(filename, "config.xml", "Configuration file");
+DEFINE_string(file, "config.xml", "Configuration file");
 
 int main(int argc, char **argv)
 {

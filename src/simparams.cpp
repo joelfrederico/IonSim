@@ -29,7 +29,7 @@ SimParams::SimParams(std::string filename)
 
 	pugi::xml_parse_result result = doc.load_file(filename.c_str());
 
-	if (!result) throw std::runtime_error("Couldn't load file");
+	if (!result) throw std::runtime_error("Couldn't load file: \"" + filename + "\"");
 
 	pugi::xml_node beam = doc.child("config").child("Beam");
 	pugi::xml_node ions = doc.child("config").child("Ions");

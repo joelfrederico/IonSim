@@ -8,7 +8,7 @@
 #include "simparams.h"
 #include <gflags/gflags.h>
 
-DECLARE_string(filename);
+DECLARE_string(file);
 
 int master(bool verbose)
 {
@@ -32,80 +32,9 @@ int master(bool verbose)
 	int max_ion_steps = 100;
 	
 	// ==============================
-	// Generate beam
+	// Load from file
 	// ==============================
-	long long n_e                = 1e6;
-	long long n_ions             = 1e4;
-	double q_tot            = 2e10;
-	double radius           = 2.4276628847185805e-06*3;
-	double sz               = 30e-6;
-	double length           = 100e-6;
-	double E                = 20.35;
-	double emit_n           = 50e-6;
-	double n_p_cgs          = 1e17;
-	double m_ion_amu        = 1.00794;
-	double sdelta           = 0.04;
-	/* zdist_t zdist           = Z_DIST_FLAT; */
-	zdist_t zdist           = Z_DIST_GAUSS;
-	int n_steps             = 1;
-	std::string filename;
-	/* std::string filename    = "output.h5"; */
-	/* pushmethod_t pushmethod = PUSH_SIMPLE; */
-	pushmethod_t pushmethod = PUSH_FIELD;
-
-	if (pushmethod == PUSH_SIMPLE)
-	{
-		filename = "simple.h5";
-	} else if (pushmethod == PUSH_FIELD) {
-		filename = "field.h5";
-	} else {
-		filename = "output.h5";
-	}
-
-	filename = "gauss.h5";
-
-	std::cout << "Output file is: " << filename << std::endl;
-
-	int n_field_x          = 201;
-	int n_field_y          = 201;
-	int n_field_z          = 201;
-	double field_trans_wind = radius;
-
-	double sr = ionsim::sr(emit_n, E, n_p_cgs, m_ion_amu);
-	std::cout << "Sr: " << sr << std::endl;
-	double nb_0 = ionsim::nb_0(q_tot, sz, sr);
-
-	/* double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0); */
-	double n_cycles = 1./2.;
-	double z_end = n_cycles * 2*M_PI * sqrt(( 4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*sr*sr*sz*m_ion_amu*GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS*GSL_CONST_MKSA_SPEED_OF_LIGHT*GSL_CONST_MKSA_SPEED_OF_LIGHT) / (q_tot * GSL_CONST_MKSA_ELECTRON_CHARGE*GSL_CONST_MKSA_ELECTRON_CHARGE));
-
-	q_tot *= z_end / sz;
-	sz = z_end;
-
-	/* const SimParams simparams( */
-	/* 	E, */
-	/* 	emit_n, */
-	/* 	length, */
-	/* 	m_ion_amu, */
-	/* 	n_p_cgs, */
-	/* 	q_tot, */
-	/* 	radius, */
-	/* 	sz, */
-	/* 	sdelta, */
-	/* 	zdist, */
-	/* 	n_steps, */
-	/* 	pushmethod, */
-	/* 	n_e, */
-	/* 	n_field_x, */
-	/* 	n_field_y, */
-	/* 	n_field_z, */
-	/* 	field_trans_wind, */
-	/* 	z_end, */
-	/* 	n_ions, */
-	/* 	filename */
-	/* 	); */
-
-	const SimParams simparams(FLAGS_filename);
+	const SimParams simparams(FLAGS_file);
 
 	// ==============================
 	// Initialize fields
@@ -123,14 +52,14 @@ int master(bool verbose)
 	// Overwrite current file
 	// ==============================
 	WriterSerial *writer_s;
-	writer_s = new WriterSerial(filename, true);
+	writer_s = new WriterSerial(simparams.filename, true);
 	(*writer_s).write_attributes(simparams);
 	delete writer_s;
 
 	// ==============================
 	// Loop over electron evolution
 	// ==============================
-	for (int step=0; step < n_steps; step++)
+	for (int step=0; step < simparams.n_steps; step++)
 	{
 		// ==============================
 		// Allocate for this loop
@@ -153,7 +82,7 @@ int master(bool verbose)
 		// ==============================
 		// Write total field
 		// ==============================
-		writer_s = new WriterSerial(filename);
+		writer_s = new WriterSerial(simparams.filename);
 		writer_s->writedata(step, *field);
 		delete writer_s;
 
@@ -172,7 +101,7 @@ int master(bool verbose)
 		loopcomm.instruct(LOOP_DUMP_IONS);
 		loopcomm.send_slaves(step);
 		loopcomm.send_slaves(0);
-		for (int z_step=0; z_step < n_field_z; z_step++)
+		for (int z_step=0; z_step < simparams.n_field_z; z_step++)
 		{
 			std::cout << "Ion step: " << z_step << std::endl;
 			loopcomm.instruct(LOOP_PUSH_IONS);
