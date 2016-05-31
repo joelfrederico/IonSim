@@ -1,0 +1,30 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<config>
+	<Beam>
+		<E>                20.35                      </E>
+		<emit_n>           50e-6                      </emit_n>
+		<field_trans_wind> 2.4276628847185805e-06*3 </field_trans_wind>
+		<length>           100e-6                     </length>
+		<m_ion_amu>        1.00794                    </m_ion_amu>
+		<n_p_cgs>     	   1e17                       </n_p_cgs>
+		<q_tot>            2e10                       </q_tot>
+		<radius>           2.4276628847185805e-06*3   </radius>
+		<sdelta>           0.04                       </sdelta>
+		<sz>               30e-6                      </sz>
+		<z_end>            0.000239744 </z_end>
+
+		<n_field_x>        201 </n_field_x>
+		<n_field_y>        201 </n_field_y>
+		<n_field_z>        201 </n_field_z>
+		<n_steps>     	   1                          </n_steps>
+
+		<n_e>              1e6                        </n_e>
+		<n_ions>      	   1e4                        </n_ions>
+
+		<pushmethod>       Simple </pushmethod>
+		<zdist>            Gauss                      </zdist>
+		<filename>         field.h5                   </filename>
+	</Beam>
+	<Ions>
+	</Ions>
+</config>

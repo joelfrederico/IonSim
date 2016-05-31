@@ -1,5 +1,5 @@
 SUBDIRS = ioncheck iontest
-AM_CPPFLAGS=$(MYAM_CPPFLAGS)
+AM_CPPFLAGS=$(MYAM_CPPFLAGS) -DPKGDATADIR=\"$(pkgdatadir)\"
 
 bin_PROGRAMS = ionsim iontemp
 
@@ -27,6 +27,8 @@ ionsim_SOURCES = \
 		 writer_serial.cpp
 
 ionsim_LDADD = $(MYLDADD)
+
+pkgdata_DATA = ../data/config.xml
 
 iontemp_SOURCES = \
 		  pugixml/src/pugixml.cpp \

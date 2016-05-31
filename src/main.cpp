@@ -8,28 +8,20 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <gflags/gflags.h> // #include <google/gflags.h>
 
 const int INT_TAG = 1;
 
+DEFINE_bool(verbose, true, "Verbose");
+DEFINE_string(filename, "config.xml", "Configuration file");
+
 int main(int argc, char **argv)
 {
+	gflags::ParseCommandLineFlags(&argc, &argv, true);
+
 	int id, c;
-	bool verbose;
-
-	verbose = false;
-
-	while ((c = getopt (argc, argv, "v")) != -1)
-	{
-		switch (c)
-			{
-			case 'v':
-				verbose = true;
-				break;
-			default:
-				abort ();
-			}
-	}
-
+	bool verbose = FLAGS_verbose;
+	
 	// ==============================
 	// Initialize MPI
 	// ==============================

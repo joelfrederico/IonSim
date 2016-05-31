@@ -5,6 +5,10 @@
 #include "writer_serial.h"
 #include "loop_comm.h"
 #include "consts.h"
+#include "simparams.h"
+#include <gflags/gflags.h>
+
+DECLARE_string(filename);
 
 int master(bool verbose)
 {
@@ -78,28 +82,30 @@ int master(bool verbose)
 	q_tot *= z_end / sz;
 	sz = z_end;
 
-	const SimParams simparams(
-		E,
-		emit_n,
-		length,
-		m_ion_amu,
-		n_p_cgs,
-		q_tot,
-		radius,
-		sz,
-		sdelta,
-		zdist,
-		n_steps,
-		pushmethod,
-		n_e,
-		n_field_x,
-		n_field_y,
-		n_field_z,
-		field_trans_wind,
-		z_end,
-		n_ions,
-		filename
-		);
+	/* const SimParams simparams( */
+	/* 	E, */
+	/* 	emit_n, */
+	/* 	length, */
+	/* 	m_ion_amu, */
+	/* 	n_p_cgs, */
+	/* 	q_tot, */
+	/* 	radius, */
+	/* 	sz, */
+	/* 	sdelta, */
+	/* 	zdist, */
+	/* 	n_steps, */
+	/* 	pushmethod, */
+	/* 	n_e, */
+	/* 	n_field_x, */
+	/* 	n_field_y, */
+	/* 	n_field_z, */
+	/* 	field_trans_wind, */
+	/* 	z_end, */
+	/* 	n_ions, */
+	/* 	filename */
+	/* 	); */
+
+	const SimParams simparams(FLAGS_filename);
 
 	// ==============================
 	// Initialize fields
