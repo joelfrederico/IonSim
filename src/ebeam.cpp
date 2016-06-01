@@ -359,13 +359,13 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 		k = floor(z_e / dz);
 		
 
-		/* field.Ez_ind(k, k, 0) ++; */
-		/* field.Ez_ind(3, 3, 0) ++; */
-
-		/* field.Bz_ind(k, k, 0) ++; */
-		/* field.Bz_ind(3, 3, 0) ++; */
 		if ((0 < k) && (k < field.z_pts) )
 		{
+			field.Ez_ind(k, k, 0) ++;
+			field.Ez_ind(1, 3, 0) ++;
+
+			field.Bz_ind(k, k, 0) ++;
+			field.Bz_ind(1, 3, 0) ++;
 			for (int i=0; i < field.x_pts; i++)
 			{
 				dx = field.x_grid[i] - x_e;
@@ -382,10 +382,10 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 					temp_tran_B = temp_tran * common_B;
 
 					field.Ex_ind(i, j, k) += temp_tran_E * dx;
-					/* field.Ey_ind(i, j, k) += temp_tran_E * dy; */
+					field.Ey_ind(i, j, k) += temp_tran_E * dy;
 
-					/* field.Bx_ind(i, j, k) += -temp_tran_B * dy; */
-					/* field.By_ind(i, j, k) +=  temp_tran_B * dx; */
+					field.Bx_ind(i, j, k) += -temp_tran_B * dy;
+					field.By_ind(i, j, k) +=  temp_tran_B * dx;
 				}
 			}
 		}
