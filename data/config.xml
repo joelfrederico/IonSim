@@ -21,7 +21,7 @@
 		<q_tot>    2e10  </q_tot>
 		<sdelta>   0.04  </sdelta>
 		<sz>       30e-6 </sz>
-		<z_center> 30e-6 </z_center>
+		<z_center> 0     </z_center>
 		<zdist>    Gauss </zdist>
 	</Beam>
 	<Ions>

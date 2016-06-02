@@ -40,6 +40,7 @@ Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, doubl
 
 int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Cov z_cov)
 {
+	double z_temp;
 	double* rho_x;
 	double* rho_y;
 	double z_len;
@@ -78,7 +79,8 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 
 				break;
 			case Z_DIST_GAUSS:
-				gsl_ran_bivariate_gaussian(r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z[i], &zp[i]);
+				gsl_ran_bivariate_gaussian(r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z_temp, &zp[i]);
+				z[i] = z_temp + _simparams.z_center;
 				break;
 		}
 	}
