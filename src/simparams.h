@@ -15,7 +15,7 @@
 const int WIDTH = 20;
 
 template <class T>
-void getdata(pugi::xml_node node, std::string key, T &out)
+void getdata(pugi::xml_node node, std::string key, bool verbose, T &out)
 {
 	if (!node)
 	{
@@ -33,43 +33,21 @@ void getdata(pugi::xml_node node, std::string key, T &out)
 		}
 	}
 
-	std::cout << std::left << std::setw(WIDTH) << key << ": " << out << std::endl;
+	if (verbose) std::cout << std::left << std::setw(WIDTH) << key << ": " << out << std::endl;
 }
 
 class SimParams
 {
 	private:
-		int _init();
 		double *_dt;
+		int _init();
 
 	public:
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
 		SimParams(std::string filename);
-		SimParams(
-			double _E,
-			double _emit_n,
-			double _length,
-			double _m_ion_amu,
-			double _n_p_cgs,
-			double _q_tot,
-			double _radius,
-			double _sz,
-			double _sdelta,
-			zdist_t _zdist,
-			int _n_steps,
-			pushmethod_t _pushmethod,
-			long long _n_e,
-			int _n_field_x,
-			int _n_field_y,
-			int _n_field_z,
-			double _field_trans_wind,
-			double _z_end,
-			long long _n_ions,
-			std::string _filename
-			);
-
+		SimParams(std::string filename, bool verbose);
 		SimParams();
 		/* SimParams(const SimParams &obj); */
 		~SimParams();
@@ -97,34 +75,38 @@ class SimParams
 		}
 
 		// ==================================
-		// Data
+		// Config
 		// ==================================
-		double E;
-		double emit_n;
+		// - Generic
+		std::string filename;
+
+		// - Ion Window
 		double field_trans_wind;
-		double length;
-		double m_ion_amu;
-		double n_p_cgs;
-		double q_tot;
 		double radius;
-		double sdelta;
-		double sz;
 		double z_end;
 		int n_field_x;
 		int n_field_y;
 		int n_field_z;
-		int n_steps;
-		long long n_e;
-		long long n_ions;
 
-		pushmethod_t pushmethod;
-		std::string filename;
+		// - Electron sim
+		int n_steps;
+
+		// - Beam
+		double E;
+		double emit_n;
+		double q_tot;
+		double sdelta;
+		double sz;
+		double z_center;
+		long long n_e;
 		zdist_t zdist;
 
-		// ==================================
-		// Calculated Data
-		// ==================================
-		double gamma_rel;
+		// - Ions
+		double length;
+		double m_ion_amu;
+		double n_p_cgs;
+		long long n_ions;
+		pushmethod_t pushmethod;
 
 		// ==================================
 		// Data methods
@@ -132,6 +114,7 @@ class SimParams
 		int z_cov(double (&out)[2][2]);
 		double ion_mass() const;
 		double dt() const;
+		double gamma_rel() const;
 };
 
 #endif

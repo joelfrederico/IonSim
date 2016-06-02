@@ -10,18 +10,18 @@
 // ==================================
 // XML Loading
 // ==================================
-std::string getstr(pugi::xml_node node, std::string name)
+std::string getstr(pugi::xml_node node, std::string name, bool verbose)
 {
 	std::string text;
 	text = node.child(name.c_str()).text().as_string();
 
 	text.erase(std::remove_if(text.begin(), text.end(), ::isspace), text.end());
 
-	std::cout << std::left << std::setw(WIDTH) << name << ": " << text << std::endl;
+	if (verbose) std::cout << std::left << std::setw(WIDTH) << name << ": " << text << std::endl;
 	return text;
 }
 
-SimParams::SimParams(std::string xmlfile)
+int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 {
 	pugi::xml_text text;
 	std::string string;
@@ -31,110 +31,90 @@ SimParams::SimParams(std::string xmlfile)
 
 	if (!result) throw std::runtime_error("Couldn't load file: \"" + xmlfile+ "\"");
 
-	pugi::xml_node beam = doc.child("config").child("Beam");
-	pugi::xml_node ions = doc.child("config").child("Ions");
+	pugi::xml_node generic     = doc.child("config").child("Generic");
+	pugi::xml_node ionsim      = doc.child("config").child("IonSim");
+	pugi::xml_node electronsim = doc.child("config").child("ElectronSim");
+	pugi::xml_node beam        = doc.child("config").child("Beam");
+	pugi::xml_node ions        = doc.child("config").child("Ions");
 
-	getdata(beam, "E"         , E         ) ;
-	getdata(beam, "emit_n"    , emit_n    ) ;
-	getdata(beam, "length"    , length    ) ;
-	getdata(beam, "m_ion_amu" , m_ion_amu ) ;
-	getdata(beam, "n_p_cgs"   , n_p_cgs   ) ;
-	getdata(beam, "q_tot"     , q_tot     ) ;
-	getdata(beam, "radius"    , radius    ) ;
-	getdata(beam, "sz"        , sz        ) ;
-	getdata(beam, "sdelta"    , sdelta    ) ;
+	// ==================================
+	// Generic
+	// ==================================
+	simparams.filename = getstr(generic, "filename", verbose);
 
-	string = getstr(beam, "zdist");
+	// ==================================
+	// IonSim
+	// ==================================
+	getdata(ionsim , "field_trans_wind" , verbose , simparams.field_trans_wind );
+	getdata(ionsim , "radius"           , verbose , simparams.radius           );
+	getdata(ionsim , "n_field_x"        , verbose , simparams.n_field_x        );
+	getdata(ionsim , "n_field_y"        , verbose , simparams.n_field_y        );
+	getdata(ionsim , "n_field_z"        , verbose , simparams.n_field_z        );
+	getdata(ionsim , "z_end"            , verbose , simparams.z_end            );
+
+	// ==================================
+	// ElectronSim
+	// ==================================
+	getdata(electronsim, "n_steps", verbose, simparams.n_steps);
+	
+	// ==================================
+	// Beam
+	// ==================================
+	getdata(beam , "n_e"    , verbose , simparams.n_e    );
+	getdata(beam , "E"      , verbose , simparams.E      );
+	getdata(beam , "emit_n" , verbose , simparams.emit_n );
+	getdata(beam , "q_tot"  , verbose , simparams.q_tot  );
+	getdata(beam , "sz"     , verbose , simparams.sz     );
+	getdata(beam , "sdelta" , verbose , simparams.sdelta );
+
+	string = getstr(beam, "zdist", verbose);
 	if (string == "Gauss") {
-		zdist = Z_DIST_GAUSS;
+		simparams.zdist = Z_DIST_GAUSS;
 	} else if (string == "Flat") {
-		zdist = Z_DIST_FLAT;
+		simparams.zdist = Z_DIST_FLAT;
 	} else {
 		throw std::runtime_error ("Not a valid option for zdist:" + string);
 	}
 
-	getdata(beam, "n_steps", n_steps);
+	// ==================================
+	// Ions
+	// ==================================
+	getdata(ions , "n_ions"    , verbose , simparams.n_ions    );
+	getdata(ions , "length"    , verbose , simparams.length    );
+	getdata(ions , "m_ion_amu" , verbose , simparams.m_ion_amu );
+	getdata(ions , "n_p_cgs"   , verbose , simparams.n_p_cgs   );
 
-	string = getstr(beam, "pushmethod");
+	string = getstr(ions, "pushmethod", verbose);
 	if (string == "Simple") {
-		pushmethod = PUSH_SIMPLE;
+		simparams.pushmethod = PUSH_SIMPLE;
 	} else if (string == "Field") {
-		pushmethod = PUSH_FIELD;
+		simparams.pushmethod = PUSH_FIELD;
 	} else if (string == "RungeKutta") {
-		pushmethod = PUSH_RUNGE_KUTTA;
+		simparams.pushmethod = PUSH_RUNGE_KUTTA;
 	} else {
 		throw std::runtime_error ("Not a valid option for zdist:" + string);
 	}
+}
 
-	getdata(beam, "n_e", n_e);
-	getdata(beam, "n_ions", n_ions);
-	getdata(beam, "n_field_x", n_field_x);
-	getdata(beam, "n_field_y", n_field_y);
-	getdata(beam, "n_field_z", n_field_z);
-	getdata(beam, "field_trans_wind", field_trans_wind);
-	getdata(beam, "z_end", z_end);
+SimParams::SimParams(std::string xmlfile, bool verbose)
+{
+	_register_file(*this, xmlfile, verbose);
+}
 
-	filename = getstr(beam, "filename");
+SimParams::SimParams(std::string xmlfile)
+{
+	_register_file(*this, xmlfile, true);
 }
 
 // ==================================
 // Constructors, Destructor
 // ==================================
-SimParams::SimParams(
-	double _E,
-	double _emit_n,
-	double _length,
-	double _m_ion_amu,
-	double _n_p_cgs,
-	double _q_tot,
-	double _radius,
-	double _sz,
-	double _sdelta,
-	zdist_t _zdist,
-	int _n_steps,
-	pushmethod_t _pushmethod,
-	long long _n_e,
-	int _n_field_x,
-	int _n_field_y,
-	int _n_field_z,
-	double _field_trans_wind,
-	double _z_end,
-	long long _n_ions,
-	std::string _filename
-	)
-{
-	E                = _E;
-	emit_n           = _emit_n;
-	length           = _length;
-	m_ion_amu        = _m_ion_amu;
-	n_p_cgs          = _n_p_cgs;
-	q_tot            = _q_tot;
-	radius           = _radius;
-	sz               = _sz;
-	sdelta           = _sdelta;
-	zdist            = _zdist;
-	n_steps          = _n_steps;
-	pushmethod       = _pushmethod;
-	n_e              = _n_e;
-	n_field_x        = _n_field_x;
-	n_field_y        = _n_field_y;
-	n_field_z        = _n_field_z;
-	field_trans_wind = _field_trans_wind;
-	z_end            = _z_end;
-	n_ions           = _n_ions;
-	filename         = _filename;
-
-	_init();
-}
-
 SimParams::SimParams()
 {
-	_init();
 }
 
 int SimParams::_init()
 {
-	gamma_rel = ionsim::GeV2gamma(E);
 	return 0;
 }
 
@@ -248,4 +228,9 @@ double SimParams::dt() const
 	}
 
 	return *_dt;
+}
+
+double SimParams::gamma_rel() const
+{
+	return ionsim::GeV2gamma(E);
 }

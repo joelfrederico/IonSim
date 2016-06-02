@@ -9,7 +9,6 @@
 #include <gsl/gsl_sf_exp.h>
 #include <gsl/gsl_sf_erf.h>
 #include "support_func.h"
-#include <sstream>
 #include "field_data.h"
 #include "consts.h"
 #include <math.h>
@@ -295,7 +294,7 @@ int Ebeam::field_Coulomb(Field_Data &field)
 	double x_e, y_e, z_e;
 
 	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
-	const double common_tran = common_para * _simparams.gamma_rel;
+	const double common_tran = common_para * _simparams.gamma_rel();
 	double temp_para, temp_tran;
 
 	for (int n=0; n < n_pts; n++) {

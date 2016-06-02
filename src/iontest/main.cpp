@@ -83,6 +83,8 @@ void read_ion(hid_t step_group_id, std::string dataset)
 
 int main(int argc, char **argv)
 {
+	std::cout << argv[0] << std::endl;
+	return 0;
 	const char *filename;
 
 	// ==================================
@@ -117,68 +119,47 @@ int main(int argc, char **argv)
 	// ==============================
 	// Generate beam
 	// ==============================
-	long n_e                = 1e6;
-	long n_ions             = 1e4;
-	double q_tot            = 2e10;
-	double radius           = 2.4276628847185805e-06;
-	double sz               = 30e-6;
-	double length           = 100e-6;
-	double E                = 20.35;
-	double emit_n           = 50e-6;
-	double n_p_cgs          = 1e17;
-	double m_ion_amu        = 1.00794;
-	double sdelta           = 0.04;
-	zdist_t zdist           = Z_DIST_FLAT;
-	int n_steps             = 1;
-	/* std::string filename    = "output.h5"; */
-	pushmethod_t pushmethod = PUSH_SIMPLE;
-	/* pushmethod_t pushmethod = PUSH_FIELD; */
+	SimParams simtemp;
+	simtemp.n_e        = 1e6;
+	simtemp.n_ions     = 1e4;
+	simtemp.q_tot      = 2e10;
+	simtemp.radius     = 2.4276628847185805e-06;
+	simtemp.sz         = 30e-6;
+	simtemp.length     = 100e-6;
+	simtemp.E          = 20.35;
+	simtemp.emit_n     = 50e-6;
+	simtemp.n_p_cgs    = 1e17;
+	simtemp.m_ion_amu  = 1.00794;
+	simtemp.sdelta     = 0.04;
+	simtemp.zdist      = Z_DIST_FLAT;
+	simtemp.n_steps    = 1;
+	simtemp.pushmethod = PUSH_SIMPLE;
+	/* simtemp.pushmethod = PUSH_FIELD; */
 
-	if (pushmethod == PUSH_SIMPLE)
+	if (simtemp.pushmethod == PUSH_SIMPLE)
 	{
-		filename = "simple.h5";
-	} else if (pushmethod == PUSH_FIELD) {
-		filename = "field.h5";
+		simtemp.filename = "simple.h5";
+	} else if (simtemp.pushmethod == PUSH_FIELD) {
+		simtemp.filename = "field.h5";
 	} else {
-		filename = "output.h5";
+		simtemp.filename = "output.h5";
 	}
 
-	long n_field_x          = 101;
-	long n_field_y          = 101;
-	long n_field_z          = 51;
-	double field_trans_wind = radius;
+	simtemp.n_field_x        = 101;
+	simtemp.n_field_y        = 101;
+	simtemp.n_field_z        = 51;
+	simtemp.field_trans_wind = simtemp.radius;
 
-	double sr = ionsim::sr(emit_n, E, n_p_cgs, m_ion_amu);
+	double sr = ionsim::sr(simtemp.emit_n, simtemp.E, simtemp.n_p_cgs, simtemp.m_ion_amu);
 	std::cout << "Sr: " << sr << std::endl;
-	double nb_0 = ionsim::nb_0(q_tot, sz, sr);
+	double nb_0 = ionsim::nb_0(simtemp.q_tot, simtemp.sz, sr);
 
-	double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0);
+	double z_end = (11.1367*GSL_CONST_MKSA_SPEED_OF_LIGHT / GSL_CONST_MKSA_ELECTRON_CHARGE) * sqrt(GSL_CONST_MKSA_VACUUM_PERMITTIVITY * simtemp.m_ion_amu * GSL_CONST_MKSA_UNIFIED_ATOMIC_MASS / nb_0);
 
-	q_tot *= z_end / sz;
-	sz = z_end;
+	simtemp.q_tot *= simtemp.z_end / simtemp.sz;
+	simtemp.sz = z_end;
 
-	const SimParams simparams(
-		E,
-		emit_n,
-		length,
-		m_ion_amu,
-		n_p_cgs,
-		q_tot,
-		radius,
-		sz,
-		sdelta,
-		zdist,
-		n_steps,
-		pushmethod,
-		n_e,
-		n_field_x,
-		n_field_y,
-		n_field_z,
-		field_trans_wind,
-		z_end,
-		n_ions,
-		filename
-		);
+	const SimParams simparams = simtemp;
 	std::cout << "F_r: " << F_r(2e-6, 0.0, simparams) << std::endl;
 
 	// ==================================
