@@ -10,8 +10,6 @@ class SimparamsTest : public :: testing::Test
 
 	public:
 		SimParams simparams;
-
-		SimparamsTest();
 };
 
 #endif
