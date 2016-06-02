@@ -18,6 +18,7 @@ std::string getstr(pugi::xml_node node, std::string name, bool verbose)
 	text.erase(std::remove_if(text.begin(), text.end(), ::isspace), text.end());
 
 	if (verbose) std::cout << std::left << std::setw(WIDTH) << name << ": " << text << std::endl;
+
 	return text;
 }
 
@@ -60,12 +61,13 @@ int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 	// ==================================
 	// Beam
 	// ==================================
-	getdata(beam , "n_e"    , verbose , simparams.n_e    );
-	getdata(beam , "E"      , verbose , simparams.E      );
-	getdata(beam , "emit_n" , verbose , simparams.emit_n );
-	getdata(beam , "q_tot"  , verbose , simparams.q_tot  );
-	getdata(beam , "sz"     , verbose , simparams.sz     );
-	getdata(beam , "sdelta" , verbose , simparams.sdelta );
+	getdata(beam , "n_e"      , verbose , simparams.n_e      );
+	getdata(beam , "E"        , verbose , simparams.E        );
+	getdata(beam , "emit_n"   , verbose , simparams.emit_n   );
+	getdata(beam , "q_tot"    , verbose , simparams.q_tot    );
+	getdata(beam , "sz"       , verbose , simparams.sz       );
+	getdata(beam , "z_center" , verbose , simparams.z_center );
+	getdata(beam , "sdelta"   , verbose , simparams.sdelta   );
 
 	string = getstr(beam, "zdist", verbose);
 	if (string == "Gauss") {
@@ -140,6 +142,7 @@ int SimParams::bcast_send() const
 	bcast_send_wrap(n_p_cgs          );
 	bcast_send_wrap(m_ion_amu        );
 	bcast_send_wrap(sz               );
+	bcast_send_wrap(z_center         );
 	bcast_send_wrap(sdelta           );
 	bcast_send_wrap(zdist            );
 	bcast_send_wrap(n_steps          );
@@ -178,6 +181,7 @@ int SimParams::bcast_receive()
 	MPI_Bcast(&n_p_cgs          , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&m_ion_amu        , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&sz               , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&z_center         , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&sdelta           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&zdist            , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_steps          , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
