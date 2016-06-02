@@ -12,50 +12,78 @@
 #include "simparams.h"
 #include "loop_comm.h"
 
-// ==============================
+// ===================================
 // Ions
-// ==============================
-Ions::Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius, double length) : Parts(*simparams, PARTS_ION), _simparams(simparams)
+// ===================================
+Ions::Ions(const SimParams *simparams, Plasma &plasma) : Parts(*simparams, PARTS_ION), _simparams(simparams)
 {
-	_plasma      = &plasma;
-	_radius      = radius;
-	/* printf("Received radius is: %0.6e\n", _radius); */
-	/* printf("Received mass is: %0.6e\n", simparams.ion_mass()); */
-
-	_part_charge = plasma.n_p() * length * M_PI * pow(radius, 2) * GSL_CONST_MKSA_ELECTRON_CHARGE;
-
+	// ===================================
+	// Init variables
+	// ===================================
 	bool keep_looking;
-
 	const gsl_rng_type * T;
 	gsl_rng * r;
+	int i_start          = 0;
+	bool custom_particle = false;
 
+	// ===================================
+	// Store config info
+	// ===================================
+	_plasma      = &plasma;
+	_radius      = simparams->radius;
+
+	// ===================================
+	// Set up random number generator env
+	// ===================================
+	// Reads env vars and sets lib vars
 	gsl_rng_env_setup();
 
+	// ===================================
+	// Set up random number generator
+	// ===================================
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
 
-	x[0]  = 2e-6;
-	xp[0] = 0;
-	y[0]  = 0;
-	yp[0] = 0;
-	z[0]  = 0;
-	zp[0] = 0;
-
-	for (int i=1; i < n_pts; i++)
-	/* for (int i=0; i < n_pts; i++) */
+	// ===================================
+	// Inject custom particle for
+	// debugging
+	// ===================================
+	i_start = 0;
+	custom_particle = true;
+	if (custom_particle)
 	{
+		x[0]  = 2e-6;
+		xp[0] = 0;
+		y[0]  = 0;
+		yp[0] = 0;
+		z[0]  = 0;
+		zp[0] = 0;
+
+		i_start = 1;
+	}
+
+	// ===================================
+	// Generate ions
+	// ===================================
+	for (int i=i_start; i < n_pts; i++)
+	{
+		// ===================================
+		// Only accept ions inside radius
+		// ===================================
 		keep_looking = true;
 		while (keep_looking)
 		{
-			x[i]     = gsl_ran_flat(r, -radius, radius);
-			y[i]     = gsl_ran_flat(r, -radius, radius);
-			if ((pow(x[i], 2.0) + pow(y[i], 2.0)) < pow(radius, 2.0))
+			x[i]     = gsl_ran_flat(r, -_radius, _radius);
+			y[i]     = gsl_ran_flat(r, -_radius, _radius);
+			if ((x[i]*x[i] + y[i]*y[i]) < (_radius*_radius))
 			{
 				keep_looking = false;
-				if (x[i] > radius) printf("Radius: %0.6e", x[i]);
 			}
 		}
-		/* z[i]  = gsl_ran_flat(r, 0, length); */
+
+		// ===================================
+		// All motion to zero; z meaningless
+		// ===================================
 		z[i] = 0;
 		xp[i] = 0;
 		yp[i] = 0;

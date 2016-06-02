@@ -13,13 +13,12 @@ class Ions : public Parts
 {
 	private:
 		double _radius;
-		double _part_charge;
 		const SimParams *_simparams;
 
 		Plasma * _plasma;
 
 	public:
-		Ions(const SimParams *simparams, Plasma &plasma, int n_pts, double radius, double length);
+		Ions(const SimParams *simparams, Plasma &plasma);
 
 		int push(double nb_0, double sig_r);
 		int push_simple(double nb_0, double sig_r);

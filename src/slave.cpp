@@ -82,7 +82,7 @@ int slave(bool verbose)
 	// ==================================
 	// Generate ions
 	// ==================================
-	Ions ions(&simparams, plas, simparams.n_ions, simparams.radius, simparams.length);
+	Ions ions(&simparams, plas);
 
 	// ==================================
 	// Slave loop

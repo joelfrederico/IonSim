@@ -13,7 +13,6 @@ SimParams simparams_gen()
 	simparams.q_tot      = 2e10;
 	simparams.radius     = 2.4276628847185805e-06;
 	simparams.sz         = 30e-6;
-	simparams.length     = 100e-6;
 	simparams.E          = 20.35;
 	simparams.emit_n     = 50e-6;
 	simparams.n_p_cgs    = 1e17;

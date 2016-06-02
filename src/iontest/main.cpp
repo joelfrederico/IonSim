@@ -125,7 +125,6 @@ int main(int argc, char **argv)
 	simtemp.q_tot      = 2e10;
 	simtemp.radius     = 2.4276628847185805e-06;
 	simtemp.sz         = 30e-6;
-	simtemp.length     = 100e-6;
 	simtemp.E          = 20.35;
 	simtemp.emit_n     = 50e-6;
 	simtemp.n_p_cgs    = 1e17;

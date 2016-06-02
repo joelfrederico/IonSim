@@ -82,7 +82,6 @@ int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 	// Ions
 	// ==================================
 	getdata(ions , "n_ions"    , verbose , simparams.n_ions    );
-	getdata(ions , "length"    , verbose , simparams.length    );
 	getdata(ions , "m_ion_amu" , verbose , simparams.m_ion_amu );
 	getdata(ions , "n_p_cgs"   , verbose , simparams.n_p_cgs   );
 
@@ -136,7 +135,6 @@ int SimParams::bcast_send() const
 	bcast_send_wrap(n_ions           );
 	bcast_send_wrap(q_tot            );
 	bcast_send_wrap(radius           );
-	bcast_send_wrap(length           );
 	bcast_send_wrap(E                );
 	bcast_send_wrap(emit_n           );
 	bcast_send_wrap(n_p_cgs          );
@@ -175,7 +173,6 @@ int SimParams::bcast_receive()
 	MPI_Bcast(&n_ions           , 1 , MPI_LONG_LONG , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&q_tot            , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&radius           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&length           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&E                , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&emit_n           , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_p_cgs          , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);

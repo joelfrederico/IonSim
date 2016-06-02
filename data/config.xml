@@ -26,7 +26,6 @@
 	</Beam>
 	<Ions>
 		<n_ions>     1e4     </n_ions>
-		<length>     100e-6  </length>
 		<m_ion_amu>  1.00794 </m_ion_amu>
 		<n_p_cgs>    1e17    </n_p_cgs>
 		<pushmethod> Field   </pushmethod>

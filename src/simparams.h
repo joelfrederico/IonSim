@@ -102,7 +102,6 @@ class SimParams
 		zdist_t zdist;
 
 		// - Ions
-		double length;
 		double m_ion_amu;
 		double n_p_cgs;
 		long long n_ions;
