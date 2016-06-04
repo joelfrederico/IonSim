@@ -9,8 +9,9 @@
 #include <gflags/gflags.h>
 
 DECLARE_string(file);
+DECLARE_bool(verbose);
 
-int master(bool verbose)
+int master()
 {
 	// ==============================
 	// Starting gun
@@ -18,7 +19,7 @@ int master(bool verbose)
 	LoopComm loopcomm;
 	MPI_Status status;
 
-	if (verbose) printf("Master says: I am the MASTER!\n");
+	if (FLAGS_verbose) printf("Master says: I am the MASTER!\n");
 	for (int slave_id=1; slave_id < loopcomm.p; slave_id++)
 	{
 		MPI_Send(&slave_id, 1, MPI_INT, slave_id, slave_id*2, MPI_COMM_WORLD);

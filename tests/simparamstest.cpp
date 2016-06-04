@@ -3,6 +3,12 @@
 #include <string.h>
 #include "support.h"
 
+SimparamsTest::SimparamsTest()
+{
+	xmlfile = PKGDATADIR;
+	xmlfile += "/config.xml";
+}
+
 TEST_F(SimparamsTest, dt)
 {
 	simparams = simparams_gen();
@@ -17,6 +23,13 @@ TEST_F(SimparamsTest, ion_mass)
 
 TEST_F(SimparamsTest, LoadXML)
 {
-	std::string file = PKGDATADIR;
-	simparams = SimParams(file + "/config.xml", false);
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(xmlfile.c_str());
+
+	ASSERT_TRUE(result) << "File could not be loaded.";
+}
+
+TEST_F(SimparamsTest, ParseXML)
+{
+	simparams = SimParams(xmlfile, false);
 }

@@ -18,10 +18,10 @@ long long calc_n_pts(const SimParams &simparams, const parttype_t type)
 	switch (type)
 	{
 		case PARTS_ION:
-			return simparams.n_ions;
+			return simparams.n_ions_node();
 			break;
 		case PARTS_E:
-			return simparams.n_e;
+			return simparams.n_e_node();
 			break;
 	}
 	return 0;

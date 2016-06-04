@@ -19,7 +19,7 @@ void getdata(pugi::xml_node node, std::string key, bool verbose, T &out)
 {
 	if (!node)
 	{
-		throw std::runtime_error("Xml doesn't exist, suspect invalid config file");
+		throw std::runtime_error("XML doesn't exist, suspect invalid config file. Key: " + key);
 	} else {
 		pugi::xml_text text = node.child(key.c_str()).text();
 		if (typeid(out) == typeid(double)) {
@@ -114,6 +114,10 @@ class SimParams
 		double ion_mass() const;
 		double dt() const;
 		double gamma_rel() const;
+		double dz() const;
+		long long n_e_node() const;
+		long long n_ions_node() const;
+		double qpp_e() const;
 };
 
 #endif

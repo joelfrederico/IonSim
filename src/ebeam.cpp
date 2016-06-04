@@ -1,19 +1,23 @@
-#include <iomanip>
-#include "ebeam.h"
-#include <mpi.h>
 #include "beam.h"
-#include <gsl/gsl_const_mksa.h>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_statistics_double.h>
-#include <gsl/gsl_sf_exp.h>
-#include <gsl/gsl_sf_erf.h>
-#include "support_func.h"
-#include "field_data.h"
 #include "consts.h"
-#include <math.h>
-#include "simparams.h"
+#include "ebeam.h"
 #include "faddeeva/Faddeeva.hh"
+#include "field_data.h"
+#include "gsl_classes.h"
+#include "simparams.h"
+#include "support_func.h"
+#include <gsl/gsl_const_mksa.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_sf_erf.h>
+#include <gsl/gsl_sf_exp.h>
+#include <gsl/gsl_statistics_double.h>
+#include <iomanip>
+#include <math.h>
+#include <mpi.h>
+#include <gflags/gflags.h>
+
+DECLARE_bool(verbose);
 
 Cov z_cov(SimParams simparams)
 {
@@ -28,67 +32,76 @@ Cov z_cov(SimParams simparams)
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams), _x_cov(x_beam.cov()), _y_cov(y_beam.cov()), _z_cov(z_cov(simparams))
+Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), _simparams(simparams), _x_cov(x_beam.cov()), _y_cov(y_beam.cov()), _z_cov(z_cov(simparams))
 {
 	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
 }
 
-Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s) : Parts(simparams, PARTS_E), qpp(simparams.q_tot/n_pts), _simparams(simparams), _x_cov(sx*sx, 0, 0, syp*syp), _y_cov(sy*sy, 0, 0, syp*syp), _z_cov(z_cov(simparams))
+Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s) : Parts(simparams, PARTS_E), _simparams(simparams), _x_cov(sx*sx, 0, 0, syp*syp), _y_cov(sy*sy, 0, 0, syp*syp), _z_cov(z_cov(simparams))
 {
 	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
 }
 
 int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Cov z_cov)
 {
+	int status;
 	double z_temp;
 	double* rho_x;
 	double* rho_y;
 	double z_len;
+	int n_e_node;
 	// ==================================
 	// Set random number generator
 	// ==================================
-	gsl_rng * r = gsl_rng_alloc(gsl_rng_mt19937);
+	GSLrng rng(s);
 	
-	// ==================================
-	// Set random number generator seed
-	// ==================================
-	gsl_rng_set(r, s);
-
 	// ==================================
 	// Create particles randomly
 	// ==================================
 	rho_x = &x_cov(0, 1);
 	rho_y = &y_cov(0, 1);
 
-	for (int i=0; i < n_pts; i++)
+	n_e_node = _simparams.n_e_node();
+	if (FLAGS_verbose) std::cout << "Creating n_pts: " << n_e_node << std::endl;
+
+	for (int i=0; i < n_e_node; i++)
 	{
 
-		gsl_ran_bivariate_gaussian(r , sqrt(x_cov(0, 0)) , sqrt(x_cov(1, 1)) , *rho_x , &x[i] , &xp[i]);
-		gsl_ran_bivariate_gaussian(r , sqrt(y_cov(0, 0)) , sqrt(y_cov(1, 1)) , *rho_y , &y[i] , &yp[i]);
+		gsl_ran_bivariate_gaussian(rng.r , sqrt(x_cov(0, 0)) , sqrt(x_cov(1, 1)) , *rho_x , &x[i] , &xp[i]);
+		gsl_ran_bivariate_gaussian(rng.r , sqrt(y_cov(0, 0)) , sqrt(y_cov(1, 1)) , *rho_y , &y[i] , &yp[i]);
 		
 		switch (_simparams.zdist)
 		{
 			case Z_DIST_FLAT:
 				z_len = _simparams.sz;
 
-				z[i] = gsl_ran_flat(r, 0, z_len);
-				zp[i] = gsl_ran_gaussian(r, z_len);
-
-				srsq = x_cov(0, 0);
-				n_resolve = -(_simparams.n_e) / (pow(2*M_PI, 1.5) * srsq * z_len * gsl_sf_expm1(-4.5));
+				z[i] = gsl_ran_flat(rng.r, 0, _simparams.sz);
 
 				break;
+
 			case Z_DIST_GAUSS:
-				gsl_ran_bivariate_gaussian(r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z_temp, &zp[i]);
+				gsl_ran_bivariate_gaussian(rng.r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z_temp, &zp[i]);
 				z[i] = z_temp + _simparams.z_center;
+
 				break;
 		}
+
+		zp[i] = gsl_ran_gaussian(rng.r, _simparams.sdelta);
 	}
 
 	// ==================================
-	// Free memory
+	// Set resolution
 	// ==================================
-	gsl_rng_free(r);
+
+	if (verbose())
+	{
+		std::cout << "=========================================" << std::endl;
+		std::cout << "Ebeam Calculated"                          << std::endl;
+		std::cout << "-----------------------------------------" << std::endl;
+		std::cout << "n_0: "       << n_0()                      << std::endl;
+		std::cout << "n_resolve: " << n_resolve()                << std::endl;
+		std::cout << "=========================================" << std::endl;
+	}
 	return 0;
 }
 
@@ -102,7 +115,7 @@ Ebeam::Ebeam(
  		double_vec yp_in,
  		double_vec z_in,
  		double_vec zp_in
-		) : Parts(simparams.ion_mass(), n_pts, type), qpp(simparams.q_tot/n_pts), _simparams(simparams)
+		) : Parts(simparams.ion_mass(), simparams.n_e_node(), type), _simparams(simparams)
 {
 	x  = x_in;
 	xp = xp_in;
@@ -231,7 +244,7 @@ int Ebeam::field_BE(Field_Data &field)
 
 	var_x_minus_var_y = var_x-var_y;
 	if (var_x_minus_var_y/var_x == 0) std::cout << "Using symmetric fields" << std::endl;
-	temp = qpp*n_pts * GSL_CONST_MKSA_ELECTRON_CHARGE/GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
+	temp = _simparams.qpp_e()*n_pts * GSL_CONST_MKSA_ELECTRON_CHARGE/GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
 
 	int k = 0;
 
@@ -295,7 +308,7 @@ int Ebeam::field_Coulomb(Field_Data &field)
 	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 
-	const double common_para = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
+	const double common_para = _simparams.qpp_e()*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*GSL_CONST_MKSA_VACUUM_PERMITTIVITY);
 	const double common_tran = common_para * _simparams.gamma_rel();
 	double temp_para, temp_tran;
 
@@ -331,19 +344,24 @@ int Ebeam::field_Coulomb(Field_Data &field)
 
 int Ebeam::field_Coulomb_sliced(Field_Data &field)
 {
-	double dx, dy, dz;
+	double dx, dy;
 	double drsq, dr, dr52;
 	double x_e, y_e, z_e;
 	int k;
+	double sr_m;
 	double srsq_macro;
+	const double dz = _simparams.dz();
 
-	dz = _simparams.z_end / field.z_pts;
+	/* dz = _simparams.z_end / field.z_pts; */
 
-	sr_macro   = 0.23475 / sqrt(n_resolve * dz);
+	/* sr_macro   = 0.23475 / sqrt(n_resolve * dz); */
+	double n_resolve_surface = n_resolve() * dz;
+	/* sr_macro   = 2.95 / (4*M_PI*sqrt(n_resolve_surface)); */
+	sr_m = sr_macro();
 
-	srsq_macro = sr_macro * sr_macro;
+	srsq_macro = sr_m*sr_m;
 
-	const double common   = qpp*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro);
+	const double common   = _simparams.qpp_e()*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro);
 
 	const double common_E = common / GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
 	const double common_B = common * GSL_CONST_MKSA_SPEED_OF_LIGHT * GSL_CONST_MKSA_VACUUM_PERMEABILITY;
@@ -358,7 +376,6 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 		z_e = z[n];
 
 		k = floor(z_e / dz);
-		
 
 		if ((0 < k) && (k < field.z_pts) )
 		{
@@ -367,6 +384,7 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 
 			field.Bz_ind(k, k, 0) ++;
 			field.Bz_ind(1, 3, 0) ++;
+
 			for (int i=0; i < field.x_pts; i++)
 			{
 				dx = field.x_grid[i] - x_e;
@@ -394,4 +412,71 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 
 
 	return 0;
+}
+
+int _calc_n_0_n_resolve(Cov x_cov, SimParams _simparams, double &n_0, double &n_resolve)
+{
+	int status;
+	double srsq = x_cov(0, 0);
+
+	switch (_simparams.zdist)
+	{
+		case Z_DIST_FLAT:
+			n_0 = (_simparams.n_e) / (M_PI * srsq * _simparams.sz);
+			n_resolve = n_0;
+			/* n_resolve = -(_simparams.n_e) / (pow(2*M_PI, 1.5) * srsq * z_len * gsl_sf_expm1(-4.5)); */
+
+			break;
+
+		case Z_DIST_GAUSS:
+			gsl_sf_result result;
+			n_0 = (_simparams.n_e) / (pow(2*M_PI, 1.5) * srsq * _simparams.sz);
+			/* n_resolve = gsl_sf_exp_mult(-4.5, n_0); */
+			status = gsl_sf_exp_mult_e(-4.5, n_0, &result);
+
+			if (status != GSL_SUCCESS)
+			{
+				std::cout << "Exp_mult_e error. n_0: " << n_0 << std::endl;
+				return -1;
+			}
+
+			break;
+	}
+
+	return 0;
+}
+
+double Ebeam::n_0() const
+{
+	double n_0, n_resolve;
+	_calc_n_0_n_resolve(_x_cov, _simparams, n_0, n_resolve);
+	return n_0;
+}
+
+double Ebeam::n_resolve() const
+{
+	double n_0, n_resolve;
+	_calc_n_0_n_resolve(_x_cov, _simparams, n_0, n_resolve);
+	return n_resolve;
+}
+
+double Ebeam::sr_macro() const
+{
+	return 0.2347535410605456 / sqrt(n_0() * _simparams.dz());
+}
+
+bool Ebeam::verbose()
+{
+	int id;
+	bool out;
+
+	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+	if (FLAGS_verbose && (id == 1))
+	{
+		out = true;
+	} else {
+		out = false;
+	}
+
+	return out;
 }

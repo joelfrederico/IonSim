@@ -110,11 +110,11 @@ am_ionsim_OBJECTS = faddeeva/Faddeeva.$(OBJEXT) \
 	pugixml/src/pugixml.$(OBJEXT) beam.$(OBJEXT) consts.$(OBJEXT) \
 	ebeam.$(OBJEXT) emit.$(OBJEXT) field_comm.$(OBJEXT) \
 	field_data.$(OBJEXT) field_interp.$(OBJEXT) \
-	hdf5_classes.$(OBJEXT) ions.$(OBJEXT) loop_comm.$(OBJEXT) \
-	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
-	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
-	writer_base.$(OBJEXT) writer_parallel.$(OBJEXT) \
-	writer_serial.$(OBJEXT)
+	gsl_classes.$(OBJEXT) hdf5_classes.$(OBJEXT) ions.$(OBJEXT) \
+	loop_comm.$(OBJEXT) main.$(OBJEXT) master.$(OBJEXT) \
+	parts.$(OBJEXT) simparams.$(OBJEXT) slave.$(OBJEXT) \
+	support_func.$(OBJEXT) writer_base.$(OBJEXT) \
+	writer_parallel.$(OBJEXT) writer_serial.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -412,6 +412,7 @@ ionsim_SOURCES = \
 		 field_comm.cpp          \
 		 field_data.cpp          \
 		 field_interp.cpp        \
+		 gsl_classes.cpp         \
 		 hdf5_classes.cpp        \
 		 ions.cpp                \
 		 loop_comm.cpp           \
@@ -558,6 +559,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_interp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsl_classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hdf5_classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iontemp.Po@am__quote@

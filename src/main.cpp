@@ -38,9 +38,9 @@ int main(int argc, char **argv)
 	// Simulate things
 	// ==============================
 	if (id == 0) {
-		master(verbose);
+		master();
 	} else {
-		slave(verbose);
+		slave();
 	}
 
 	MPI_Barrier(MPI_COMM_WORLD);

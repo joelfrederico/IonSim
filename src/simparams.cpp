@@ -32,6 +32,13 @@ int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 
 	if (!result) throw std::runtime_error("Couldn't load file: \"" + xmlfile+ "\"");
 
+	if (verbose)
+	{
+		std::cout << "=========================================" << std::endl;
+		std::cout << "Config file loaded" << std::endl;
+		std::cout << "-----------------------------------------" << std::endl;
+	}
+
 	pugi::xml_node generic     = doc.child("config").child("Generic");
 	pugi::xml_node ionsim      = doc.child("config").child("IonSim");
 	pugi::xml_node electronsim = doc.child("config").child("ElectronSim");
@@ -95,6 +102,13 @@ int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 	} else {
 		throw std::runtime_error ("Not a valid option for zdist:" + string);
 	}
+
+	if (verbose)
+	{
+		std::cout << "=========================================" << std::endl;
+	}
+
+	return 0;
 }
 
 SimParams::SimParams(std::string xmlfile, bool verbose)
@@ -221,7 +235,7 @@ double SimParams::ion_mass() const
 
 double SimParams::dt() const
 {
-	return ( z_end / ((n_field_z-1) * GSL_CONST_MKSA_SPEED_OF_LIGHT) );
+	return dz() / GSL_CONST_MKSA_SPEED_OF_LIGHT;
 	return 0;
 	if (*_dt == -1)
 	{
@@ -231,7 +245,33 @@ double SimParams::dt() const
 	return *_dt;
 }
 
+double SimParams::dz() const
+{
+	return z_end / (n_field_z-1);
+}
+
 double SimParams::gamma_rel() const
 {
 	return ionsim::GeV2gamma(E);
+}
+
+long long SimParams::n_e_node() const
+{
+	int p;
+	MPI_Comm_size(MPI_COMM_WORLD, &p);
+	return n_e / (p-1);
+}
+
+long long SimParams::n_ions_node() const
+{
+	int p;
+	double out;
+	MPI_Comm_size(MPI_COMM_WORLD, &p);
+	out = n_ions / (p-1);
+	return out;
+}
+
+double SimParams::qpp_e() const
+{
+	return q_tot / n_e;
 }

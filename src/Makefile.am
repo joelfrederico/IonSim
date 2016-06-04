@@ -13,6 +13,7 @@ ionsim_SOURCES = \
 		 field_comm.cpp          \
 		 field_data.cpp          \
 		 field_interp.cpp        \
+		 gsl_classes.cpp         \
 		 hdf5_classes.cpp        \
 		 ions.cpp                \
 		 loop_comm.cpp           \

@@ -12,8 +12,11 @@
 #include "consts.h"
 #include <sstream>
 #include <iomanip>
+#include <gflags/gflags.h>
 
-int slave(bool verbose)
+DECLARE_bool(verbose);
+
+int slave()
 {
 	std::stringstream streamme;
 	std::string subgroup;
@@ -29,7 +32,7 @@ int slave(bool verbose)
 	MPI_Status status;
 
 	MPI_Recv(&buf, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-	if (verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
+	if (FLAGS_verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
@@ -46,8 +49,8 @@ int slave(bool verbose)
 	// Recalculate to distribute
 	// simulation across nodes
 	// ==================================
-	simparams_temp.n_e    /= (loopcomm.p-1);
-	simparams_temp.n_ions /= (loopcomm.p-1);
+	/* simparams_temp.n_e    /= (loopcomm.p-1); */
+	/* simparams_temp.n_ions /= (loopcomm.p-1); */
 
 	const SimParams simparams = simparams_temp;
 
@@ -77,7 +80,7 @@ int slave(bool verbose)
 
 	Ebeam ebeam(simparams, x_beam, y_beam, loopcomm.id + 1);
 	// Fix for having less charge per particle with more processors
-	ebeam.qpp /= (loopcomm.p-1);
+	/* ebeam.qpp /= (loopcomm.p-1); */
 
 	// ==================================
 	// Generate ions

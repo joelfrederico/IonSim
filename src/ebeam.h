@@ -45,9 +45,9 @@ class Ebeam : public Parts
 		// ==================================
 		// Member data
 		// ==================================
-		double qpp;
-		double n_resolve;
-		double sr_macro;
+		double n_resolve() const;
+		double n_0() const;
+		double sr_macro() const;
 
 		// ==================================
 		// Member methods
@@ -62,6 +62,8 @@ class Ebeam : public Parts
 		int field_BE(Field_Data &field);
 		int field_Coulomb(Field_Data &field);
 		int field_Coulomb_sliced(Field_Data &field);
+
+		bool verbose();
 };
 
 #endif

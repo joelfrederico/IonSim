@@ -54,8 +54,10 @@ int WriterBase::write_attributes(const SimParams &simparams) const
 {
 	AttributeCreate version          ( file_id , "version"          , VERSION                    );
 	AttributeCreate n_e              ( file_id , "n_e"              , simparams.n_e              );
+	AttributeCreate n_e_node         ( file_id , "n_e_node"         , simparams.n_e_node()       );
 	AttributeCreate n_ions           ( file_id , "n_ions"           , simparams.n_ions           );
 	AttributeCreate q_tot            ( file_id , "q_tot"            , simparams.q_tot            );
+	AttributeCreate qpp_e            ( file_id , "qpp_e"            , simparams.qpp_e()          );
 	AttributeCreate radius           ( file_id , "radius"           , simparams.radius           );
 	AttributeCreate E                ( file_id , "E"                , simparams.E                );
 	AttributeCreate emit_n           ( file_id , "emit_n"           , simparams.emit_n           );

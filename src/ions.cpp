@@ -62,10 +62,12 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma) : Parts(*simparams, PARTS
 		i_start = 1;
 	}
 
+	long long n_ions_node = _simparams->n_ions_node();
+
 	// ===================================
 	// Generate ions
 	// ===================================
-	for (int i=i_start; i < n_pts; i++)
+	for (int i=i_start; i < n_ions_node; i++)
 	{
 		// ===================================
 		// Only accept ions inside radius
