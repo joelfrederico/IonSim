@@ -50,6 +50,8 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 	double* rho_y;
 	double z_len;
 	int n_e_node;
+	int id;
+	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 	// ==================================
 	// Set random number generator
 	// ==================================
@@ -62,7 +64,8 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 	rho_y = &y_cov(0, 1);
 
 	n_e_node = _simparams.n_e_node();
-	if (FLAGS_verbose) std::cout << "Creating n_pts: " << n_e_node << std::endl;
+
+	if (FLAGS_verbose && (id == 1)) std::cout << "Creating n_pts: " << n_e_node << std::endl;
 
 	for (int i=0; i < n_e_node; i++)
 	{
@@ -345,22 +348,22 @@ int Ebeam::field_Coulomb(Field_Data &field)
 int Ebeam::field_Coulomb_sliced(Field_Data &field)
 {
 	double dx, dy;
-	double drsq, dr, dr52;
+	double drsq, dr;
 	double x_e, y_e, z_e;
+	const double temp = 0.5;
+	double k_double;
 	int k;
 	double sr_m;
 	double srsq_macro;
 	const double dz = _simparams.dz();
 
-	/* dz = _simparams.z_end / field.z_pts; */
-
-	/* sr_macro   = 0.23475 / sqrt(n_resolve * dz); */
-	double n_resolve_surface = n_resolve() * dz;
-	/* sr_macro   = 2.95 / (4*M_PI*sqrt(n_resolve_surface)); */
 	sr_m = sr_macro();
-
 	srsq_macro = sr_m*sr_m;
 
+	int id;
+	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+
+	/* std::cout << "Id: " << id << ", Qpp: " << _simparams.qpp_e() << std::endl; */
 	const double common   = _simparams.qpp_e()*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro);
 
 	const double common_E = common / GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
@@ -375,15 +378,21 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 		y_e = y[n];
 		z_e = z[n];
 
-		k = floor(z_e / dz);
+		k_double = z_e / dz;
+		k = floor(k_double);
+		field.Ez_ind(0, 1, 0)++;
+		if (k < 0)
+		{
+			std::cout << "K: " << k << std::endl;
+		}
 
-		if ((0 < k) && (k < field.z_pts) )
+		if ((0 <= k) && (k <= field.z_pts-1) )
 		{
 			field.Ez_ind(k, k, 0) ++;
-			field.Ez_ind(1, 3, 0) ++;
+			field.Ez_ind(0, 2, 0) ++;
 
 			field.Bz_ind(k, k, 0) ++;
-			field.Bz_ind(1, 3, 0) ++;
+			/* field.Bz_ind(1, 3, 0) ++; */
 
 			for (int i=0; i < field.x_pts; i++)
 			{
@@ -407,6 +416,10 @@ int Ebeam::field_Coulomb_sliced(Field_Data &field)
 					field.By_ind(i, j, k) +=  temp_tran_B * dx;
 				}
 			}
+		} else {
+			field.Ez_ind(1, 0, 0)++;
+			std::cout << "K: " << k << ", k_double: " << k_double << std::endl;
+			std::cout << "zend: " << _simparams.z_end << ", dz: " << dz << ", z_e: " << z_e << std::endl;
 		}
 	}
 

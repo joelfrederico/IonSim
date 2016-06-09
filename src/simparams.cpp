@@ -247,7 +247,7 @@ double SimParams::dt() const
 
 double SimParams::dz() const
 {
-	return z_end / (n_field_z-1);
+	return z_end / n_field_z;
 }
 
 double SimParams::gamma_rel() const
