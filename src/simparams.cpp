@@ -236,13 +236,6 @@ double SimParams::ion_mass() const
 double SimParams::dt() const
 {
 	return dz() / GSL_CONST_MKSA_SPEED_OF_LIGHT;
-	return 0;
-	if (*_dt == -1)
-	{
-		*_dt = ( z_end / ((n_field_z-1) * GSL_CONST_MKSA_SPEED_OF_LIGHT) );
-	}
-
-	return *_dt;
 }
 
 double SimParams::dz() const

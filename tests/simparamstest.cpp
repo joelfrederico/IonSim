@@ -12,7 +12,7 @@ SimparamsTest::SimparamsTest()
 TEST_F(SimparamsTest, dt)
 {
 	simparams = simparams_gen();
-	EXPECT_NEAR(simparams.dt(), 6.34737e-14, 1e-17);
+	EXPECT_NEAR(simparams.dt(), 6.2229127307165854e-14, 1e-17);
 }
 
 TEST_F(SimparamsTest, ion_mass)
