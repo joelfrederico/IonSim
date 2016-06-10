@@ -44,6 +44,7 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 src/ioncheck/Makefile
 		 src/iontest/Makefile
+		 src/ionprocess/Makefile
 		 tests/Makefile
 		 ])
 AC_OUTPUT

@@ -39,6 +39,22 @@ class GroupStepAccess : public GroupAccess
 		GroupStepAccess(hid_t &loc_id, unsigned int step);
 };
 
+class DatasetOpen : public Debug
+{
+	private:
+		hid_t _loc_id;
+		/* DataspaceCreate *dataspace; */
+
+	public:
+		const std::string _dataset_str;
+
+		/* hid_t dataspace_id; */
+		hid_t dataset_id;
+
+		DatasetOpen(hid_t &loc_id, std::string dataset_str);
+		~DatasetOpen();
+};
+
 class DatasetAccess : public Debug
 {
 	private:
@@ -75,6 +91,21 @@ class PlistCreate : public Debug
 
 		PlistCreate(hid_t cls_id);
 		~PlistCreate();
+};
+
+class AttributeOpen : public Debug
+{
+	private:
+		const std::string _attr_name;
+		const hid_t _loc_id;
+
+	public:
+		hid_t attr_id;
+
+		AttributeOpen(hid_t loc_id, std::string attr_name);
+		~AttributeOpen();
+
+		int read();
 };
 
 class AttributeCreate : public Debug
@@ -144,5 +175,30 @@ class AttributeCreate : public Debug
 		~AttributeCreate();
 };
 
+class FileOpen : public Debug
+{
+	private:
+		std::string _filename;
+
+	public:
+		hid_t file_id;
+
+		FileOpen(std::string filename);
+		FileOpen(std::string filename, unsigned flags);
+		~FileOpen();
+};
+
+class FileCreate : public Debug
+{
+	private:
+		std::string _filename;
+
+	public:
+		hid_t file_id;
+
+		FileCreate(std::string filename);
+		FileCreate(std::string filename, unsigned flags);
+		~FileCreate();
+};
 
 #endif

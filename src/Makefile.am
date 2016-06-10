@@ -1,4 +1,4 @@
-SUBDIRS = ioncheck iontest
+SUBDIRS = ioncheck iontest ionprocess
 AM_CPPFLAGS=$(MYAM_CPPFLAGS) -DPKGDATADIR=\"$(pkgdatadir)\"
 
 bin_PROGRAMS = ionsim iontemp

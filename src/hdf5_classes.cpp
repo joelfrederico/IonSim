@@ -83,6 +83,26 @@ GroupStepAccess::GroupStepAccess(hid_t &loc_id, unsigned int step) :
 }
 
 // ==================================
+// DatasetOpen
+// ==================================
+DatasetOpen::DatasetOpen(hid_t &loc_id, std::string dataset_str) :
+	Debug(false),
+	_dataset_str(dataset_str)
+{
+	_loc_id = loc_id;
+	
+	// ==================================
+	// Open dataset
+	// ==================================
+	dataset_id = H5Dopen(_loc_id, dataset_str.c_str(), H5P_DEFAULT);
+}
+
+DatasetOpen::~DatasetOpen()
+{
+	close(&H5Dclose, dataset_id, _dataset_str);
+}
+
+// ==================================
 // DatasetAccess
 // ==================================
 DatasetAccess::DatasetAccess(hid_t &loc_id, std::string dataset_str, int rank, hsize_t *count) :
@@ -143,6 +163,31 @@ PlistCreate::~PlistCreate()
 }
 
 // ==================================
+// AttributeOpen
+// ==================================
+AttributeOpen::AttributeOpen(hid_t loc_id, std::string attr_name) :
+	Debug(false),
+	_loc_id(loc_id)
+{
+	attr_id = H5Aopen(loc_id, attr_name.c_str(), H5P_DEFAULT);
+}
+
+AttributeOpen::~AttributeOpen()
+{
+	close(&H5Aclose, attr_id, _attr_name);
+}
+
+int AttributeOpen::read()
+{
+	int out;
+	herr_t status;
+
+	status = H5Aread(attr_id, H5T_NATIVE_INT, &out);
+
+	return out;
+}
+
+// ==================================
 // AttributeCreate
 // ==================================
 AttributeCreate::~AttributeCreate()
@@ -150,4 +195,58 @@ AttributeCreate::~AttributeCreate()
 	close(&H5Aclose, attr_id, _attr_name);
 
 	delete _dataspace;
+}
+
+// ==================================
+// FileOpen
+// ==================================
+hid_t _fileopen(std::string filename, unsigned flags)
+{
+	return H5Fopen(filename.c_str(), flags, H5P_DEFAULT);
+}
+
+FileOpen::FileOpen(std::string filename) :
+	Debug(false)
+{
+	_filename = filename;
+	file_id = _fileopen(filename, H5F_ACC_RDONLY);
+}
+
+FileOpen::FileOpen(std::string filename, unsigned flags) :
+	Debug(false)
+{
+	_filename = filename;
+	file_id = _fileopen(filename, flags);
+}
+
+FileOpen::~FileOpen()
+{
+	close(&H5Fclose, file_id, _filename);
+}
+
+// ==================================
+// FileCreate
+// ==================================
+hid_t _filecreate(std::string filename, unsigned flags)
+{
+	return H5Fcreate(filename.c_str(), flags, H5P_DEFAULT, H5P_DEFAULT);
+}
+
+FileCreate::FileCreate(std::string filename) :
+	Debug(false)
+{
+	_filename = filename;
+	file_id = _filecreate(filename, H5F_ACC_TRUNC);
+}
+
+FileCreate::FileCreate(std::string filename, unsigned flags) :
+	Debug(false)
+{
+	_filename = filename;
+	file_id = _filecreate(filename, flags);
+}
+
+FileCreate::~FileCreate()
+{
+	close(&H5Fclose, file_id, _filename);
 }
