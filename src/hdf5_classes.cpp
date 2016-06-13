@@ -1,6 +1,8 @@
 #include "hdf5_classes.h"
 #include <typeinfo>
 
+const bool DEBUG_FLAG = false;
+
 // ==================================
 // Debug
 // ==================================
@@ -18,9 +20,9 @@ herr_t Debug::close(herr_t (*f)(hid_t), hid_t attr_id, std::string name)
 	{
 		if (status < 0)
 		{
-			std::cout << "Couldn't close: " << name << std::endl;
+			std::cerr << "Couldn't close: " << name << std::endl;
 		} else {
-			std::cout << "Successfully closed: " << name << std::endl;
+			std::cerr << "Successfully closed: " << name << std::endl;
 		}
 	}
 
@@ -32,7 +34,7 @@ herr_t Debug::close(herr_t (*f)(hid_t), hid_t attr_id, std::string name)
 // GroupAccess
 // ==================================
 GroupAccess::GroupAccess(hid_t &loc_id, std::string group_str) :
-	Debug(false),
+	Debug(DEBUG_FLAG),
 	_group_str(group_str)
 {
 	_loc_id = loc_id;
@@ -86,7 +88,7 @@ GroupStepAccess::GroupStepAccess(hid_t &loc_id, unsigned int step) :
 // DatasetOpen
 // ==================================
 DatasetOpen::DatasetOpen(hid_t &loc_id, std::string dataset_str) :
-	Debug(false),
+	Debug(DEBUG_FLAG),
 	_dataset_str(dataset_str)
 {
 	_loc_id = loc_id;
@@ -95,23 +97,25 @@ DatasetOpen::DatasetOpen(hid_t &loc_id, std::string dataset_str) :
 	// Open dataset
 	// ==================================
 	dataset_id = H5Dopen(_loc_id, dataset_str.c_str(), H5P_DEFAULT);
+	dataspace_id = H5Dget_space(dataset_id);
 }
 
 DatasetOpen::~DatasetOpen()
 {
+	close(&H5Sclose, dataspace_id, _dataset_str + ":dataspace");
 	close(&H5Dclose, dataset_id, _dataset_str);
 }
 
 // ==================================
 // DatasetAccess
 // ==================================
-DatasetAccess::DatasetAccess(hid_t &loc_id, std::string dataset_str, int rank, hsize_t *count) :
-	Debug(false),
+DatasetAccess::DatasetAccess(hid_t &loc_id, std::string dataset_str, int rank, hsize_t *dims) :
+	Debug(DEBUG_FLAG),
 	_dataset_str(dataset_str)
 {
 	_loc_id = loc_id;
 	
-	dataspace = new DataspaceCreate(rank, count);
+	dataspace = new DataspaceCreate(rank, dims);
 	dataspace_id = (*dataspace).dataspace_id;
 
 	// ==================================
@@ -130,14 +134,14 @@ DatasetAccess::~DatasetAccess()
 // ==================================
 // DataspaceCreate
 // ==================================
-DataspaceCreate::DataspaceCreate(int rank, hsize_t *count) :
-	Debug(false)
+DataspaceCreate::DataspaceCreate(int rank, hsize_t *dims) :
+	Debug(DEBUG_FLAG)
 {
-	dataspace_id = H5Screate_simple(rank, count, NULL);
+	dataspace_id = H5Screate_simple(rank, dims, NULL);
 }
 
 DataspaceCreate::DataspaceCreate(H5S_class_t type) :
-	Debug(false)
+	Debug(DEBUG_FLAG)
 {
 	dataspace_id = H5Screate(type);
 }
@@ -151,7 +155,7 @@ DataspaceCreate::~DataspaceCreate()
 // PlistCreate
 // ==================================
 PlistCreate::PlistCreate(hid_t cls_id) :
-	Debug(false)
+	Debug(DEBUG_FLAG)
 {
 	_cls_id = cls_id;
 	plist_id = H5Pcreate(cls_id);
@@ -166,7 +170,7 @@ PlistCreate::~PlistCreate()
 // AttributeOpen
 // ==================================
 AttributeOpen::AttributeOpen(hid_t loc_id, std::string attr_name) :
-	Debug(false),
+	Debug(DEBUG_FLAG),
 	_loc_id(loc_id)
 {
 	attr_id = H5Aopen(loc_id, attr_name.c_str(), H5P_DEFAULT);
@@ -206,14 +210,14 @@ hid_t _fileopen(std::string filename, unsigned flags)
 }
 
 FileOpen::FileOpen(std::string filename) :
-	Debug(false)
+	Debug(DEBUG_FLAG)
 {
 	_filename = filename;
 	file_id = _fileopen(filename, H5F_ACC_RDONLY);
 }
 
 FileOpen::FileOpen(std::string filename, unsigned flags) :
-	Debug(false)
+	Debug(DEBUG_FLAG)
 {
 	_filename = filename;
 	file_id = _fileopen(filename, flags);
@@ -233,14 +237,14 @@ hid_t _filecreate(std::string filename, unsigned flags)
 }
 
 FileCreate::FileCreate(std::string filename) :
-	Debug(false)
+	Debug(DEBUG_FLAG)
 {
 	_filename = filename;
 	file_id = _filecreate(filename, H5F_ACC_TRUNC);
 }
 
 FileCreate::FileCreate(std::string filename, unsigned flags) :
-	Debug(false)
+	Debug(DEBUG_FLAG)
 {
 	_filename = filename;
 	file_id = _filecreate(filename, flags);
