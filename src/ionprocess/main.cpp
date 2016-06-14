@@ -3,6 +3,7 @@
 #include <gflags/gflags.h> // #include <google/gflags.h>
 #include <ionprocess.h>
 #include "../hdf5_classes.h"
+#include <vector>
 
 DEFINE_bool(verbose, true, "Verbose");
 DEFINE_int32(step, 0, "Electron Step");
@@ -13,6 +14,7 @@ DEFINE_int32(xbins, 101, "Number of bins in x");
 
 int main(int argc, char **argv)
 {
+	unsigned long long *hist_buf;
 	std::string filename, basename, procname;
 	hsize_t dims[2];
 	hsize_t memdims[1];
@@ -40,7 +42,7 @@ int main(int argc, char **argv)
 	basename = filename.substr(0, filename.find_last_of("."));
 	procname = basename + "_processed.h5";
 
-	unsigned long long *hist;
+	std::vector<unsigned long long> hist;
 	long histsize;
 	int n_field_z;
 
@@ -61,9 +63,9 @@ int main(int argc, char **argv)
 	DatasetAccess hist_data(output.file_id, "hist", 2, dims);
 	memspace = new DataspaceCreate(1, memdims);
 
-	H5Dwrite(hist_data.dataset_id, H5T_NATIVE_ULLONG, memspace->dataspace_id, hist_data.dataspace_id, H5P_DEFAULT, hist);
+	hist_buf = &hist[0];
+	H5Dwrite(hist_data.dataset_id, H5T_NATIVE_ULLONG, memspace->dataspace_id, hist_data.dataspace_id, H5P_DEFAULT, hist_buf);
 
 	delete memspace;
-	delete[] hist;
 	return 0;
 }

@@ -1,5 +1,8 @@
 #include "../hdf5_classes.h"
 #include <cmath>
+#include "ionprocess.h"
+#include <vector>
+#include <string>
 
 std::string _getion(unsigned int step)
 {
@@ -20,24 +23,7 @@ int index(int i, int j, int k, int ncols, int nrows)
 	return i + j * ncols + k*ncols*nrows;
 }
 
-int get_n_field_z(std::string filename, int step)
-{
-	// ==============================
-	// Open files for reading/writing
-	// ==============================
-	FileOpen data(filename);
-
-	// ==============================
-	// Find ions and number of them
-	// ==============================
-	GroupStepAccess stepgroup(data.file_id, step);
-	GroupAccess ionstep(stepgroup.group_id, "ions_steps");
-
-	AttributeOpen n_field_z_attr(data.file_id, "n_field_z");
-	return n_field_z_attr.read();
-}
-
-int makehist(std::string filename, int xbins, int step, unsigned long long *&hist, long &histsize, int &n_field_z)
+int makehist(std::string filename, int xbins, int step, std::vector<unsigned long long> &hist, long &histsize, int &n_field_z)
 {
 	// ==============================
 	// Initialize Vars 
@@ -120,6 +106,7 @@ int makehist(std::string filename, int xbins, int step, unsigned long long *&his
 	// Histogram
 	// ==============================
 	histsize = xbins*n_field_z;
+	hist.reserve(histsize);
 	delx = 2*x_abs_max/xbins;
 
 	for (int i=0; i < n_field_z ; i++)
@@ -154,17 +141,9 @@ int makehist(std::string filename, int xbins, int step, unsigned long long *&his
 	std::cout << "n_field_z: " << n_field_z << std::endl;
 	std::cout << "step: " << step << std::endl;
 	std::cout << "Hist[0]: " << hist[0] << std::endl;
-	std::cout << "Hist: " << hist << std::endl;
 
 	unsigned long long test = 0;
 	std::cout << "Test: " << test - 1 << std::endl;
 
 	return 0;
 }
-
-int dealloc_hist(unsigned long long *&hist)
-{
-	delete [] hist;
-	return 0;
-}
-
