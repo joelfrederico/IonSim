@@ -110,11 +110,11 @@ am_ionsim_OBJECTS = faddeeva/Faddeeva.$(OBJEXT) \
 	pugixml/src/pugixml.$(OBJEXT) beam.$(OBJEXT) consts.$(OBJEXT) \
 	ebeam.$(OBJEXT) emit.$(OBJEXT) field_comm.$(OBJEXT) \
 	field_data.$(OBJEXT) field_interp.$(OBJEXT) \
-	gsl_classes.$(OBJEXT) hdf5_classes.$(OBJEXT) ions.$(OBJEXT) \
-	loop_comm.$(OBJEXT) main.$(OBJEXT) master.$(OBJEXT) \
-	parts.$(OBJEXT) simparams.$(OBJEXT) slave.$(OBJEXT) \
-	support_func.$(OBJEXT) writer_base.$(OBJEXT) \
-	writer_parallel.$(OBJEXT) writer_serial.$(OBJEXT)
+	gsl_classes.$(OBJEXT) ions.$(OBJEXT) loop_comm.$(OBJEXT) \
+	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
+	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
+	writer_base.$(OBJEXT) writer_parallel.$(OBJEXT) \
+	writer_serial.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -302,6 +302,7 @@ HDF5_FFLAGS = @HDF5_FFLAGS@
 HDF5_FLIBS = @HDF5_FLIBS@
 HDF5_LDFLAGS = @HDF5_LDFLAGS@
 HDF5_LIBS = @HDF5_LIBS@
+HDF5_TYPE = @HDF5_TYPE@
 HDF5_VERSION = @HDF5_VERSION@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -381,6 +382,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+ionsim_CFLAGS = @ionsim_CFLAGS@
+ionsim_LIBS = @ionsim_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -400,7 +403,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = ioncheck iontest ionprocess
+SUBDIRS = ioncheck iontest
 AM_CPPFLAGS = $(MYAM_CPPFLAGS) -DPKGDATADIR=\"$(pkgdatadir)\"
 ionsim_SOURCES = \
 		 faddeeva/Faddeeva.cc    \
@@ -413,7 +416,6 @@ ionsim_SOURCES = \
 		 field_data.cpp          \
 		 field_interp.cpp        \
 		 gsl_classes.cpp         \
-		 hdf5_classes.cpp        \
 		 ions.cpp                \
 		 loop_comm.cpp           \
 		 main.cpp                \
@@ -560,7 +562,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_interp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsl_classes.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hdf5_classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iontemp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop_comm.Po@am__quote@

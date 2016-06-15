@@ -1,4 +1,4 @@
-SUBDIRS = ioncheck iontest ionprocess
+SUBDIRS = ioncheck iontest
 AM_CPPFLAGS=$(MYAM_CPPFLAGS) -DPKGDATADIR=\"$(pkgdatadir)\"
 
 bin_PROGRAMS = ionsim iontemp
@@ -14,7 +14,6 @@ ionsim_SOURCES = \
 		 field_data.cpp          \
 		 field_interp.cpp        \
 		 gsl_classes.cpp         \
-		 hdf5_classes.cpp        \
 		 ions.cpp                \
 		 loop_comm.cpp           \
 		 main.cpp                \

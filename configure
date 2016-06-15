@@ -639,6 +639,7 @@ LIBOBJS
 MYAM_CPPFLAGS
 MYLDADD
 GFLAGS_LIBS
+HDF5_TYPE
 HDF5_FLIBS
 HDF5_FFLAGS
 HDF5_FC
@@ -650,6 +651,8 @@ HDF5_CC
 HDF5_VERSION
 H5FC
 H5CC
+ionsim_LIBS
+ionsim_CFLAGS
 GSL_LIBS
 GSL_CFLAGS
 PKG_CONFIG_LIBDIR
@@ -812,7 +815,9 @@ PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 GSL_CFLAGS
-GSL_LIBS'
+GSL_LIBS
+ionsim_CFLAGS
+ionsim_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1479,6 +1484,9 @@ Some influential environment variables:
               path overriding pkg-config's built-in search path
   GSL_CFLAGS  C compiler flags for GSL, overriding pkg-config
   GSL_LIBS    linker flags for GSL, overriding pkg-config
+  ionsim_CFLAGS
+              C compiler flags for ionsim, overriding pkg-config
+  ionsim_LIBS linker flags for ionsim, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -16645,6 +16653,97 @@ $as_echo "yes" >&6; }
 
 fi
 
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ionsim" >&5
+$as_echo_n "checking for ionsim... " >&6; }
+
+if test -n "$ionsim_CFLAGS"; then
+    pkg_cv_ionsim_CFLAGS="$ionsim_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"ionsim\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "ionsim") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_ionsim_CFLAGS=`$PKG_CONFIG --cflags "ionsim" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$ionsim_LIBS"; then
+    pkg_cv_ionsim_LIBS="$ionsim_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"ionsim\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "ionsim") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_ionsim_LIBS=`$PKG_CONFIG --libs "ionsim" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        ionsim_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "ionsim" 2>&1`
+        else
+	        ionsim_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "ionsim" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$ionsim_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (ionsim) were not met:
+
+$ionsim_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables ionsim_CFLAGS
+and ionsim_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables ionsim_CFLAGS
+and ionsim_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	ionsim_CFLAGS=$pkg_cv_ionsim_CFLAGS
+	ionsim_LIBS=$pkg_cv_ionsim_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
 
 
 
@@ -16689,6 +16788,7 @@ HDF5_LIBS=""
 HDF5_FC=""
 HDF5_FFLAGS=""
 HDF5_FLIBS=""
+HDF5_TYPE=""
 
 if test "$with_hdf5" = "yes"; then
     if test -z "$H5CC"; then
@@ -16743,6 +16843,18 @@ $as_echo_n "checking Using provided HDF5 C wrapper... " >&6; }
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $H5CC" >&5
 $as_echo "$H5CC" >&6; }
     fi
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for HDF5 type" >&5
+$as_echo_n "checking for HDF5 type... " >&6; }
+    case $H5CC in #(
+  *h5pcc) :
+    HDF5_TYPE=parallel ;; #(
+  *h5cc) :
+    HDF5_TYPE=serial ;; #(
+  *) :
+    HDF5_TYPE=neither ;;
+esac
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HDF5_TYPE" >&5
+$as_echo "$HDF5_TYPE" >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for HDF5 libraries" >&5
 $as_echo_n "checking for HDF5 libraries... " >&6; }
     if test ! -f "$H5CC" || test ! -x "$H5CC"; then
@@ -16965,6 +17077,7 @@ $as_echo "no" >&6; }
 
 
 
+
 $as_echo "#define HAVE_HDF5 1" >>confdefs.h
 
     fi
@@ -16975,11 +17088,11 @@ GFLAGS_LIBS="-lgflags"
 GFLAGS_LIBS=$GFLAGS_LIBS
 
 
-MYLDADD="$GSL_LIBS $HDF5_LIBS $GFLAGS_LIBS"
+MYLDADD="$GSL_LIBS $HDF5_LIBS $GFLAGS_LIBS $ionsim_LIBS"
 MYLDADD=$MYLDADD
 
 
-MYAM_CPPFLAGS="$GSL_CFLAGS $HDF5_CPPFLAGS $GFLAGS_CPPFLAGS"
+MYAM_CPPFLAGS="$GSL_CFLAGS $HDF5_CPPFLAGS $GFLAGS_CPPFLAGS $ionsim_CFLAGS"
 MYAM_CPPFLAGS=$MYAM_CPPFLAGS
 
 
@@ -16995,7 +17108,7 @@ MYAM_CPPFLAGS=$MYAM_CPPFLAGS
 # Checks for library functions.
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/ioncheck/Makefile src/iontest/Makefile src/ionprocess/Makefile tests/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/ioncheck/Makefile src/iontest/Makefile tests/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -18114,7 +18227,6 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/ioncheck/Makefile") CONFIG_FILES="$CONFIG_FILES src/ioncheck/Makefile" ;;
     "src/iontest/Makefile") CONFIG_FILES="$CONFIG_FILES src/iontest/Makefile" ;;
-    "src/ionprocess/Makefile") CONFIG_FILES="$CONFIG_FILES src/ionprocess/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

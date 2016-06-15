@@ -2,7 +2,7 @@
 #include "parts.h"
 #include "support_func.h"
 #include "field_data.h"
-#include "hdf5_classes.h"
+#include <ionsim.h>
 
 WriterSerial::WriterSerial(const std::string &filename) :
 	WriterBase(filename)

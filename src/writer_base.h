@@ -6,7 +6,7 @@
 #include <typeinfo>
 #include "field_data.h"
 #include "simparams.h"
-#include "hdf5_classes.h"
+#include <ionsim.h>
 
 typedef int writer_t;
 const writer_t WRITER_NULL     = 0;

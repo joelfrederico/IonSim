@@ -2,7 +2,7 @@
 #include "writer_base.h"
 #include "field_data.h"
 #include "support_func.h"
-#include "hdf5_classes.h"
+#include <ionsim.h>
 
 WriterBase::WriterBase(const std::string &filename)
 {

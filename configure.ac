@@ -17,15 +17,16 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for libraries.
 PKG_CHECK_MODULES([GSL], [gsl >= 1.15])
+PKG_CHECK_MODULES([ionsim], [ionsim])
 AX_LIB_HDF5([parallel])
 # AC_CHECK_LIB([gflags], [], [HAVE_GFLAGS=1] [GFLAGS_LIBS="-lgflags"], AC_MSG_WARN([gflags is not installed.]))
 GFLAGS_LIBS="-lgflags"
 AC_SUBST(GFLAGS_LIBS,[$GFLAGS_LIBS])
 
-MYLDADD="$GSL_LIBS $HDF5_LIBS $GFLAGS_LIBS"
+MYLDADD="$GSL_LIBS $HDF5_LIBS $GFLAGS_LIBS $ionsim_LIBS"
 AC_SUBST(MYLDADD,[$MYLDADD])
 
-MYAM_CPPFLAGS="$GSL_CFLAGS $HDF5_CPPFLAGS $GFLAGS_CPPFLAGS"
+MYAM_CPPFLAGS="$GSL_CFLAGS $HDF5_CPPFLAGS $GFLAGS_CPPFLAGS $ionsim_CFLAGS"
 AC_SUBST(MYAM_CPPFLAGS,[$MYAM_CPPFLAGS])
 
 # AC_LANG_PUSH([C++])
@@ -44,7 +45,6 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 src/ioncheck/Makefile
 		 src/iontest/Makefile
-		 src/ionprocess/Makefile
 		 tests/Makefile
 		 ])
 AC_OUTPUT

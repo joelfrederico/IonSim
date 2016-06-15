@@ -1,5 +1,5 @@
 #include "ebeam.h"
-#include "hdf5_classes.h"
+#include <ionsim.h>
 #include "loop_comm.h"
 #include "support_func.h"
 #include "writer_parallel.h"
