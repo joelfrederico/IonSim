@@ -78,7 +78,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 			case Z_DIST_FLAT:
 				z_len = _simparams.sz;
 
-				z[i] = gsl_ran_flat(rng.r, 0, _simparams.sz);
+				z[i] = gsl_ran_flat(rng.r, _simparams.z_center, _simparams.sz);
 
 				break;
 
