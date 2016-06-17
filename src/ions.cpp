@@ -205,11 +205,6 @@ int Ions::push_field(Field_Data &field, int z_step)
 		Ex = fieldinterp.Ex(x[i], y[i], z_step);
 		Ey = fieldinterp.Ey(x[i], y[i], z_step);
 
-		/* x_ind = round(x[i] / field.dxdi) + ( (field.x_pts-1)/2 ); */
-		/* y_ind = round(y[i] / field.dydj) + ( (field.y_pts-1)/2 ); */
-		/* Ex = field.Ex_ind(x_ind, y_ind, z_step); */
-		/* Ey = field.Ey_ind(x_ind, y_ind, z_step); */
-
 		Fx = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ex;
 		Fy = -GSL_CONST_MKSA_ELECTRON_CHARGE * Ey;
 
@@ -219,12 +214,9 @@ int Ions::push_field(Field_Data &field, int z_step)
 		x[i] = x[i] + xp[i] * dt;
 		y[i] = y[i] + yp[i] * dt;
 
-		/* z[i]  = x_ind; */
-		/* zp[i] = y_ind; */
-
 		z[i]  = Fx;
 		zp[i] = Ex;
 	}
-	/* printf("Updated\n"); */
+
 	return 0;
 }
