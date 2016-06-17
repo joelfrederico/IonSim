@@ -19,12 +19,6 @@ int Field_Interp::_init()
 	Ez_xacc = gsl_interp_accel_alloc();
 	Ez_yacc = gsl_interp_accel_alloc();
 
-	/*
-	splinex = gsl_spline2d_alloc(&_interptype, _field.x_pts, _field.y_pts);
-	spliney = gsl_spline2d_alloc(&_interptype, _field.x_pts, _field.y_pts);
-	splinez = gsl_spline2d_alloc(&_interptype, _field.x_pts, _field.y_pts);
-	*/
-
 	interp2d_x = gsl_interp2d_alloc(&_interptype, _field.x_pts, _field.y_pts);
 	interp2d_y = gsl_interp2d_alloc(&_interptype, _field.x_pts, _field.y_pts);
 	interp2d_z = gsl_interp2d_alloc(&_interptype, _field.x_pts, _field.y_pts);
@@ -41,12 +35,6 @@ int Field_Interp::_init()
 
 int Field_Interp::_init_splines(int z_step)
 {
-	/*
-	gsl_spline2d_init(splinex, _field.x_grid, _field.y_grid, x_data, _field.x_pts, _field.y_pts);
-	gsl_spline2d_init(spliney, _field.x_grid, _field.y_grid, y_data, _field.x_pts, _field.y_pts);
-	gsl_spline2d_init(splinez, _field.x_grid, _field.y_grid, z_data, _field.x_pts, _field.y_pts);
-	*/
-
 	gsl_interp2d_init(interp2d_x, _field.x_grid, _field.y_grid, x_data, _field.x_pts, _field.y_pts);
 	gsl_interp2d_init(interp2d_y, _field.x_grid, _field.y_grid, y_data, _field.x_pts, _field.y_pts);
 	gsl_interp2d_init(interp2d_z, _field.x_grid, _field.y_grid, z_data, _field.x_pts, _field.y_pts);
@@ -55,12 +43,6 @@ int Field_Interp::_init_splines(int z_step)
 	{
 		for (int j=0; j < _field.y_pts; j++)
 		{
-			/*
-			gsl_spline2d_set(splinex, x_data, i, j, _field.Ex_ind(i, j, z_step));
-			gsl_spline2d_set(spliney, y_data, i, j, _field.Ey_ind(i, j, z_step));
-			gsl_spline2d_set(splinez, z_data, i, j, _field.Ez_ind(i, j, z_step));
-			*/
-
 			gsl_interp2d_set(interp2d_x, x_data, i, j, _field.Ex_ind(i, j, z_step));
 			gsl_interp2d_set(interp2d_y, y_data, i, j, _field.Ey_ind(i, j, z_step));
 			gsl_interp2d_set(interp2d_z, z_data, i, j, _field.Ez_ind(i, j, z_step));
@@ -77,12 +59,6 @@ Field_Interp::~Field_Interp()
 	delete x_data;
 	delete y_data;
 	delete z_data;
-
-	/*
-	gsl_spline2d_free(splinex);
-	gsl_spline2d_free(spliney);
-	gsl_spline2d_free(splinez);
-	*/
 
 	gsl_interp2d_free(interp2d_x);
 	gsl_interp2d_free(interp2d_y);
@@ -117,7 +93,6 @@ double Field_Interp::field_interp(double x, double y, int z_step, int dim)
 	int err;
 	double out;
 
-	/* gsl_spline2d *spline; */
 	gsl_interp2d *interp2d;
 	gsl_interp_accel *xacc;
 	gsl_interp_accel *yacc;
@@ -133,7 +108,6 @@ double Field_Interp::field_interp(double x, double y, int z_step, int dim)
 		case 0:
 			xacc = Ex_xacc;
 			yacc = Ex_yacc;
-			/* spline = splinex; */
 			data = x_data;
 			interp2d = interp2d_x;
 			break;
@@ -141,21 +115,21 @@ double Field_Interp::field_interp(double x, double y, int z_step, int dim)
 			xacc = Ey_xacc;
 			yacc = Ey_yacc;
 			data = y_data;
-			/* spline = spliney; */
 			interp2d = interp2d_y;
 			break;
 		case 2:
 			xacc = Ez_xacc;
 			yacc = Ez_yacc;
 			data = z_data;
-			/* spline = splinez; */
 			interp2d = interp2d_z;
 			break;
 	}
 
-
-	/* err = gsl_spline2d_eval_e(spline, x, y, xacc, yacc, &out); */
 	err = gsl_interp2d_eval_e_extrap(interp2d, _field.x_grid, _field.y_grid, data, x, y, xacc, yacc, &out);
+	if (err != 0)
+	{
+		std::cerr << "Interpolation error!" << std::endl;
+	}
 
 	return out;
 }

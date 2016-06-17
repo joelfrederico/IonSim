@@ -48,7 +48,8 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 	double z_temp;
 	double* rho_x;
 	double* rho_y;
-	double z_len;
+	const double z_first = _simparams.z_center - (_simparams.sz/2);
+	const double z_second = _simparams.z_center + (_simparams.sz/2);
 	int n_e_node;
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
@@ -76,9 +77,8 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 		switch (_simparams.zdist)
 		{
 			case Z_DIST_FLAT:
-				z_len = _simparams.sz;
 
-				z[i] = gsl_ran_flat(rng.r, _simparams.z_center, _simparams.sz);
+				z[i] = gsl_ran_flat(rng.r, z_first, z_second);
 
 				break;
 

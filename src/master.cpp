@@ -60,13 +60,13 @@ int master()
 	// ==============================
 	// Loop over electron evolution
 	// ==============================
-	for (int step=0; step < simparams.n_steps; step++)
+	for (int e_step=0; e_step < simparams.n_steps; e_step++)
 	{
 		// ==============================
 		// Allocate for this loop
 		// ==============================
 		field = new Field_Data(simparams);
-		printf("Step: %d\n", step);
+		printf("Step: %d\n", e_step);
 
 		// ==============================
 		// Get fields from slaves
@@ -78,13 +78,13 @@ int master()
 		// Write electrons
 		// ==============================
 		loopcomm.instruct(LOOP_DUMP_E);
-		loopcomm.send_slaves(step);
+		loopcomm.send_slaves(e_step);
 
 		// ==============================
 		// Write total field
 		// ==============================
 		writer_s = new WriterSerial(simparams.filename);
-		writer_s->writedata(step, *field);
+		writer_s->writedata(e_step, *field);
 		delete writer_s;
 
 		// ==============================
@@ -100,17 +100,16 @@ int master()
 		// Integrate ion motion
 		// ==============================
 		loopcomm.instruct(LOOP_DUMP_IONS);
-		loopcomm.send_slaves(step);
+		loopcomm.send_slaves(e_step);
 		loopcomm.send_slaves(0);
 		for (int z_step=0; z_step < simparams.n_field_z; z_step++)
 		{
 			std::cout << "Ion step: " << z_step << std::endl;
 			loopcomm.instruct(LOOP_PUSH_IONS);
-			/* MPI_Barrier(MPI_COMM_WORLD); */
-			loopcomm.send_slaves(step);
+			loopcomm.send_slaves(z_step);
 
 			loopcomm.instruct(LOOP_DUMP_IONS);
-			loopcomm.send_slaves(step);
+			loopcomm.send_slaves(e_step);
 			loopcomm.send_slaves(z_step+1);
 
 		}

@@ -27,7 +27,6 @@ gtest_SOURCES = \
 		../src/field_comm.cpp \
 		../src/field_data.cpp \
 		../src/field_interp.cpp \
-		../src/hdf5_classes.cpp \
 		../src/ions.cpp \
 		../src/loop_comm.cpp \
 		../src/parts.cpp \

@@ -122,7 +122,6 @@ am_gtest_OBJECTS = gtest-fieldtest.$(OBJEXT) gtest-gtest.$(OBJEXT) \
 	../src/gtest-field_comm.$(OBJEXT) \
 	../src/gtest-field_data.$(OBJEXT) \
 	../src/gtest-field_interp.$(OBJEXT) \
-	../src/gtest-hdf5_classes.$(OBJEXT) \
 	../src/gtest-ions.$(OBJEXT) ../src/gtest-loop_comm.$(OBJEXT) \
 	../src/gtest-parts.$(OBJEXT) ../src/gtest-simparams.$(OBJEXT) \
 	../src/gtest-support_func.$(OBJEXT)
@@ -576,7 +575,6 @@ gtest_SOURCES = \
 		../src/field_comm.cpp \
 		../src/field_data.cpp \
 		../src/field_interp.cpp \
-		../src/hdf5_classes.cpp \
 		../src/ions.cpp \
 		../src/loop_comm.cpp \
 		../src/parts.cpp \
@@ -680,8 +678,6 @@ clean-checkPROGRAMS:
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-field_interp.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
-../src/gtest-hdf5_classes.$(OBJEXT): ../src/$(am__dirstamp) \
-	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-ions.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-loop_comm.$(OBJEXT): ../src/$(am__dirstamp) \
@@ -717,7 +713,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-field_interp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-hdf5_classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-parts.Po@am__quote@
@@ -930,20 +925,6 @@ gtest-support.obj: support.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/field_interp.cpp' object='../src/gtest-field_interp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-field_interp.obj `if test -f '../src/field_interp.cpp'; then $(CYGPATH_W) '../src/field_interp.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/field_interp.cpp'; fi`
-
-../src/gtest-hdf5_classes.o: ../src/hdf5_classes.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-hdf5_classes.o -MD -MP -MF ../src/$(DEPDIR)/gtest-hdf5_classes.Tpo -c -o ../src/gtest-hdf5_classes.o `test -f '../src/hdf5_classes.cpp' || echo '$(srcdir)/'`../src/hdf5_classes.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-hdf5_classes.Tpo ../src/$(DEPDIR)/gtest-hdf5_classes.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/hdf5_classes.cpp' object='../src/gtest-hdf5_classes.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-hdf5_classes.o `test -f '../src/hdf5_classes.cpp' || echo '$(srcdir)/'`../src/hdf5_classes.cpp
-
-../src/gtest-hdf5_classes.obj: ../src/hdf5_classes.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-hdf5_classes.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-hdf5_classes.Tpo -c -o ../src/gtest-hdf5_classes.obj `if test -f '../src/hdf5_classes.cpp'; then $(CYGPATH_W) '../src/hdf5_classes.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/hdf5_classes.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-hdf5_classes.Tpo ../src/$(DEPDIR)/gtest-hdf5_classes.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/hdf5_classes.cpp' object='../src/gtest-hdf5_classes.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-hdf5_classes.obj `if test -f '../src/hdf5_classes.cpp'; then $(CYGPATH_W) '../src/hdf5_classes.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/hdf5_classes.cpp'; fi`
 
 ../src/gtest-ions.o: ../src/ions.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-ions.o -MD -MP -MF ../src/$(DEPDIR)/gtest-ions.Tpo -c -o ../src/gtest-ions.o `test -f '../src/ions.cpp' || echo '$(srcdir)/'`../src/ions.cpp

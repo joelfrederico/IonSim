@@ -1,4 +1,4 @@
-#include "hdf5_classes.h"
+#include <ionsim.h>
 #include "support_func.h"
 #include "hdf5test.h"
 #include "gtest/gtest.h"

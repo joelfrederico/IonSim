@@ -139,8 +139,7 @@ int slave()
 				// ==================================
 				// Push ions
 				// ==================================
-				/* MPI_Barrier(MPI_COMM_WORLD); */
-				loopcomm.recv_master(&step_buf);
+				loopcomm.recv_master(&substep_buf);
 				switch (simparams.pushmethod)
 				{
 					case PUSH_RUNGE_KUTTA:
@@ -150,7 +149,7 @@ int slave()
 						ions.push_simple(nb_0, sr);
 						break;
 					case PUSH_FIELD:
-						ions.push_field(*field, step_buf);
+						ions.push_field(*field, substep_buf);
 
 						break;
 				}
