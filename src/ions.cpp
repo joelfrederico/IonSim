@@ -11,6 +11,7 @@
 #include "support_func.h"
 #include "simparams.h"
 #include "loop_comm.h"
+#include "mpi.h"
 
 // ===================================
 // Ions
@@ -23,6 +24,7 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma) : Parts(*simparams, PARTS
 	bool keep_looking;
 	const gsl_rng_type * T;
 	gsl_rng * r;
+	int s;
 	int i_start          = 0;
 	bool custom_particle = false;
 
@@ -43,6 +45,8 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma) : Parts(*simparams, PARTS
 	// ===================================
 	T = gsl_rng_default;
 	r = gsl_rng_alloc(T);
+	MPI_Comm_rank(MPI_COMM_WORLD, &s);
+	gsl_rng_set(r, s);
 
 	// ===================================
 	// Inject custom particle for
@@ -69,6 +73,9 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma) : Parts(*simparams, PARTS
 	// ===================================
 	for (int i=i_start; i < n_ions_node; i++)
 	{
+		/* x[i]     = gsl_ran_flat(r, -_radius, _radius); */
+		/* y[i]     = gsl_ran_flat(r, -_radius, _radius); */
+
 		// ===================================
 		// Only accept ions inside radius
 		// ===================================
@@ -91,6 +98,8 @@ Ions::Ions(const SimParams *simparams, Plasma &plasma) : Parts(*simparams, PARTS
 		yp[i] = 0;
 		zp[i] = 0;
 	}
+
+	gsl_rng_free(r);
 }
 
 std::complex<double> F_r(double x, double y, const SimParams &simparams)
