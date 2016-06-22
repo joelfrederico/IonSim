@@ -16,7 +16,7 @@ class Ebeam : public Parts
 		// ==================================
 		SimParams _simparams;
 
-		int _gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Cov z_cov);
+		int _gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov);
 		
 		const Cov _x_cov;
 		const Cov _y_cov;
@@ -28,8 +28,8 @@ class Ebeam : public Parts
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
-		Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s);
-		Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s);
+		Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam);
+		Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp);
 		Ebeam(
 				const SimParams &simparams,
 				const double n_pts,

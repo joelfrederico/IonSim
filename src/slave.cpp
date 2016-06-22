@@ -78,7 +78,7 @@ int slave()
 	sr = ionsim::sr(simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu);
 	nb_0 = ionsim::nb_0(simparams.q_tot, simparams.sz, sr);
 
-	Ebeam ebeam(simparams, x_beam, y_beam, loopcomm.id + 1);
+	Ebeam ebeam(simparams, x_beam, y_beam);
 	// Fix for having less charge per particle with more processors
 	/* ebeam.qpp /= (loopcomm.p-1); */
 

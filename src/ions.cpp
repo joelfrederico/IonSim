@@ -203,7 +203,8 @@ int Ions::push_simple(double nb_0, double sig_r)
 
 int Ions::push_field(Field_Data &field, int z_step)
 {
-	double dt = _simparams->dt();
+	const double dt = _simparams->dt();
+	const double dz = _simparams->dz();
 	/* Field_Interp fieldinterp(field, *gsl_interp2d_bicubic); */
 	Field_Interp fieldinterp(field, *gsl_interp2d_bilinear);
 	double Fx, Fy, Ex, Ey;
@@ -223,8 +224,8 @@ int Ions::push_field(Field_Data &field, int z_step)
 		x[i] = x[i] + xp[i] * dt;
 		y[i] = y[i] + yp[i] * dt;
 
-		z[i]  = Fx;
-		zp[i] = Ex;
+		z[i]  = dz * (z_step+1);
+		zp[i] = Fx;
 	}
 
 	return 0;

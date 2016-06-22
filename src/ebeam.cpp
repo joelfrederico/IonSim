@@ -32,17 +32,17 @@ Cov z_cov(SimParams simparams)
 // ==================================
 // Constructors
 // ==================================
-Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam, unsigned long int s) : Parts(simparams, PARTS_E), _simparams(simparams), _x_cov(x_beam.cov()), _y_cov(y_beam.cov()), _z_cov(z_cov(simparams))
+Ebeam::Ebeam(const SimParams &simparams, Beam x_beam, Beam y_beam) : Parts(simparams, PARTS_E), _simparams(simparams), _x_cov(x_beam.cov()), _y_cov(y_beam.cov()), _z_cov(z_cov(simparams))
 {
-	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
+	_gen_bivariate_gaussian(_x_cov, _y_cov, _z_cov);
 }
 
-Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp, unsigned long int s) : Parts(simparams, PARTS_E), _simparams(simparams), _x_cov(sx*sx, 0, 0, syp*syp), _y_cov(sy*sy, 0, 0, syp*syp), _z_cov(z_cov(simparams))
+Ebeam::Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp) : Parts(simparams, PARTS_E), _simparams(simparams), _x_cov(sx*sx, 0, 0, syp*syp), _y_cov(sy*sy, 0, 0, syp*syp), _z_cov(z_cov(simparams))
 {
-	_gen_bivariate_gaussian(s, _x_cov, _y_cov, _z_cov);
+	_gen_bivariate_gaussian(_x_cov, _y_cov, _z_cov);
 }
 
-int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Cov z_cov)
+int Ebeam::_gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov)
 {
 	int status;
 	double z_temp;
@@ -56,7 +56,7 @@ int Ebeam::_gen_bivariate_gaussian(unsigned long int s, Cov x_cov, Cov y_cov, Co
 	// ==================================
 	// Set random number generator
 	// ==================================
-	GSLrng rng(s);
+	GSLrng rng(id);
 	
 	// ==================================
 	// Create particles randomly
