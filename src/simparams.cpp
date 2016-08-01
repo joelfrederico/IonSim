@@ -1,11 +1,11 @@
-#include "simparams.h"
-#include <gsl/gsl_const_mksa.h>
-#include <math.h>
-#include "support_func.h"
 #include "consts.h"
 #include "pugixml/src/pugixml.hpp"
-#include <stdexcept>
+#include "simparams.h"
+#include "support_func.h"
 #include <algorithm>
+#include <gsl/gsl_const_mksa.h>
+#include <math.h>
+#include <stdexcept>
 
 // ==================================
 // XML Loading
@@ -49,6 +49,8 @@ int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 	// Generic
 	// ==================================
 	simparams.filename = getstr(generic, "filename", verbose);
+	getdata(ionsim , "push_electrons" , verbose , simparams.push_electrons );
+	getdata(ionsim , "push_ions"      , verbose , simparams.push_ions      );
 
 	// ==================================
 	// IonSim
@@ -59,6 +61,7 @@ int _register_file(SimParams &simparams, std::string xmlfile, bool verbose)
 	getdata(ionsim , "n_field_y"        , verbose , simparams.n_field_y        );
 	getdata(ionsim , "n_field_z"        , verbose , simparams.n_field_z        );
 	getdata(ionsim , "z_end"            , verbose , simparams.z_end            );
+	getdata(ionsim , "ion_z_bool"       , verbose , simparams.ion_z_bool       );
 
 	// ==================================
 	// ElectronSim
@@ -164,6 +167,9 @@ int SimParams::bcast_send() const
 	bcast_send_wrap(n_field_z        );
 	bcast_send_wrap(field_trans_wind );
 	bcast_send_wrap(z_end            );
+	bcast_send_wrap(push_electrons   );
+	bcast_send_wrap(push_ions        );
+	bcast_send_wrap(ion_z_bool       );
 
 	// Send string
 
@@ -202,6 +208,9 @@ int SimParams::bcast_receive()
 	MPI_Bcast(&n_field_z        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&field_trans_wind , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&z_end            , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&push_electrons   , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&push_ions        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&ion_z_bool       , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
 
 	// Receive string
 

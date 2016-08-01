@@ -230,3 +230,87 @@ int Ions::push_field(Field_Data &field, int z_step)
 
 	return 0;
 }
+
+
+int Ions::field_Coulomb_sliced(Field_Data &field, int step)
+{
+	double dx, dy, dz;
+	double drsq, dr;
+	double x_e, y_e, z_e;
+	double k_double;
+	double sr_m;
+	double srsq_macro;
+	int k_start, k_end;
+
+	sr_m = sr_macro();
+	srsq_macro = sr_m*sr_m;
+
+	int id;
+	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+
+	/* const double common   = _simparams.qpp_e()*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro); */
+
+	/* const double common_E = common / GSL_CONST_MKSA_VACUUM_PERMITTIVITY; */
+	/* const double common_B = common * GSL_CONST_MKSA_SPEED_OF_LIGHT * GSL_CONST_MKSA_VACUUM_PERMEABILITY; */
+
+	double temp_tran;
+	double temp_tran_E;
+	double temp_tran_B;
+
+	for (int n=0; n < n_pts; n++) {
+		x_e = x[n];
+		y_e = y[n];
+		z_e = z[n];
+
+		if (_simparams->ion_z_bool)
+		{
+			k_start = 0;
+			k_end = field.z_pts;
+		} else {
+			k_start = step;
+			k_end = step+1;
+		}
+
+		for (int i=0; i < field.x_pts; i++)
+		{
+			dx = field.x_grid[i] - x_e;
+			for (int j=0; j < field.y_pts; j++)
+			{
+				dy = field.y_grid[j] - y_e;
+				for (int k=k_start; k < k_end; k++)
+				{
+					dz = field.z_grid[k] - z_e;
+					drsq = dx*dx + dy*dy + dz*dz;
+					dr   = sqrt(drsq);
+
+					temp_tran = gsl_sf_exprel(- drsq / (2*srsq_macro));
+
+					temp_tran_E = temp_tran * common_E;
+					temp_tran_B = temp_tran * common_B;
+
+					field.Ex_ind(i, j, k) += temp_tran_E * dx;
+					field.Ey_ind(i, j, k) += temp_tran_E * dy;
+
+					/* field.Bx_ind(i, j, k) += -temp_tran_B * dy; */
+					/* field.By_ind(i, j, k) +=  temp_tran_B * dx; */
+				}
+			}
+		}
+	}
+
+
+	return 0;
+}
+
+double np() const
+{
+	return _simparams->n_p_cgs * 
+}
+
+// ==================================
+// Smoothing- see thesis
+// ==================================
+double Ions::sr_macro() const
+{
+	return 0.2347535410605456 / sqrt(n_0() * _simparams.dz());
+}

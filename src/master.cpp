@@ -41,7 +41,7 @@ int master()
 	// Initialize fields
 	// ==============================
 	Field_Data *field;
-	Field_Data *field_interp;
+	Field_Data *ion_field;
 	Field_Comm fieldcomm;
 
 	// ==============================
@@ -65,7 +65,8 @@ int master()
 		// ==============================
 		// Allocate for this loop
 		// ==============================
-		field = new Field_Data(simparams);
+		field     = new Field_Data(simparams);
+		ion_field = new Field_Data(simparams);
 		printf("Step: %d\n", e_step);
 
 		// ==============================
@@ -99,24 +100,36 @@ int master()
 		// ==============================
 		// Integrate ion motion
 		// ==============================
-		loopcomm.instruct(LOOP_DUMP_IONS);
-		loopcomm.send_slaves(e_step);
-		loopcomm.send_slaves(0);
 		for (int z_step=0; z_step < simparams.n_field_z; z_step++)
 		{
-			std::cout << "Ion step: " << z_step << std::endl;
-			loopcomm.instruct(LOOP_PUSH_IONS);
-			loopcomm.send_slaves(z_step);
-
+			// ==============================
+			// Record ions
+			// ==============================
 			loopcomm.instruct(LOOP_DUMP_IONS);
 			loopcomm.send_slaves(e_step);
-			loopcomm.send_slaves(z_step+1);
+			loopcomm.send_slaves(z_step);
+
+			// ==============================
+			// Get current ion field
+			// ==============================
+			loopcomm.instruct(LOOP_GET_IFIELD);
+			loopcomm.recv_ion_field_others_add(*ion_field);
+
+			// Only push ions if flag is set and not on last step
+			// (no point to push ions if not going to record)
+			if ( (simparams.push_ions) && (z_step < (simparams.n_field_z-1)) )
+			{
+				std::cout << "Ion step: " << z_step << std::endl;
+				loopcomm.instruct(LOOP_PUSH_IONS);
+				loopcomm.send_slaves(z_step);
+			}
 
 		}
 
 		// ==============================
 		// Deallocate for this loop
 		// ==============================
+		delete ion_field;
 		delete field;
 	}
 

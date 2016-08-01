@@ -28,6 +28,8 @@ void getdata(pugi::xml_node node, std::string key, bool verbose, T &out)
 			out = text.as_double();
 		} else if (typeid(out) == typeid(int)) {
 			out = text.as_int();
+		} else if (typeid(out) == typeid(bool)) {
+			out = text.as_bool();
 		} else {
 			throw std::runtime_error("Type not matched");
 		}
@@ -70,6 +72,9 @@ class SimParams
 				MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
 			} else if (typeid(send) == typeid(long long)) {
 				MPI_Bcast(&buf, 1, MPI_LONG_LONG, 0, MPI_COMM_WORLD);
+			} else if (typeid(send) == typeid(bool)) {
+				int buf_bool = send;
+				MPI_Bcast(&buf_bool, 1, MPI_INT, 0, MPI_COMM_WORLD);
 			} else return -1;
 			return 0;
 		}
@@ -79,6 +84,8 @@ class SimParams
 		// ==================================
 		// - Generic
 		std::string filename;
+		bool push_electrons;
+		bool push_ions;
 
 		// - Ion Window
 		double field_trans_wind;
@@ -87,6 +94,7 @@ class SimParams
 		int n_field_x;
 		int n_field_y;
 		int n_field_z;
+		bool ion_z_bool;
 
 		// - Electron sim
 		int n_steps;

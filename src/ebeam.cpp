@@ -473,6 +473,9 @@ double Ebeam::n_resolve() const
 	return n_resolve;
 }
 
+// ==================================
+// Smoothing- see thesis
+// ==================================
 double Ebeam::sr_macro() const
 {
 	return 0.2347535410605456 / sqrt(n_0() * _simparams.dz());

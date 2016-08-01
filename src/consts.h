@@ -55,13 +55,15 @@ class zDist
 // ==================================
 // Loop flags
 // ==================================
-const loopflag_t LOOP_KILL        = 1;
-const loopflag_t LOOP_DUMP_IONS   = 2;
-const loopflag_t LOOP_DUMP_E      = 3;
-const loopflag_t LOOP_PUSH_E      = 4;
-const loopflag_t LOOP_PUSH_IONS   = 5;
-const loopflag_t LOOP_GET_EFIELD  = 6;
-const loopflag_t LOOP_SEND_EFIELD = 7;
+const loopflag_t LOOP_KILL         = 1;
+const loopflag_t LOOP_DUMP_IONS    = 2;
+const loopflag_t LOOP_DUMP_E       = 3;
+const loopflag_t LOOP_PUSH_E       = 4;
+const loopflag_t LOOP_PUSH_IONS    = 5;
+const loopflag_t LOOP_GET_EFIELD   = 6;
+const loopflag_t LOOP_SEND_EFIELD  = 7;
+const loopflag_t LOOP_GET_IFIELD   = 8;
+const loopflag_t LOOP_RESET_IFIELD = 9;
 
 // ==================================
 // MPI tags

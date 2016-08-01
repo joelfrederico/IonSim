@@ -22,18 +22,30 @@ bool Field_Data::_samedim(const Field_Data &rhs) const
 
 int Field_Data::_init()
 {
+	// ==================================
+	// Initialize E-field
+	// ==================================
 	Ex_data = new double[n_pts];
 	Ey_data = new double[n_pts];
 	Ez_data = new double[n_pts];
 
+	// ==================================
+	// Initialize B-field
+	// ==================================
 	Bx_data = new double[n_pts];
 	By_data = new double[n_pts];
 	Bz_data = new double[n_pts];
 
+	// ==================================
+	// Initialize grid indices
+	// ==================================
 	x_grid = new double[x_pts];
 	y_grid = new double[y_pts];
 	z_grid = new double[z_pts];
 
+	// ==================================
+	// Set fields to zero
+	// ==================================
 	for (long long i=0; i < n_pts; i++)
 	{
 		Ex_data[i] = double(0);
@@ -45,14 +57,23 @@ int Field_Data::_init()
 		Bz_data[i] = double(0);
 	}
 
+	// ==================================
+	// Get differential lengths
+	// ==================================
 	dxdi = x_edge_mag * 2 / (x_pts-1);
 	dydj = y_edge_mag * 2 / (y_pts-1);
 	dzdk = z_edge_mag * 2 / (z_pts-1);
 
+	// ==================================
+	// Get midpoints
+	// ==================================
 	mid_i = (x_pts-1) / 2;
 	mid_j = (y_pts-1) / 2;
 	mid_k = (z_pts-1) / 2;
 
+	// ==================================
+	// Set grid indices
+	// ==================================
 	for (int i=0; i < x_pts; i++)
 	{
 		x_grid[i] = (i-mid_i) * dxdi;
@@ -68,11 +89,18 @@ int Field_Data::_init()
 		z_grid[k] = (k-mid_k) * dzdk;
 	}
 
+	// ==================================
+	// In this case, z_grid must be set
+	// explicitly
+	// ==================================
 	if (z_pts == 1)
 	{
 		z_grid[0] = 0;
 	}
 
+	// ==================================
+	// Initialize splines for interp
+	// ==================================
 	splines_valid = _init_splines();
 
 	return 0;

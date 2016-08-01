@@ -1,4 +1,5 @@
 #include "consts.h"
+#include "emit.h"
 #include "field_data.h"
 #include "support_func.h"
 #include <hdf5.h>
@@ -7,8 +8,6 @@
 #include <mpi.h>
 #include <sstream>
 #include <string>
-#include "emit.h"
-/* #include "beam.h" */
 
 
 namespace ionsim

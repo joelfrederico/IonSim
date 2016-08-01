@@ -55,7 +55,9 @@ int slave()
 	const SimParams simparams = simparams_temp;
 
 	Field_Data *field;
+	Field_Data *ion_field;
 	field = new Field_Data(simparams);
+	ion_field = new Field_Data(simparams.n_field_x, simparams.n_field_y, 1, simparams.field_trans_wind, simparams.field_trans_wind, 0);
 
 	// ==================================
 	// Write attributes
@@ -173,6 +175,21 @@ int slave()
 				delete field;
 				field = new Field_Data(simparams);
 				fieldcomm.recv_field_copy(*field, 0);
+				break;
+
+			case LOOP_GET_IFIELD:
+				// ==================================
+				// Retrieve current ion field
+				// ==================================
+				loopcomm.recv_master(&substep_buf);
+				ions.field_Coulomb_sliced(*ion_field, substep_buf);
+
+				fieldcomm.send_field(*ion_field, 0);
+
+				break;
+			case LOOP_RESET_IFIELD:
+				delete ion_field;
+				ion_field = new Field_Data(simparams);
 				break;
 		}
 
