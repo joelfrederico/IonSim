@@ -3,16 +3,17 @@ AM_CPPFLAGS=$(MYAM_CPPFLAGS)
 
 bin_PROGRAMS = iontest
 
-iontest_SOURCES=\
+iontest_SOURCES=                           \
 		../pugixml/src/pugixml.cpp \
-		 main.cpp \
-		 ../ions.cpp \
-		 ../field_interp.cpp \
-		 ../field_data.cpp \
-		 ../parts.cpp \
-		 ../beam.cpp \
-		 ../emit.cpp \
-		 ../support_func.cpp \
+		 main.cpp                  \
+		 ../ions.cpp               \
+		 ../field_interp.cpp       \
+		 ../field_data.cpp         \
+		 ../parts.cpp              \
+		 ../scalar_data.cpp        \
+		 ../beam.cpp               \
+		 ../emit.cpp               \
+		 ../support_func.cpp       \
 		 ../simparams.cpp
 
 iontest_LDADD = $(MYLDADD)

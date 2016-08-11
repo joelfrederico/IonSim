@@ -84,36 +84,36 @@ class SimParams
 		// ==================================
 		// - Generic
 		std::string filename;
-		bool push_electrons;
-		bool push_ions;
+		bool push_electrons;		// Enable electron pushing
+		bool push_ions; 		// Enable ion pushing
 
 		// - Ion Window
-		double field_trans_wind;
-		double radius;
-		double z_end;
-		int n_field_x;
-		int n_field_y;
-		int n_field_z;
-		bool ion_z_bool;
+		double field_trans_wind; 	// Transverse sim window
+		double radius; 			// ?
+		double z_end; 			// Longitudinal length of sim window
+		int n_field_x; 			// Number of points in x
+		int n_field_y; 			// Number of points in y
+		int n_field_z; 			// Number of points in z
+		bool ion_z_bool; 		// ?
 
 		// - Electron sim
-		int n_steps;
+		int n_steps; 			// Number of electron pushes
 
 		// - Beam
-		double E;
-		double emit_n;
-		double q_tot;
-		double sdelta;
-		double sz;
-		double z_center;
-		long long n_e;
-		zdist_t zdist;
+		double E; 			// Energy in GeV
+		double emit_n; 			// Normalized emittance
+		double q_tot; 			// Total charge
+		double sdelta; 			// Energy spread
+		double sz; 			// Longitudinal RMS
+		double z_center; 		// Center of beam in ion window
+		long long n_e; 			// Number of electron macroparticles
+		zdist_t zdist; 			// Type of electron distribution
 
 		// - Ions
-		double m_ion_amu;
-		double n_p_cgs;
-		long long n_ions;
-		pushmethod_t pushmethod;
+		double m_ion_amu; 		// Ion mass
+		double n_p_cgs; 		// Ion density in CGS
+		long long n_ions; 		// Number of ion macroparticles
+		pushmethod_t pushmethod; 	// Push method?
 
 		// ==================================
 		// Data methods

@@ -34,12 +34,12 @@ class Ebeam : public Parts
 				const SimParams &simparams,
 				const double n_pts,
 				const double type,
-				double_vec x_in,
- 				double_vec xp_in,
- 				double_vec y_in,
- 				double_vec yp_in,
- 				double_vec z_in,
- 				double_vec zp_in
+				ldouble_vec x_in,
+ 				ldouble_vec xp_in,
+ 				ldouble_vec y_in,
+ 				ldouble_vec yp_in,
+ 				ldouble_vec z_in,
+ 				ldouble_vec zp_in
 				);
 
 		// ==================================

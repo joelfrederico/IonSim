@@ -72,12 +72,12 @@ int WriterParallel::_writedata(DatasetAccess *&dataset, hid_t &loc_id, const std
 	int n_write = MAX_N_WRITE;
 	double *buf;
 
-	const double_vec * _x  = &parts.x;
-	const double_vec * _xp = &parts.xp;
-	const double_vec * _y  = &parts.y;
-	const double_vec * _yp = &parts.yp;
-	const double_vec * _z  = &parts.z;
-	const double_vec * _zp = &parts.zp;
+	const ldouble_vec * _x  = &parts.x;
+	const ldouble_vec * _xp = &parts.xp;
+	const ldouble_vec * _y  = &parts.y;
+	const ldouble_vec * _yp = &parts.yp;
+	const ldouble_vec * _z  = &parts.z;
+	const ldouble_vec * _zp = &parts.zp;
 
 	hsize_t count[2];
 	hsize_t offset[2];

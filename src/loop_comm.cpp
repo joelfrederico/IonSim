@@ -83,10 +83,9 @@ int LoopComm::send_slaves(const int buf) const
 
 int LoopComm::recv_master(int *buf) const
 {
-	MPI_Status status;
 	if (id == 0) return -1;
 
-	MPI_Recv(buf, 1, MPI_INT, MASTER_RANK, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, &status);
+	MPI_Recv(buf, 1, MPI_INT, MASTER_RANK, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	return 0;
 }

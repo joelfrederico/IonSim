@@ -151,8 +151,6 @@ int Field_Comm::sum_fields(Field_Data &field, MPI_Comm *comm_id)
 	Bybuf = new double[field.n_pts];
 	Bzbuf = new double[field.n_pts];
 
-	Field_Data temp(field.x_pts, field.y_pts, field.z_pts, field.x_edge_mag, field.y_edge_mag, field.z_edge_mag);;
-
 	for (int i=0; i < p; i++)
 	{
 		if (i == my_id)

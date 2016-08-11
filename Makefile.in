@@ -192,7 +192,7 @@ CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in AUTHORS \
 	COPYING ChangeLog INSTALL NEWS README ar-lib compile \
-	config.guess config.sub depcomp install-sh ltmain.sh missing
+	config.guess config.sub install-sh ltmain.sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -263,6 +263,9 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FFTW3L_CFLAGS = @FFTW3L_CFLAGS@
+FFTW3L_LIBS = @FFTW3L_LIBS@
+FFTW3L_MPI_LIBS = @FFTW3L_MPI_LIBS@
 FGREP = @FGREP@
 GFLAGS_LIBS = @GFLAGS_LIBS@
 GREP = @GREP@
@@ -270,6 +273,7 @@ GSL_CFLAGS = @GSL_CFLAGS@
 GSL_LIBS = @GSL_LIBS@
 H5CC = @H5CC@
 H5FC = @H5FC@
+HAVE_CXX11 = @HAVE_CXX11@
 HDF5_CC = @HDF5_CC@
 HDF5_CFLAGS = @HDF5_CFLAGS@
 HDF5_CPPFLAGS = @HDF5_CPPFLAGS@

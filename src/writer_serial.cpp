@@ -50,12 +50,12 @@ int WriterSerial::writedata(long step, const std::string &group_str, const std::
 	// Initialize all variables
 	// ==================================
 	long long n_pts             = parts.n_pts;
-	const double_vec * _x  = &parts.x;
-	const double_vec * _xp = &parts.xp;
-	const double_vec * _y  = &parts.y;
-	const double_vec * _yp = &parts.yp;
-	const double_vec * _z  = &parts.z;
-	const double_vec * _zp = &parts.zp;
+	const ldouble_vec * _x  = &parts.x;
+	const ldouble_vec * _xp = &parts.xp;
+	const ldouble_vec * _y  = &parts.y;
+	const ldouble_vec * _yp = &parts.yp;
+	const ldouble_vec * _z  = &parts.z;
+	const ldouble_vec * _zp = &parts.zp;
 	double *buf;
 
 	int n_write = MAX_N_WRITE;

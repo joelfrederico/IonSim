@@ -48,6 +48,8 @@ int Ebeam::_gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov)
 	double z_temp;
 	double* rho_x;
 	double* rho_y;
+	double sigma_x, sigma_y;
+	double buf_x, buf_y;
 	const double z_first = _simparams.z_center - (_simparams.sz/2);
 	const double z_second = _simparams.z_center + (_simparams.sz/2);
 	int n_e_node;
@@ -70,9 +72,13 @@ int Ebeam::_gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov)
 
 	for (int i=0; i < n_e_node; i++)
 	{
+		gsl_ran_bivariate_gaussian(rng.r , sqrt(x_cov(0, 0)) , sqrt(x_cov(1, 1)) , *rho_x , &buf_x , &buf_y);
+		x[i]  = buf_x;
+		xp[i] = buf_y;
 
-		gsl_ran_bivariate_gaussian(rng.r , sqrt(x_cov(0, 0)) , sqrt(x_cov(1, 1)) , *rho_x , &x[i] , &xp[i]);
-		gsl_ran_bivariate_gaussian(rng.r , sqrt(y_cov(0, 0)) , sqrt(y_cov(1, 1)) , *rho_y , &y[i] , &yp[i]);
+		gsl_ran_bivariate_gaussian(rng.r , sqrt(y_cov(0, 0)) , sqrt(y_cov(1, 1)) , *rho_y , &buf_x , &buf_y);
+		y[i]  = buf_x;
+		yp[i] = buf_y;
 		
 		switch (_simparams.zdist)
 		{
@@ -83,7 +89,9 @@ int Ebeam::_gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov)
 				break;
 
 			case Z_DIST_GAUSS:
-				gsl_ran_bivariate_gaussian(rng.r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z_temp, &zp[i]);
+				gsl_ran_bivariate_gaussian(rng.r, sqrt(z_cov(0, 0)), sqrt(z_cov(1, 1)), 0, &z_temp, &buf_y);
+				zp[i] = buf_y;
+
 				z[i] = z_temp + _simparams.z_center;
 
 				break;
@@ -112,12 +120,12 @@ Ebeam::Ebeam(
 		const SimParams &simparams,
 		const double n_pts,
 		const double type,
-		double_vec x_in,
- 		double_vec xp_in,
- 		double_vec y_in,
- 		double_vec yp_in,
- 		double_vec z_in,
- 		double_vec zp_in
+		ldouble_vec x_in,
+ 		ldouble_vec xp_in,
+ 		ldouble_vec y_in,
+ 		ldouble_vec yp_in,
+ 		ldouble_vec z_in,
+ 		ldouble_vec zp_in
 		) : Parts(simparams.ion_mass(), simparams.n_e_node(), type), _simparams(simparams)
 {
 	x  = x_in;
@@ -134,26 +142,32 @@ Ebeam::Ebeam(
 
 double Ebeam::x_mean()
 {
-	double* x = &x[0];
-	return gsl_stats_mean(x, 1, n_pts);
+	/* double* x = &x[0]; */
+	/* return gsl_stats_mean(x, 1, n_pts); */
+	return ionsim::mean(x);
 }
 
 double Ebeam::x_std()
 {
 	/* double* x_local = &x[0]; */
-	return gsl_stats_sd_m(x.data(), 1, n_pts, 0);
+	/* return gsl_stats_sd_m(x.data(), 1, n_pts, 0); */
+	long double mean = x_mean();
+	return ionsim::std(x, mean);
 }
 
 double Ebeam::y_mean()
 {
-	double* y = &y[0];
-	return gsl_stats_mean(y, 1, n_pts);
+	/* double* y = &y[0]; */
+	/* return gsl_stats_mean(y, 1, n_pts); */
+	return ionsim::mean(y);
 }
 
 double Ebeam::y_std()
 {
 	/* double* y_local = &y[0]; */
-	return gsl_stats_sd_m(y.data(), 1, n_pts, 0);
+	/* return gsl_stats_sd_m(y.data(), 1, n_pts, 0); */
+	long double mean = y_mean();
+	return ionsim::std(y, mean);
 }
 
 Ebeam Ebeam::between(double z0, double z1)
@@ -161,12 +175,12 @@ Ebeam Ebeam::between(double z0, double z1)
 	// ==================================
 	// Initialize vectors to hold coords
 	// ==================================
-	double_vec x_out;
-	double_vec xp_out;
-	double_vec y_out;
-	double_vec yp_out;
-	double_vec z_out;
-	double_vec zp_out;
+	ldouble_vec x_out;
+	ldouble_vec xp_out;
+	ldouble_vec y_out;
+	ldouble_vec yp_out;
+	ldouble_vec z_out;
+	ldouble_vec zp_out;
 
 	// ==================================
 	// Check limits are correct

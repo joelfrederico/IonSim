@@ -144,6 +144,7 @@ int func(double t, const double y[], double dydt[], void * params)
 	return GSL_SUCCESS;
 }
 
+/*
 int Ions::push(double nb_0, double sig_r)
 {
 	double dt = _simparams->dt();
@@ -155,30 +156,31 @@ int Ions::push(double nb_0, double sig_r)
 	gsl_odeiv2_evolve *e  = gsl_odeiv2_evolve_alloc(4);
 	gsl_odeiv2_step *step = gsl_odeiv2_step_alloc(gsl_odeiv2_step_rk4, 4);
 
-	/* gsl_odeiv2_driver *d = gsl_odeiv2_driver_alloc_y_new(&sys, gsl_odeiv2_step_rk4, dt, sig_r/100, 1e-8); */
+	// gsl_odeiv2_driver *d = gsl_odeiv2_driver_alloc_y_new(&sys, gsl_odeiv2_step_rk4, dt, sig_r/100, 1e-8);
 	
 	for (int i=0; i < n_pts; i++)
 	{
-		double y[] = {x[i], y[i], xp[i], yp[i]};
+		long double y[] = {x[i], y[i], xp[i], yp[i]};
 		double yerr[4];
-		/* gsl_odeiv2_driver_apply_fixed_step(d, &t, dt, 4, y); */
-		gsl_odeiv2_step_apply(step, t, dt, y, yerr, NULL, NULL, &sys);
+		// gsl_odeiv2_driver_apply_fixed_step(d, &t, dt, 4, y);
+		gsl_odeiv2_step_apply(step, t, dt, &y, yerr, NULL, NULL, &sys);
 		x[i]  = y[0];
 		xp[i] = y[2];
 		y[i]  = y[1];
 		yp[i] = y[3];
 
-		/* F = F_r(x[i], y[i], nb_0, sig_r); */
+		// F = F_r(x[i], y[i], nb_0, sig_r);
 		z[i]  = std::abs(F);
 		zp[i] = mass;
 	}
 
-	/* gsl_odeiv2_driver_free(d); */
+	// gsl_odeiv2_driver_free(d);
 	gsl_odeiv2_step_free(step);
 	gsl_odeiv2_evolve_free(e);
 
 	return 0;
 }
+*/
 
 int Ions::push_simple(double nb_0, double sig_r)
 {
@@ -231,7 +233,7 @@ int Ions::push_field(Field_Data &field, int z_step)
 	return 0;
 }
 
-
+/*
 int Ions::field_Coulomb_sliced(Field_Data &field, int step)
 {
 	double dx, dy, dz;
@@ -248,10 +250,10 @@ int Ions::field_Coulomb_sliced(Field_Data &field, int step)
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-	/* const double common   = _simparams.qpp_e()*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro); */
+	// const double common   = _simparams.qpp_e()*GSL_CONST_MKSA_ELECTRON_CHARGE / (4*M_PI*dz*srsq_macro);
 
-	/* const double common_E = common / GSL_CONST_MKSA_VACUUM_PERMITTIVITY; */
-	/* const double common_B = common * GSL_CONST_MKSA_SPEED_OF_LIGHT * GSL_CONST_MKSA_VACUUM_PERMEABILITY; */
+	// const double common_E = common / GSL_CONST_MKSA_VACUUM_PERMITTIVITY;
+	// const double common_B = common * GSL_CONST_MKSA_SPEED_OF_LIGHT * GSL_CONST_MKSA_VACUUM_PERMEABILITY;
 
 	double temp_tran;
 	double temp_tran_E;
@@ -291,8 +293,8 @@ int Ions::field_Coulomb_sliced(Field_Data &field, int step)
 					field.Ex_ind(i, j, k) += temp_tran_E * dx;
 					field.Ey_ind(i, j, k) += temp_tran_E * dy;
 
-					/* field.Bx_ind(i, j, k) += -temp_tran_B * dy; */
-					/* field.By_ind(i, j, k) +=  temp_tran_B * dx; */
+					// field.Bx_ind(i, j, k) += -temp_tran_B * dy;
+					// field.By_ind(i, j, k) +=  temp_tran_B * dx;
 				}
 			}
 		}
@@ -301,16 +303,21 @@ int Ions::field_Coulomb_sliced(Field_Data &field, int step)
 
 	return 0;
 }
+*/
 
-double np() const
+/*
+double Ions::np() const
 {
 	return _simparams->n_p_cgs * 
 }
+*/
 
+/*
 // ==================================
 // Smoothing- see thesis
 // ==================================
 double Ions::sr_macro() const
 {
-	return 0.2347535410605456 / sqrt(n_0() * _simparams.dz());
+	return 0.2347535410605456 / sqrt(n_0() * _simparams->dz());
 }
+*/

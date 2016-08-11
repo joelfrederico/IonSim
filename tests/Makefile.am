@@ -14,23 +14,24 @@ libgtest_la_LDFLAGS =-pthread
 
 check_PROGRAMS = gtest mpi_gtest
 
-gtest_SOURCES = \
-		fieldtest.cpp \
-		gtest.cpp \
-		hdf5test.cpp \
-		ionstest.cpp \
-		simparamstest.cpp \
-		support.cpp \
+gtest_SOURCES =                                \
+		fieldtest.cpp                  \
+		gtest.cpp                      \
+		hdf5test.cpp                   \
+		ionstest.cpp                   \
+		simparamstest.cpp              \
+		support.cpp                    \
 		../src/pugixml/src/pugixml.cpp \
-		../src/beam.cpp \
-		../src/emit.cpp \
-		../src/field_comm.cpp \
-		../src/field_data.cpp \
-		../src/field_interp.cpp \
-		../src/ions.cpp \
-		../src/loop_comm.cpp \
-		../src/parts.cpp \
-		../src/simparams.cpp \
+		../src/beam.cpp                \
+		../src/emit.cpp                \
+		../src/field_comm.cpp          \
+		../src/field_data.cpp          \
+		../src/field_interp.cpp        \
+		../src/ions.cpp                \
+		../src/loop_comm.cpp           \
+		../src/parts.cpp               \
+		../src/scalar_data.cpp         \
+		../src/simparams.cpp           \
 		../src/support_func.cpp
 
 gtest_LDADD = libgtest.la $(MYLDADD)

@@ -3,11 +3,16 @@
 
 #include "simparams.h"
 #include "consts.h"
+#include "scalar_data.h"
+#include <vector>
 
 class Parts
 {
 	private:
-		int _vec_reserve();
+		double _particle_charge;
+
+		int _init();
+
 	public:
 		// ==============================
 		// Constructors
@@ -22,13 +27,18 @@ class Parts
 		const long long n_pts;
 		const parttype_t type;
 
-		double_vec x;
-		double_vec xp;
-		double_vec y;
-		double_vec yp;
-		double_vec z;
-		double_vec zp;
+		ldouble_vec x;
+		ldouble_vec xp;
+		ldouble_vec y;
+		ldouble_vec yp;
+		ldouble_vec z;
+		ldouble_vec zp;
 
+		// ==============================
+		// Data methods
+		// ==============================
+		ScalarData get_rho_dz(double z0, double z1, const SimParams &simparams);
+		std::vector<ScalarData> get_J();
 };
 
 #endif

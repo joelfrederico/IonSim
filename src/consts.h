@@ -8,7 +8,9 @@
 // ==================================
 // Define types
 // ==================================
-typedef std::vector<double> double_vec;
+typedef long double ldouble;
+typedef long long llong;
+typedef std::vector<ldouble> ldouble_vec;
 typedef int loopflag_t;
 typedef int tag_t;
 typedef int pushmethod_t;
@@ -55,6 +57,7 @@ class zDist
 // ==================================
 // Loop flags
 // ==================================
+
 const loopflag_t LOOP_KILL         = 1;
 const loopflag_t LOOP_DUMP_IONS    = 2;
 const loopflag_t LOOP_DUMP_E       = 3;
@@ -64,6 +67,12 @@ const loopflag_t LOOP_GET_EFIELD   = 6;
 const loopflag_t LOOP_SEND_EFIELD  = 7;
 const loopflag_t LOOP_GET_IFIELD   = 8;
 const loopflag_t LOOP_RESET_IFIELD = 9;
+const loopflag_t LOOP_FFTW_2D_DFT  = 10;
+const loopflag_t LOOP_FFTW_2D_IDFT = 11;
+const loopflag_t LOOP_GET_RHO      = 12;
+const loopflag_t LOOP_START_E_ITER = 13;
+const loopflag_t LOOP_START_I_ITER = 14;
+const loopflag_t LOOP_GET_FIELDS   = 15;
 
 // ==================================
 // MPI tags

@@ -10,6 +10,7 @@ ionsim_SOURCES = \
 		 consts.cpp              \
 		 ebeam.cpp               \
 		 emit.cpp                \
+		 fftw_classes.cpp        \
 		 field_comm.cpp          \
 		 field_data.cpp          \
 		 field_interp.cpp        \
@@ -19,6 +20,8 @@ ionsim_SOURCES = \
 		 main.cpp                \
 		 master.cpp              \
 		 parts.cpp               \
+		 scalar_data.cpp         \
+		 scalar_data_comm.cpp    \
 		 simparams.cpp           \
 		 slave.cpp               \
 		 support_func.cpp        \

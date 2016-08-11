@@ -1,4 +1,4 @@
-#include "mpi.h"
+#include <mpi.h>
 #include "support_func.h"
 #include "field_data.h"
 #include "field_comm.h"
@@ -7,6 +7,9 @@
 #include "consts.h"
 #include "simparams.h"
 #include <gflags/gflags.h>
+#include "scalar_data_comm.h"
+#include <fftw3-mpi.h>
+#include "fftw_classes.h"
 
 DECLARE_string(file);
 DECLARE_bool(verbose);
@@ -16,8 +19,9 @@ int master()
 	// ==============================
 	// Starting gun
 	// ==============================
+	const char *wisdom_file = ".fftw-wisdom";
 	LoopComm loopcomm;
-	MPI_Status status;
+	ScalarData_Comm scalarcomm;
 
 	if (FLAGS_verbose) printf("Master says: I am the MASTER!\n");
 	for (int slave_id=1; slave_id < loopcomm.p; slave_id++)
@@ -40,9 +44,26 @@ int master()
 	// ==============================
 	// Initialize fields
 	// ==============================
+	long long rho_size;
+	ScalarData rho(simparams);
+	ScalarData psi(simparams);
 	Field_Data *field;
-	Field_Data *ion_field;
 	Field_Comm fieldcomm;
+	long long local_n0, local_0_start;
+	long double *buf;
+
+	// ==============================
+	// Try to read FFT wisdom
+	// ==============================
+	fftwl_mpi_init();
+	if (fftwl_import_wisdom_from_filename(".fftw_wisdom"))
+	{
+		std::cout << "Wisdom imported successfully" << std::endl;
+	} else {
+		std::cout << "Wisdom not imported" << std::endl;
+	}
+
+	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
 
 	// ==============================
 	// Send simparams everywhere
@@ -66,8 +87,13 @@ int master()
 		// Allocate for this loop
 		// ==============================
 		field     = new Field_Data(simparams);
-		ion_field = new Field_Data(simparams);
 		printf("Step: %d\n", e_step);
+
+		// ==============================
+		// Setup slave for e loop
+		// ==============================
+		loopcomm.instruct(LOOP_START_E_ITER);
+		loopcomm.send_slaves(e_step);
 
 		// ==============================
 		// Get fields from slaves
@@ -79,7 +105,6 @@ int master()
 		// Write electrons
 		// ==============================
 		loopcomm.instruct(LOOP_DUMP_E);
-		loopcomm.send_slaves(e_step);
 
 		// ==============================
 		// Write total field
@@ -98,16 +123,68 @@ int master()
 		}
 
 		// ==============================
+		// Get rho
+		// ==============================
+		loopcomm.instruct(LOOP_GET_RHO);
+		rho = 0;
+		scalarcomm.recv_scalar_others_add(rho);
+
+		// ==============================
+		// Get fields
+		// ==============================
+		loopcomm.instruct(LOOP_GET_FIELDS);
+		for (int id=1; id < loopcomm.p; id++)
+		{
+			// Load wisdom and distribute
+			if (fftwl_import_wisdom_from_filename(wisdom_file))
+			{
+				std::cout << "Wisdom import succeeded" << std::endl;
+			} else {
+				std::cout << "Wisdom import failed" << std::endl;
+			}
+
+			fftwl_recv_local_size(local_n0, local_0_start, id);
+
+			rho_size = local_n0*rho.y_pts;
+
+			// Get pointer to proper location in array
+			buf = (rho.data.data() + local_0_start);
+
+			// Send rho
+			MPI_Send(&buf, local_n0*rho.y_pts, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
+		}
+		
+		// Let slaves do FFT, then collect psi
+		for (int id=1; id < loopcomm.p; id++)
+		{
+			fftwl_recv_local_size(local_n0, local_0_start, id);
+			rho_size = local_n0*rho.y_pts;
+
+			// Receive psi
+			buf = (psi.data.data() + local_0_start);
+			MPI_Recv(&buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+		}
+		// Receive wisdom and save
+		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
+		fftwl_export_wisdom_to_filename(wisdom_file);
+
+		/*
+		// ==============================
 		// Integrate ion motion
 		// ==============================
 		for (int z_step=0; z_step < simparams.n_field_z; z_step++)
 		{
 			// ==============================
+			// Setup slave for e loop
+			// ==============================
+			loopcomm.instruct(LOOP_START_E_ITER);
+			loopcomm.send_slaves(z_step);
+
+			// ==============================
 			// Record ions
 			// ==============================
 			loopcomm.instruct(LOOP_DUMP_IONS);
-			loopcomm.send_slaves(e_step);
-			loopcomm.send_slaves(z_step);
 
 			// ==============================
 			// Get current ion field
@@ -121,15 +198,14 @@ int master()
 			{
 				std::cout << "Ion step: " << z_step << std::endl;
 				loopcomm.instruct(LOOP_PUSH_IONS);
-				loopcomm.send_slaves(z_step);
 			}
 
 		}
+		*/
 
 		// ==============================
 		// Deallocate for this loop
 		// ==============================
-		delete ion_field;
 		delete field;
 	}
 

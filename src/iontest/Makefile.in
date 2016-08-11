@@ -109,8 +109,8 @@ am_iontest_OBJECTS = ../pugixml/src/iontest-pugixml.$(OBJEXT) \
 	iontest-main.$(OBJEXT) ../iontest-ions.$(OBJEXT) \
 	../iontest-field_interp.$(OBJEXT) \
 	../iontest-field_data.$(OBJEXT) ../iontest-parts.$(OBJEXT) \
-	../iontest-beam.$(OBJEXT) ../iontest-emit.$(OBJEXT) \
-	../iontest-support_func.$(OBJEXT) \
+	../iontest-scalar_data.$(OBJEXT) ../iontest-beam.$(OBJEXT) \
+	../iontest-emit.$(OBJEXT) ../iontest-support_func.$(OBJEXT) \
 	../iontest-simparams.$(OBJEXT)
 iontest_OBJECTS = $(am_iontest_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -209,6 +209,9 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FFTW3L_CFLAGS = @FFTW3L_CFLAGS@
+FFTW3L_LIBS = @FFTW3L_LIBS@
+FFTW3L_MPI_LIBS = @FFTW3L_MPI_LIBS@
 FGREP = @FGREP@
 GFLAGS_LIBS = @GFLAGS_LIBS@
 GREP = @GREP@
@@ -216,6 +219,7 @@ GSL_CFLAGS = @GSL_CFLAGS@
 GSL_LIBS = @GSL_LIBS@
 H5CC = @H5CC@
 H5FC = @H5FC@
+HAVE_CXX11 = @HAVE_CXX11@
 HDF5_CC = @HDF5_CC@
 HDF5_CFLAGS = @HDF5_CFLAGS@
 HDF5_CPPFLAGS = @HDF5_CPPFLAGS@
@@ -330,14 +334,15 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(MYAM_CPPFLAGS)
 iontest_SOURCES = \
 		../pugixml/src/pugixml.cpp \
-		 main.cpp \
-		 ../ions.cpp \
-		 ../field_interp.cpp \
-		 ../field_data.cpp \
-		 ../parts.cpp \
-		 ../beam.cpp \
-		 ../emit.cpp \
-		 ../support_func.cpp \
+		 main.cpp                  \
+		 ../ions.cpp               \
+		 ../field_interp.cpp       \
+		 ../field_data.cpp         \
+		 ../parts.cpp              \
+		 ../scalar_data.cpp        \
+		 ../beam.cpp               \
+		 ../emit.cpp               \
+		 ../support_func.cpp       \
 		 ../simparams.cpp
 
 iontest_LDADD = $(MYLDADD)
@@ -447,6 +452,8 @@ clean-binPROGRAMS:
 	../$(DEPDIR)/$(am__dirstamp)
 ../iontest-parts.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
+../iontest-scalar_data.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 ../iontest-beam.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
 ../iontest-emit.$(OBJEXT): ../$(am__dirstamp) \
@@ -474,6 +481,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-field_interp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-parts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-scalar_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/iontest-support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../pugixml/src/$(DEPDIR)/iontest-pugixml.Po@am__quote@
@@ -586,6 +594,20 @@ iontest-main.obj: main.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../parts.cpp' object='../iontest-parts.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-parts.obj `if test -f '../parts.cpp'; then $(CYGPATH_W) '../parts.cpp'; else $(CYGPATH_W) '$(srcdir)/../parts.cpp'; fi`
+
+../iontest-scalar_data.o: ../scalar_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-scalar_data.o -MD -MP -MF ../$(DEPDIR)/iontest-scalar_data.Tpo -c -o ../iontest-scalar_data.o `test -f '../scalar_data.cpp' || echo '$(srcdir)/'`../scalar_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-scalar_data.Tpo ../$(DEPDIR)/iontest-scalar_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../scalar_data.cpp' object='../iontest-scalar_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-scalar_data.o `test -f '../scalar_data.cpp' || echo '$(srcdir)/'`../scalar_data.cpp
+
+../iontest-scalar_data.obj: ../scalar_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-scalar_data.obj -MD -MP -MF ../$(DEPDIR)/iontest-scalar_data.Tpo -c -o ../iontest-scalar_data.obj `if test -f '../scalar_data.cpp'; then $(CYGPATH_W) '../scalar_data.cpp'; else $(CYGPATH_W) '$(srcdir)/../scalar_data.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/iontest-scalar_data.Tpo ../$(DEPDIR)/iontest-scalar_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../scalar_data.cpp' object='../iontest-scalar_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../iontest-scalar_data.obj `if test -f '../scalar_data.cpp'; then $(CYGPATH_W) '../scalar_data.cpp'; else $(CYGPATH_W) '$(srcdir)/../scalar_data.cpp'; fi`
 
 ../iontest-beam.o: ../beam.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iontest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../iontest-beam.o -MD -MP -MF ../$(DEPDIR)/iontest-beam.Tpo -c -o ../iontest-beam.o `test -f '../beam.cpp' || echo '$(srcdir)/'`../beam.cpp

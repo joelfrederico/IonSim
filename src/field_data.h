@@ -11,7 +11,6 @@ class Field_Data
 		// ==================================
 		// Private data members
 		// ==================================
-
 		double mid_i;
 		double mid_j;
 		double mid_k;

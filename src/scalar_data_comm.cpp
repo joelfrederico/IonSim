@@ -1,0 +1,57 @@
+#include "scalar_data_comm.h"
+#include "scalar_data.h"
+#include "support_func.h"
+#include <mpi.h>
+#include "loop_comm.h"
+#include "consts.h"
+#include <vector>
+
+ScalarData_Comm::ScalarData_Comm()
+{
+	LoopComm loopcomm;
+	p     = loopcomm.p;
+	my_id = loopcomm.id;
+}
+
+int ScalarData_Comm::recv_scalar_others_add(ScalarData &scalar_recv)
+{
+	long long n_pts = scalar_recv.n_pts();
+
+	std::vector<double> buf;
+	buf.resize(n_pts);
+
+	for (int id=0; id < p; id++)
+	{
+		if (id != my_id)
+		{
+			/* std::cout << "Receiving " << scalar_recv.n_pts << " from: " << id << std::endl; */
+			MPI_Recv(buf.data(), n_pts, MPI_DOUBLE, id, TAG_FIELD, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			/* std::cout << "Finished receiving from: " << id << std::endl; */
+
+			for (int ind=0; ind < n_pts; ind++)
+			{
+				scalar_recv.ind(ind) += buf[ind];
+			}
+		}
+	}
+
+	return 0;
+}
+
+int ScalarData_Comm::recv_scalar_copy(ScalarData &scalar_recv, int sender_id)
+{
+	long long n_pts = scalar_recv.n_pts();
+
+	MPI_Recv(scalar_recv.data.data(), n_pts, MPI_DOUBLE, sender_id, TAG_FIELD, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+	return 0;
+}
+
+int ScalarData_Comm::send_scalar(ScalarData &scalar_send, int dest_id)
+{
+	/* std::cout << "Sending " << scalar_send.n_pts << " to: " << dest_id << std::endl; */
+	MPI_Send(scalar_send.data.data(), scalar_send.n_pts(), MPI_DOUBLE, dest_id, TAG_FIELD, MPI_COMM_WORLD);
+	/* std::cout << "Finished sending to: " << dest_id << std::endl; */
+
+	return 0;
+}

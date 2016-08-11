@@ -108,13 +108,14 @@ PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_ionsim_OBJECTS = faddeeva/Faddeeva.$(OBJEXT) \
 	pugixml/src/pugixml.$(OBJEXT) beam.$(OBJEXT) consts.$(OBJEXT) \
-	ebeam.$(OBJEXT) emit.$(OBJEXT) field_comm.$(OBJEXT) \
-	field_data.$(OBJEXT) field_interp.$(OBJEXT) \
-	gsl_classes.$(OBJEXT) ions.$(OBJEXT) loop_comm.$(OBJEXT) \
-	main.$(OBJEXT) master.$(OBJEXT) parts.$(OBJEXT) \
-	simparams.$(OBJEXT) slave.$(OBJEXT) support_func.$(OBJEXT) \
-	writer_base.$(OBJEXT) writer_parallel.$(OBJEXT) \
-	writer_serial.$(OBJEXT)
+	ebeam.$(OBJEXT) emit.$(OBJEXT) fftw_classes.$(OBJEXT) \
+	field_comm.$(OBJEXT) field_data.$(OBJEXT) \
+	field_interp.$(OBJEXT) gsl_classes.$(OBJEXT) ions.$(OBJEXT) \
+	loop_comm.$(OBJEXT) main.$(OBJEXT) master.$(OBJEXT) \
+	parts.$(OBJEXT) scalar_data.$(OBJEXT) \
+	scalar_data_comm.$(OBJEXT) simparams.$(OBJEXT) slave.$(OBJEXT) \
+	support_func.$(OBJEXT) writer_base.$(OBJEXT) \
+	writer_parallel.$(OBJEXT) writer_serial.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
 am__DEPENDENCIES_1 =
 ionsim_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -287,6 +288,9 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FFTW3L_CFLAGS = @FFTW3L_CFLAGS@
+FFTW3L_LIBS = @FFTW3L_LIBS@
+FFTW3L_MPI_LIBS = @FFTW3L_MPI_LIBS@
 FGREP = @FGREP@
 GFLAGS_LIBS = @GFLAGS_LIBS@
 GREP = @GREP@
@@ -294,6 +298,7 @@ GSL_CFLAGS = @GSL_CFLAGS@
 GSL_LIBS = @GSL_LIBS@
 H5CC = @H5CC@
 H5FC = @H5FC@
+HAVE_CXX11 = @HAVE_CXX11@
 HDF5_CC = @HDF5_CC@
 HDF5_CFLAGS = @HDF5_CFLAGS@
 HDF5_CPPFLAGS = @HDF5_CPPFLAGS@
@@ -412,6 +417,7 @@ ionsim_SOURCES = \
 		 consts.cpp              \
 		 ebeam.cpp               \
 		 emit.cpp                \
+		 fftw_classes.cpp        \
 		 field_comm.cpp          \
 		 field_data.cpp          \
 		 field_interp.cpp        \
@@ -421,6 +427,8 @@ ionsim_SOURCES = \
 		 main.cpp                \
 		 master.cpp              \
 		 parts.cpp               \
+		 scalar_data.cpp         \
+		 scalar_data_comm.cpp    \
 		 simparams.cpp           \
 		 slave.cpp               \
 		 support_func.cpp        \
@@ -558,6 +566,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/consts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ebeam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fftw_classes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field_interp.Po@am__quote@
@@ -568,6 +577,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scalar_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scalar_data_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slave.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support_func.Po@am__quote@

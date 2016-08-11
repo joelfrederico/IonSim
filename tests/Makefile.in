@@ -123,7 +123,9 @@ am_gtest_OBJECTS = gtest-fieldtest.$(OBJEXT) gtest-gtest.$(OBJEXT) \
 	../src/gtest-field_data.$(OBJEXT) \
 	../src/gtest-field_interp.$(OBJEXT) \
 	../src/gtest-ions.$(OBJEXT) ../src/gtest-loop_comm.$(OBJEXT) \
-	../src/gtest-parts.$(OBJEXT) ../src/gtest-simparams.$(OBJEXT) \
+	../src/gtest-parts.$(OBJEXT) \
+	../src/gtest-scalar_data.$(OBJEXT) \
+	../src/gtest-simparams.$(OBJEXT) \
 	../src/gtest-support_func.$(OBJEXT)
 gtest_OBJECTS = $(am_gtest_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -433,6 +435,9 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FFTW3L_CFLAGS = @FFTW3L_CFLAGS@
+FFTW3L_LIBS = @FFTW3L_LIBS@
+FFTW3L_MPI_LIBS = @FFTW3L_MPI_LIBS@
 FGREP = @FGREP@
 GFLAGS_LIBS = @GFLAGS_LIBS@
 GREP = @GREP@
@@ -440,6 +445,7 @@ GSL_CFLAGS = @GSL_CFLAGS@
 GSL_LIBS = @GSL_LIBS@
 H5CC = @H5CC@
 H5FC = @H5FC@
+HAVE_CXX11 = @HAVE_CXX11@
 HDF5_CC = @HDF5_CC@
 HDF5_CFLAGS = @HDF5_CFLAGS@
 HDF5_CPPFLAGS = @HDF5_CPPFLAGS@
@@ -563,22 +569,23 @@ libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
 libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest $(MYAM_CPPFLAGS)
 libgtest_la_LDFLAGS = -pthread
 gtest_SOURCES = \
-		fieldtest.cpp \
-		gtest.cpp \
-		hdf5test.cpp \
-		ionstest.cpp \
-		simparamstest.cpp \
-		support.cpp \
+		fieldtest.cpp                  \
+		gtest.cpp                      \
+		hdf5test.cpp                   \
+		ionstest.cpp                   \
+		simparamstest.cpp              \
+		support.cpp                    \
 		../src/pugixml/src/pugixml.cpp \
-		../src/beam.cpp \
-		../src/emit.cpp \
-		../src/field_comm.cpp \
-		../src/field_data.cpp \
-		../src/field_interp.cpp \
-		../src/ions.cpp \
-		../src/loop_comm.cpp \
-		../src/parts.cpp \
-		../src/simparams.cpp \
+		../src/beam.cpp                \
+		../src/emit.cpp                \
+		../src/field_comm.cpp          \
+		../src/field_data.cpp          \
+		../src/field_interp.cpp        \
+		../src/ions.cpp                \
+		../src/loop_comm.cpp           \
+		../src/parts.cpp               \
+		../src/scalar_data.cpp         \
+		../src/simparams.cpp           \
 		../src/support_func.cpp
 
 gtest_LDADD = libgtest.la $(MYLDADD)
@@ -684,6 +691,8 @@ clean-checkPROGRAMS:
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-parts.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
+../src/gtest-scalar_data.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-simparams.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/gtest-support_func.$(OBJEXT): ../src/$(am__dirstamp) \
@@ -716,6 +725,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-ions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-parts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-scalar_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtest-support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/pugixml/src/$(DEPDIR)/gtest-pugixml.Po@am__quote@
@@ -967,6 +977,20 @@ gtest-support.obj: support.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/parts.cpp' object='../src/gtest-parts.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-parts.obj `if test -f '../src/parts.cpp'; then $(CYGPATH_W) '../src/parts.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/parts.cpp'; fi`
+
+../src/gtest-scalar_data.o: ../src/scalar_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-scalar_data.o -MD -MP -MF ../src/$(DEPDIR)/gtest-scalar_data.Tpo -c -o ../src/gtest-scalar_data.o `test -f '../src/scalar_data.cpp' || echo '$(srcdir)/'`../src/scalar_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-scalar_data.Tpo ../src/$(DEPDIR)/gtest-scalar_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/scalar_data.cpp' object='../src/gtest-scalar_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-scalar_data.o `test -f '../src/scalar_data.cpp' || echo '$(srcdir)/'`../src/scalar_data.cpp
+
+../src/gtest-scalar_data.obj: ../src/scalar_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-scalar_data.obj -MD -MP -MF ../src/$(DEPDIR)/gtest-scalar_data.Tpo -c -o ../src/gtest-scalar_data.obj `if test -f '../src/scalar_data.cpp'; then $(CYGPATH_W) '../src/scalar_data.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/scalar_data.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtest-scalar_data.Tpo ../src/$(DEPDIR)/gtest-scalar_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/scalar_data.cpp' object='../src/gtest-scalar_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtest-scalar_data.obj `if test -f '../src/scalar_data.cpp'; then $(CYGPATH_W) '../src/scalar_data.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/scalar_data.cpp'; fi`
 
 ../src/gtest-simparams.o: ../src/simparams.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gtest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtest-simparams.o -MD -MP -MF ../src/$(DEPDIR)/gtest-simparams.Tpo -c -o ../src/gtest-simparams.o `test -f '../src/simparams.cpp' || echo '$(srcdir)/'`../src/simparams.cpp
