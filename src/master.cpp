@@ -39,7 +39,17 @@ int master()
 	// ==============================
 	// Load from file
 	// ==============================
-	const SimParams simparams(FLAGS_file);
+	SimParams *simparams_try;
+	try
+	{
+		simparams_try = new SimParams(FLAGS_file);
+	} catch (...) {
+		loopcomm.instruct(LOOP_KILL);
+		return 0;
+	}
+
+	const SimParams simparams = *simparams_try;
+	delete simparams_try;
 
 	// ==============================
 	// Initialize fields
@@ -47,6 +57,7 @@ int master()
 	long long rho_size;
 	ScalarData rho(simparams);
 	ScalarData psi(simparams);
+	std::vector<std::complex<long double>> cdata;
 	Field_Data *field;
 	Field_Comm fieldcomm;
 	long long local_n0, local_0_start;
@@ -56,7 +67,7 @@ int master()
 	// Try to read FFT wisdom
 	// ==============================
 	fftwl_mpi_init();
-	if (fftwl_import_wisdom_from_filename(".fftw_wisdom"))
+	if (fftwl_import_wisdom_from_filename(wisdom_file))
 	{
 		std::cout << "Wisdom imported successfully" << std::endl;
 	} else {
@@ -77,6 +88,7 @@ int master()
 	writer_s = new WriterSerial(simparams.filename, true);
 	(*writer_s).write_attributes(simparams);
 	delete writer_s;
+
 
 	// ==============================
 	// Loop over electron evolution
@@ -135,14 +147,6 @@ int master()
 		loopcomm.instruct(LOOP_GET_FIELDS);
 		for (int id=1; id < loopcomm.p; id++)
 		{
-			// Load wisdom and distribute
-			if (fftwl_import_wisdom_from_filename(wisdom_file))
-			{
-				std::cout << "Wisdom import succeeded" << std::endl;
-			} else {
-				std::cout << "Wisdom import failed" << std::endl;
-			}
-
 			fftwl_recv_local_size(local_n0, local_0_start, id);
 
 			rho_size = local_n0*rho.y_pts;
@@ -151,9 +155,25 @@ int master()
 			buf = (rho.data.data() + local_0_start);
 
 			// Send rho
-			MPI_Send(&buf, local_n0*rho.y_pts, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
+			MPI_Send(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 		}
-		
+
+		for (int id=1; id < loopcomm.p; id++)
+		{
+			MPI_Recv_complex(id, cdata);
+
+		}
+
+		cdata[0].real(100);
+		writer_s = new WriterSerial(simparams.filename);
+		writer_s->writedata(e_step, cdata, "complex");
+		delete writer_s;
+
+		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
+		fftwl_export_wisdom_to_filename(wisdom_file);
+		loopcomm.instruct(LOOP_KILL);
+		return 0;
+
 		// Let slaves do FFT, then collect psi
 		for (int id=1; id < loopcomm.p; id++)
 		{
@@ -162,12 +182,13 @@ int master()
 
 			// Receive psi
 			buf = (psi.data.data() + local_0_start);
-			MPI_Recv(&buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
+			MPI_Recv(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		}
 		// Receive wisdom and save
 		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
 		fftwl_export_wisdom_to_filename(wisdom_file);
+
+		loopcomm.instruct(LOOP_KILL);
 
 		/*
 		// ==============================

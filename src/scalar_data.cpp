@@ -14,7 +14,7 @@ bool ScalarData::_samedim(const ScalarData &rhs) const
 
 long long ScalarData::n_pts() const
 {
-	return x_pts*y_pts*z_pts;
+	return x_pts * y_pts * z_pts;
 }
 
 int ScalarData::_init()
@@ -135,20 +135,31 @@ long double &ScalarData::ind(long long ind)
 	return data[ind];
 }
 
-
-llong ScalarData::lt_x_ind(ldouble x)
+int getind_e(const ldouble x, const double delx, const double mid, const int n_pts, int &ind)
 {
-	return floor(x/dxdi + mid_i);
+	ind = floor(x/delx + mid);
+	if ( (0 < ind ) && (ind < n_pts-1))
+	{
+		return 0;
+	} else {
+		return -1;
+	}
 }
 
-llong ScalarData::lt_y_ind(ldouble y)
+int ScalarData::lt_x_ind_e(const ldouble x, int &ind) const
 {
-	return floor(y/dydj + mid_j);
+	return getind_e(x, dxdi, mid_i, x_pts, ind);
+	/* return floor(x/dxdi + mid_i); */
 }
 
-llong ScalarData::lt_z_ind(ldouble z)
+int ScalarData::lt_y_ind_e(const ldouble y, int &ind) const
 {
-	return floor(z/dzdk + mid_k);
+	return getind_e(y, dydj, mid_j, y_pts, ind);
+}
+
+int ScalarData::lt_z_ind_e(const ldouble z, int &ind) const
+{
+	return getind_e(z, dzdk, 0, z_pts, ind);
 }
 
 // ==================================
@@ -170,7 +181,7 @@ ScalarData &ScalarData::operator=(const ScalarData &rhs)
 		{
 			this->data = rhs.data;
 		} else {
-			throw "Cannot copy fields of different sizes";
+			throw std::runtime_error("Cannot copy fields of different sizes");
 		}
 	}
     	return *this;
@@ -179,7 +190,7 @@ ScalarData &ScalarData::operator=(const ScalarData &rhs)
 ScalarData ScalarData::operator-() const
 {
 	ScalarData temp = *this;
-	for (int i; i < n_pts(); i++)
+	for (int i=0; i < n_pts(); i++)
 	{
 		temp.data[i] *= -1;
 	}
@@ -191,12 +202,12 @@ ScalarData &ScalarData::operator+=(const ScalarData &rhs)
 {
 	if ( this->_samedim(rhs) )
 	{
-		for (int i; i < n_pts(); i++)
+		for (int i=0; i < n_pts(); i++)
 		{
 			this->data[i] += rhs.data[i];
 		}
 	} else {
-		throw "Cannot add fields of different sizes";
+		throw std::runtime_error("Cannot add fields of different sizes");
 	}
 	return *this;
 }
@@ -205,12 +216,12 @@ ScalarData &ScalarData::operator-=(const ScalarData &rhs)
 {
 	if ( this->_samedim(rhs) )
 	{
-		for (int i; i < n_pts(); i++)
+		for (int i=0; i < n_pts(); i++)
 		{
 			this->data[i] -= rhs.data[i];
 		}
 	} else {
-		throw "Cannot subtract fields of different sizes";
+		throw std::runtime_error("Cannot subtract fields of different sizes");
 	}
 	return *this;
 }

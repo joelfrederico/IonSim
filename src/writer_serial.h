@@ -4,6 +4,7 @@
 #include "writer_base.h"
 #include "parts.h"
 #include "field_data.h"
+#include <ionsim.h>
 
 class WriterSerial : public WriterBase
 {
@@ -20,6 +21,52 @@ class WriterSerial : public WriterBase
 
 		int writedata(long step, const std::string &group, const std::string &dataset_str, const Parts &parts);
 		int writedata(long step, Field_Data &field);
+
+		template<typename T>
+		int writedata(const long step, const std::vector<std::complex<T>> &buf, std::string name) const
+		{
+			// ==================================
+			// Initialize all variables
+			// ==================================
+			typename std::vector<std::complex<T>>::size_type bsize = buf.size();
+			std::vector<typename std::vector<std::complex<T>>::size_type> size{bsize, 2};
+			hid_t hdf5type;
+			herr_t status;
+			std::vector<double> dbuf;
+
+			dbuf.resize(2*bsize);
+			for (int i=0; i<bsize; i++)
+			{
+				dbuf[i] = buf[i].real();
+				dbuf[i+bsize] = buf[i].imag();
+			}
+
+			// ==================================
+			// Pair type with HDF5 type
+			// ==================================
+			if (typeid(T) == typeid(long double))
+			{
+				hdf5type = H5T_NATIVE_DOUBLE;
+			} else if (typeid(T) == typeid(double)) {
+				hdf5type = H5T_NATIVE_DOUBLE;
+			} else if (typeid(T) == typeid(float)) {
+				hdf5type = H5T_NATIVE_FLOAT;
+			}
+
+			// ==================================
+			// Access or create a new group
+			// ==================================
+			GroupStepAccess step_group(file_id, step);
+			GroupAccess group(step_group.group_id, name);
+
+			DatasetAccess vdataset(group.loc_id, name, size, hdf5type);
+
+			status = H5Dwrite(vdataset.dataset_id, hdf5type, vdataset.dataspace_id, vdataset.dataspace_id, H5P_DEFAULT, dbuf.data());
+
+			JTF_PRINTVAL(status);
+			
+			return 0;
+		}
 };
 
 #endif

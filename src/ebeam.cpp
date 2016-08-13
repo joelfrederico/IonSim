@@ -100,6 +100,7 @@ int Ebeam::_gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov)
 		zp[i] = gsl_ran_gaussian(rng.r, _simparams.sdelta);
 	}
 
+
 	// ==================================
 	// Set resolution
 	// ==================================

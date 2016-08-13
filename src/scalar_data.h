@@ -51,7 +51,6 @@ class ScalarData
 		// ==================================
 		long long n_pts() const;
 
-
 		// ==================================
 		// Methods
 		// ==================================
@@ -60,9 +59,9 @@ class ScalarData
 		ldouble &ind(int i, int j, int k);
 		ldouble &ind(long long ind);
 
-		llong lt_x_ind(ldouble x);
-		llong lt_y_ind(ldouble y);
-		llong lt_z_ind(ldouble z);
+		int lt_x_ind_e(const ldouble x, int &ind) const;
+		int lt_y_ind_e(const ldouble y, int &ind) const;
+		int lt_z_ind_e(const ldouble z, int &ind) const;
 
 		// ==================================
 		// Operators
@@ -76,7 +75,7 @@ class ScalarData
 		template <class T>
 		ScalarData &operator=(const T rhs)
 		{
-			for (int i; i < n_pts(); i++)
+			for (int i=0; i < n_pts(); i++)
 			{
 				this->data[i] = rhs;
 			}
@@ -86,7 +85,7 @@ class ScalarData
 		template <class T>
 		ScalarData &operator*=(const T rhs)
 		{
-			for (int i; i < n_pts(); i++)
+			for (int i=0; i < n_pts(); i++)
 			{
 				this->data[i] *= rhs;
 			}

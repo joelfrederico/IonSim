@@ -1,6 +1,10 @@
 #ifndef __CONSTS_H_INCLUDED__
 #define __CONSTS_H_INCLUDED__
 
+#define JTF_PRINTVAL(x) std::cout << #x << ":\t" << x << std::endl
+#define JTF_PRINTVAL_NOEND(x) std::cout << #x << ":\t" << x
+#define JTF_PRINT(x) std::cout << #x << std::endl
+
 #include <gsl/gsl_const_mksa.h>
 #include <vector>
 #include <complex>
@@ -77,9 +81,12 @@ const loopflag_t LOOP_GET_FIELDS   = 15;
 // ==================================
 // MPI tags
 // ==================================
-const tag_t TAG_LOOP_INSTRUCT = 100;
-const tag_t TAG_LOOP_MESSAGE  = 200;
-const tag_t TAG_FIELD         = 300;
+const tag_t TAG_LOOP_INSTRUCT       = 100;
+const tag_t TAG_LOOP_MESSAGE        = 200;
+const tag_t TAG_FIELD               = 300;
+const tag_t TAG_LDOUBLE_COMPLEX_VEC = 400;
+const tag_t TAG_DOUBLE_COMPLEX_VEC  = 500;
+const tag_t TAG_FLOAT_COMPLEX_VEC   = 600;
 
 const int MASTER_RANK = 0;
 

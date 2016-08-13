@@ -10,6 +10,42 @@
 int psifftw_base(SimParams simparams, LoopComm loopcomm);
 int fftwl_recv_local_size(long long &local_n0, long long &local_0_start, const int id);
 
+template<typename T>
+int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
+{
+	int count;
+	long ind;
+	MPI_Status status;
+	MPI_Datatype mpitype;
+	std::vector<T> dbuf;
+
+	MPI_Probe(id, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+	
+	if (status.MPI_TAG == TAG_LDOUBLE_COMPLEX_VEC)
+	{
+		mpitype = MPI_LONG_DOUBLE;
+	} else if (status.MPI_TAG == TAG_DOUBLE_COMPLEX_VEC) {
+		mpitype = MPI_DOUBLE;
+	} else if (status.MPI_TAG == TAG_FLOAT_COMPLEX_VEC) {
+		mpitype = MPI_FLOAT;
+	}
+
+	MPI_Get_count(&status, mpitype, &count);
+	dbuf.resize(count);
+	buf.resize(count/2);
+
+	MPI_Recv(dbuf.data(), count, mpitype, id, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+	for (long i=0; i<count/2; i++)
+	{
+		ind = i*2;
+		buf[i].real(dbuf[ind]);
+		buf[i].imag(dbuf[ind+1]);
+	}
+
+	return 0;
+}
+
 // ==================================
 // Classes: receiving and doing FFT
 // ==================================

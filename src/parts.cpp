@@ -13,6 +13,13 @@
 // ==============================
 int Parts::_init()
 {
+	x.resize(n_pts);
+	xp.resize(n_pts);
+	y.resize(n_pts);
+	yp.resize(n_pts);
+	z.resize(n_pts);
+	zp.resize(n_pts);
+
 	switch (type)
 	{
 		case PARTS_ION:
@@ -53,23 +60,30 @@ Parts::Parts(const SimParams &simparams, const parttype_t _type) : type(_type), 
 	_init();
 }
 
-ScalarData Parts::get_rho_dz(double z0, double z1, const SimParams &simparams)
+int Parts::get_rho_dz(const double z0, const double z1, ScalarData rho, const SimParams &simparams) const
 {
 	int x_pts = simparams.n_field_x;
 	int y_pts = simparams.n_field_y;
 	long double x_edge_mag = simparams.field_trans_wind;
 	long double y_edge_mag = simparams.field_trans_wind;
+	int x_ind, y_ind, z_ind, e_x, e_y, e_z;
 
-	ScalarData rho(x_pts, y_pts, 1, x_edge_mag, y_edge_mag, 0);
+	e_z = rho.lt_z_ind_e((z1+z0)/2, z_ind);
+	/* ScalarData rho(x_pts, y_pts, 1, x_edge_mag, y_edge_mag, 0); */
 	for (long long i=0; i < n_pts; i++)
 	{
 		if ((z0 <= z[i]) && (z[i] < z1))
 		{
-			rho.ind(rho.lt_x_ind(x[i]), rho.lt_y_ind(y[i]), rho.lt_z_ind(z[i]))++;
+			e_x = rho.lt_x_ind_e(x[i], x_ind);
+			e_y = rho.lt_y_ind_e(y[i], y_ind);
+			if ((e_x==0) && (e_y==0))
+			{
+				rho.ind(x_ind, y_ind, z_ind)++;
+			}
 		}
 	}
 
 	rho *= _particle_charge;
 
-	return rho;
+	return 0;
 }

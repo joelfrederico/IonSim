@@ -47,6 +47,7 @@ int slave()
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
+
 	// ==================================
 	// Initialize FFTW
 	// ==================================
@@ -223,7 +224,8 @@ int slave()
 				// Histogram to find rho
 				// ==================================
 				z0 = step_buf * simparams.dz();
-				rho = ebeam.get_rho_dz(z0, z1, simparams);
+				z1 = (step_buf+1) * simparams.dz();
+				ebeam.get_rho_dz(z0, z1, rho, simparams);
 
 				// ==================================
 				// Compute psi
@@ -245,7 +247,8 @@ int slave()
 				/* N1 = simparams.y_pts; */
 				psi_k = psifftw_base(simparams, loopcomm);
 
-				
+				JTF_PRINT(Heyi);
+
 				break;
 		}
 

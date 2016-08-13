@@ -37,7 +37,7 @@ class Parts
 		// ==============================
 		// Data methods
 		// ==============================
-		ScalarData get_rho_dz(double z0, double z1, const SimParams &simparams);
+		int get_rho_dz(const double z0, const double z1, ScalarData rho, const SimParams &simparams) const;
 		std::vector<ScalarData> get_J();
 };
 
