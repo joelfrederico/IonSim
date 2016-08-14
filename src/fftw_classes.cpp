@@ -36,6 +36,7 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0
 	long long local_0_start_ll = local_0_start;
 
 	count = buf.size();
+	dbuf.resize(2*count);
 	for (long i=0; i<count; i++)
 	{
 		ind = i*2;
@@ -170,9 +171,11 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 			cdata[ind2].imag(rho_k[ind][1]);
 		}
 	}
+	JTF_PRINT(Here?);
 
 	MPI_Send_complex(cdata, local_n0, local_0_start);
 
+	JTF_PRINT(There?);
 	// ==================================
 	// Create and execute plan
 	// ==================================
