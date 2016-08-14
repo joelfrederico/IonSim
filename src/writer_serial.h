@@ -56,8 +56,9 @@ class WriterSerial : public WriterBase
 			// ==================================
 			// Access or create a new group
 			// ==================================
-			GroupStepAccess step_group(file_id, step);
-			GroupAccess group(step_group.group_id, name);
+			/* GroupStepAccess step_group(file_id, step); */
+			/* GroupAccess group(step_group.group_id, name); */
+			GroupAccess group(file_id, name);
 
 			DatasetAccess vdataset(group.loc_id, name, size, hdf5type);
 

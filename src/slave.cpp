@@ -72,9 +72,9 @@ int slave()
 	// Recalculate to distribute
 	// simulation across nodes
 	// ==================================
-	ScalarData psi(simparams);
-	ScalarData rho(simparams);
-	ScalarData psi_k(simparams);
+	ScalarData<ldouble> psi(simparams);
+	ScalarData<ldouble> rho(simparams);
+	ScalarData<std::complex<ldouble>> psi_k(simparams);
 
 	Field_Data *field;
 	Field_Data *ion_field;
@@ -245,6 +245,7 @@ int slave()
 				// ==================================
 				/* N0 = simparams.x_pts; */
 				/* N1 = simparams.y_pts; */
+				JTF_PRINT(Starting sub);
 				psi_k = psifftw_base(simparams, loopcomm);
 
 				JTF_PRINT(Heyi);

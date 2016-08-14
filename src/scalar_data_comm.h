@@ -13,9 +13,14 @@ class ScalarData_Comm
 	public:
 		ScalarData_Comm();
 
-		int recv_scalar_others_add(ScalarData &scalar_recv);
-		int recv_scalar_copy(ScalarData &scalar_recv, int sender_id);
-		int send_scalar(ScalarData &scalar_send, int dest_id);
+		template<typename T>
+		int recv_scalar_others_add(ScalarData<T> &scalar_recv);
+
+		template<typename T>
+		int recv_scalar_copy(ScalarData<T> &scalar_recv, int sender_id);
+
+		template<typename T>
+		int send_scalar(ScalarData<T> &scalar_send, int dest_id);
 };
 
 #endif

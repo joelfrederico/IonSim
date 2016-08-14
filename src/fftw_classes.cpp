@@ -26,16 +26,16 @@ int fftwl_recv_local_size(long long &local_n0, long long &local_0_start, const i
 }
 
 template<typename T>
-int MPI_Send_complex(const std::vector<std::complex<T>> &buf)
+int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0, ptrdiff_t local_0_start)
 {
 	typename std::vector<T> dbuf;
 	long ind;
 	int count;
 	MPI_Datatype mpitype;
 	int tag;
+	long long local_0_start_ll = local_0_start;
 
 	count = buf.size();
-	dbuf.resize(2*count);
 	for (long i=0; i<count; i++)
 	{
 		ind = i*2;
@@ -43,8 +43,11 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf)
 		dbuf[ind+1] = buf[i].imag();
 	}
 
+	dbuf[1] = 50;
+
 	if (typeid(T) == typeid(long double))
 	{
+		JTF_PRINT(Sending long double);
 		mpitype = MPI_LONG_DOUBLE;
 		tag = TAG_LDOUBLE_COMPLEX_VEC;
 	} else if (typeid(T) == typeid(double)) {
@@ -57,6 +60,8 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf)
 		throw std::runtime_error("Not a valid complex type!");
 	}
 
+	MPI_Send(&local_0_start_ll, 1, MPI_LONG_LONG, 0, TAG_COMPLEX_VEC_START, MPI_COMM_WORLD);
+	JTF_PRINT_NOEND(Sending count: ) << 2*count << std::endl;
 	MPI_Send(dbuf.data(), 2*count, mpitype, 0, tag, MPI_COMM_WORLD);
 
 	return 0;
@@ -65,7 +70,7 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf)
 
 long c_ind(const long i, const long j, const ptrdiff_t N1)
 {
-	return i*(2*(N1/2+1)) + j;
+	return i*(N1/2+1) + j;
 }
 
 long column_major(const long i, const long j, const ptrdiff_t N0)
@@ -88,7 +93,8 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	ldouble_vec rho_x;
 	long long int rho_x_size;
 	long long int i, j;
-	ScalarData psi(simparams);
+
+	ScalarData<ldouble> psi(simparams);
 	long double f0, f1, kx, ky, k2;
 	long double *real_out, *r_buf;
 	fftwl_complex *c_buf, *rho_k;
@@ -138,7 +144,7 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 
 	fftwl_execute(planforward);
 
-	cdata.resize(N0*(N1/2+1));
+	cdata.resize(local_n0*(N1/2+1));
 	// ==================================
 	// Divide by k^2
 	// ==================================
@@ -165,7 +171,7 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 		}
 	}
 
-	MPI_Send_complex(cdata);
+	MPI_Send_complex(cdata, local_n0, local_0_start);
 
 	// ==================================
 	// Create and execute plan

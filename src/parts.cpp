@@ -60,7 +60,8 @@ Parts::Parts(const SimParams &simparams, const parttype_t _type) : type(_type), 
 	_init();
 }
 
-int Parts::get_rho_dz(const double z0, const double z1, ScalarData rho, const SimParams &simparams) const
+template<typename T>
+int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> rho, const SimParams &simparams) const
 {
 	int x_pts = simparams.n_field_x;
 	int y_pts = simparams.n_field_y;
@@ -87,3 +88,5 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData rho, const Si
 
 	return 0;
 }
+
+template int Parts::get_rho_dz(const double z0, const double z1, ScalarData<ldouble> rho, const SimParams &simparams) const;

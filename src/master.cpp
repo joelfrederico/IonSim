@@ -55,8 +55,8 @@ int master()
 	// Initialize fields
 	// ==============================
 	long long rho_size;
-	ScalarData rho(simparams);
-	ScalarData psi(simparams);
+	ScalarData<ldouble> rho(simparams);
+	ScalarData<ldouble> psi(simparams);
 	std::vector<std::complex<long double>> cdata;
 	Field_Data *field;
 	Field_Comm fieldcomm;
@@ -158,6 +158,7 @@ int master()
 			MPI_Send(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 		}
 
+		cdata.resize(rho.x_pts, rho.y_pts/2+1);
 		for (int id=1; id < loopcomm.p; id++)
 		{
 			MPI_Recv_complex(id, cdata);

@@ -4,6 +4,7 @@
 #include "consts.h"
 #include "simparams.h"
 
+template<typename Tclass>
 class ScalarData
 {
 	private:
@@ -31,20 +32,20 @@ class ScalarData
 		// ==================================
 		// Member data
 		// ==================================
-		double dxdi;
-		double dydj;
-		double dzdk;
+		long double dxdi;
+		long double dydj;
+		long double dzdk;
 
 		const int x_pts;
 		const int y_pts;
 		const int z_pts;
 
-		const double x_edge_mag;
-		const double y_edge_mag;
-		const double z_edge_mag;
+		const long double x_edge_mag;
+		const long double y_edge_mag;
+		const long double z_edge_mag;
 
-		ldouble_vec data;
-		ldouble_vec x_grid, y_grid, z_grid;
+		std::vector<Tclass> data;
+		std::vector<long double> x_grid, y_grid, z_grid;
 
 		// ==================================
 		// Calculated data
@@ -56,8 +57,8 @@ class ScalarData
 		// ==================================
 		long long _index(int i, int j, int k) const;
 
-		ldouble &ind(int i, int j, int k);
-		ldouble &ind(long long ind);
+		Tclass &ind(int i, int j, int k);
+		Tclass &ind(long long ind);
 
 		int lt_x_ind_e(const ldouble x, int &ind) const;
 		int lt_y_ind_e(const ldouble y, int &ind) const;
@@ -66,14 +67,14 @@ class ScalarData
 		// ==================================
 		// Operators
 		// ==================================
-		ScalarData &operator=(const ScalarData &rhs);
-		ScalarData operator-() const;
+		ScalarData<Tclass> &operator=(const ScalarData<Tclass> &rhs);
+		ScalarData<Tclass> operator-() const;
 
-		ScalarData &operator+=(const ScalarData &rhs);
-		ScalarData &operator-=(const ScalarData &rhs);
+		ScalarData<Tclass> &operator+=(const ScalarData<Tclass> &rhs);
+		ScalarData<Tclass> &operator-=(const ScalarData<Tclass> &rhs);
 
 		template <class T>
-		ScalarData &operator=(const T rhs)
+		ScalarData<Tclass> &operator=(const T rhs)
 		{
 			for (int i=0; i < n_pts(); i++)
 			{
@@ -83,7 +84,7 @@ class ScalarData
 		}
 
 		template <class T>
-		ScalarData &operator*=(const T rhs)
+		ScalarData<Tclass> &operator*=(const T rhs)
 		{
 			for (int i=0; i < n_pts(); i++)
 			{
@@ -92,13 +93,13 @@ class ScalarData
 			return *this;
 		}
 
-		const ScalarData operator+(const ScalarData &rhs);
-		const ScalarData operator-(const ScalarData &rhs);
+		const ScalarData<Tclass> operator+(const ScalarData<Tclass> &rhs);
+		const ScalarData<Tclass> operator-(const ScalarData<Tclass> &rhs);
 
 		template <class T>
-		const ScalarData operator*(const T rhs)
+		const ScalarData<Tclass> operator*(const T rhs)
 		{
-			return ScalarData(*this) *= rhs;
+			return ScalarData<Tclass>(*this) *= rhs;
 		}
 };
 

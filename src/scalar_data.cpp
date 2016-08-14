@@ -2,7 +2,8 @@
 #include <vector>
 #include <math.h>
 
-bool ScalarData::_samedim(const ScalarData &rhs) const
+template<typename T>
+bool ScalarData<T>::_samedim(const ScalarData &rhs) const
 {
 	if ( ((*this).x_pts == rhs.x_pts) && ((*this).y_pts == rhs.y_pts) && ((*this).z_pts == rhs.z_pts) )
 	{
@@ -12,12 +13,14 @@ bool ScalarData::_samedim(const ScalarData &rhs) const
 	}
 }
 
-long long ScalarData::n_pts() const
+template<typename T>
+long long ScalarData<T>::n_pts() const
 {
 	return x_pts * y_pts * z_pts;
 }
 
-int ScalarData::_init()
+template<typename T>
+int ScalarData<T>::_init()
 {
 	// ==================================
 	// Initialize Scalar Field
@@ -85,7 +88,8 @@ int ScalarData::_init()
 	return 0;
 }
 
-ScalarData::ScalarData(const ScalarData &rhs) : 
+template<typename T>
+ScalarData<T>::ScalarData(const ScalarData &rhs) : 
 	x_pts(rhs.x_pts),
 	y_pts(rhs.y_pts),
 	z_pts(rhs.z_pts),
@@ -97,7 +101,8 @@ ScalarData::ScalarData(const ScalarData &rhs) :
 	data = rhs.data;
 }
 
-ScalarData::ScalarData(int _x_pts, int _y_pts, int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
+template<typename T>
+ScalarData<T>::ScalarData(int _x_pts, int _y_pts, int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
 	x_pts(_x_pts),
 	y_pts(_y_pts),
 	z_pts(_z_pts),
@@ -108,7 +113,8 @@ ScalarData::ScalarData(int _x_pts, int _y_pts, int _z_pts, double _x_edge_mag, d
 	_init();
 }
 
-ScalarData::ScalarData(const SimParams &simparams) :
+template<typename T>
+ScalarData<T>::ScalarData(const SimParams &simparams) :
 	x_pts(simparams.n_field_x),
 	y_pts(simparams.n_field_y),
 	z_pts(simparams.n_field_z),
@@ -119,18 +125,21 @@ ScalarData::ScalarData(const SimParams &simparams) :
 	_init();
 }
 
-long long ScalarData::_index(int i, int j, int k) const
+template<typename T>
+long long ScalarData<T>::_index(int i, int j, int k) const
 {
 	long long index = i + x_pts*(j + y_pts*k);
 	return index;
 }
 
-long double &ScalarData::ind(int i, int j, int k)
+template<typename T>
+T &ScalarData<T>::ind(int i, int j, int k)
 {
 	return data[_index(i, j, k)];
 }
 
-long double &ScalarData::ind(long long ind)
+template<typename T>
+T &ScalarData<T>::ind(long long ind)
 {
 	return data[ind];
 }
@@ -146,18 +155,21 @@ int getind_e(const ldouble x, const double delx, const double mid, const int n_p
 	}
 }
 
-int ScalarData::lt_x_ind_e(const ldouble x, int &ind) const
+template<typename T>
+int ScalarData<T>::lt_x_ind_e(const ldouble x, int &ind) const
 {
 	return getind_e(x, dxdi, mid_i, x_pts, ind);
 	/* return floor(x/dxdi + mid_i); */
 }
 
-int ScalarData::lt_y_ind_e(const ldouble y, int &ind) const
+template<typename T>
+int ScalarData<T>::lt_y_ind_e(const ldouble y, int &ind) const
 {
 	return getind_e(y, dydj, mid_j, y_pts, ind);
 }
 
-int ScalarData::lt_z_ind_e(const ldouble z, int &ind) const
+template<typename T>
+int ScalarData<T>::lt_z_ind_e(const ldouble z, int &ind) const
 {
 	return getind_e(z, dzdk, 0, z_pts, ind);
 }
@@ -165,7 +177,8 @@ int ScalarData::lt_z_ind_e(const ldouble z, int &ind) const
 // ==================================
 // Operators
 // ==================================
-ScalarData &ScalarData::operator=(const ScalarData &rhs)
+template<typename T>
+ScalarData<T> &ScalarData<T>::operator=(const ScalarData<T> &rhs)
 {
 	if (this != &rhs)
 	{
@@ -187,7 +200,8 @@ ScalarData &ScalarData::operator=(const ScalarData &rhs)
     	return *this;
 }
 
-ScalarData ScalarData::operator-() const
+template<typename T>
+ScalarData<T> ScalarData<T>::operator-() const
 {
 	ScalarData temp = *this;
 	for (int i=0; i < n_pts(); i++)
@@ -198,7 +212,8 @@ ScalarData ScalarData::operator-() const
 	return temp;
 }
 
-ScalarData &ScalarData::operator+=(const ScalarData &rhs)
+template<typename T>
+ScalarData<T> &ScalarData<T>::operator+=(const ScalarData<T> &rhs)
 {
 	if ( this->_samedim(rhs) )
 	{
@@ -212,7 +227,8 @@ ScalarData &ScalarData::operator+=(const ScalarData &rhs)
 	return *this;
 }
 
-ScalarData &ScalarData::operator-=(const ScalarData &rhs)
+template<typename T>
+ScalarData<T> &ScalarData<T>::operator-=(const ScalarData<T> &rhs)
 {
 	if ( this->_samedim(rhs) )
 	{
@@ -226,12 +242,17 @@ ScalarData &ScalarData::operator-=(const ScalarData &rhs)
 	return *this;
 }
 
-const ScalarData ScalarData::operator+(const ScalarData &rhs)
+template<typename T>
+const ScalarData<T> ScalarData<T>::operator+(const ScalarData<T> &rhs)
 {
-	return ScalarData(*this) += rhs;
+	return ScalarData<T>(*this) += rhs;
 }
 
-const ScalarData ScalarData::operator-(const ScalarData &rhs)
+template<typename T>
+const ScalarData<T> ScalarData<T>::operator-(const ScalarData<T> &rhs)
 {
 	return ScalarData(*this) -= rhs;
 }
+
+template class ScalarData<long double>;
+template class ScalarData<std::complex<long double>>;

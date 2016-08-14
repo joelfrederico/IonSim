@@ -15,7 +15,8 @@ ScalarData_Comm::ScalarData_Comm()
 	my_id = loopcomm.id;
 }
 
-int ScalarData_Comm::recv_scalar_others_add(ScalarData &scalar_recv)
+template<typename T>
+int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
 {
 	long long n_pts = scalar_recv.n_pts();
 
@@ -51,7 +52,8 @@ int ScalarData_Comm::recv_scalar_others_add(ScalarData &scalar_recv)
 	return 0;
 }
 
-int ScalarData_Comm::recv_scalar_copy(ScalarData &scalar_recv, int sender_id)
+template<typename T>
+int ScalarData_Comm::recv_scalar_copy(ScalarData<T> &scalar_recv, int sender_id)
 {
 	long long n_pts = scalar_recv.n_pts();
 
@@ -60,7 +62,8 @@ int ScalarData_Comm::recv_scalar_copy(ScalarData &scalar_recv, int sender_id)
 	return 0;
 }
 
-int ScalarData_Comm::send_scalar(ScalarData &scalar_send, int dest_id)
+template<typename T>
+int ScalarData_Comm::send_scalar(ScalarData<T> &scalar_send, int dest_id)
 {
 	long long n_pts = scalar_send.n_pts();
 	if (n_pts > max_n_pts)
@@ -76,3 +79,6 @@ int ScalarData_Comm::send_scalar(ScalarData &scalar_send, int dest_id)
 
 	return 0;
 }
+
+template int ScalarData_Comm::send_scalar(ScalarData<ldouble> &scalar_send, int dest_id);
+template int ScalarData_Comm::recv_scalar_others_add(ScalarData<ldouble> &scalar_recv);

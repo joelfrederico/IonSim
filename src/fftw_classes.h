@@ -14,15 +14,19 @@ template<typename T>
 int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 {
 	int count;
+	long long local_0_start_ll;
 	long ind;
 	MPI_Status status;
 	MPI_Datatype mpitype;
 	std::vector<T> dbuf;
+	
+	MPI_Recv(&local_0_start_ll, 1, MPI_LONG_LONG, 1, TAG_COMPLEX_VEC_START, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	MPI_Probe(id, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	
 	if (status.MPI_TAG == TAG_LDOUBLE_COMPLEX_VEC)
 	{
+		JTF_PRINT(Receiving long double);
 		mpitype = MPI_LONG_DOUBLE;
 	} else if (status.MPI_TAG == TAG_DOUBLE_COMPLEX_VEC) {
 		mpitype = MPI_DOUBLE;
@@ -31,6 +35,7 @@ int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 	}
 
 	MPI_Get_count(&status, mpitype, &count);
+	JTF_PRINT_NOEND(Receiving count: ) << count << std::endl;
 	dbuf.resize(count);
 	buf.resize(count/2);
 
@@ -39,7 +44,7 @@ int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 	for (long i=0; i<count/2; i++)
 	{
 		ind = i*2;
-		buf[i].real(dbuf[ind]);
+		buf[i + local_0_start_ll].real(dbuf[ind]);
 		buf[i].imag(dbuf[ind+1]);
 	}
 
