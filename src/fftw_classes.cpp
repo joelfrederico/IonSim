@@ -48,7 +48,6 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0
 
 	if (typeid(T) == typeid(long double))
 	{
-		JTF_PRINT(Sending long double);
 		mpitype = MPI_LONG_DOUBLE;
 		tag = TAG_LDOUBLE_COMPLEX_VEC;
 	} else if (typeid(T) == typeid(double)) {
@@ -62,7 +61,6 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0
 	}
 
 	MPI_Send(&local_0_start_ll, 1, MPI_LONG_LONG, 0, TAG_COMPLEX_VEC_START, MPI_COMM_WORLD);
-	JTF_PRINT_NOEND(Sending count: ) << 2*count << std::endl;
 	MPI_Send(dbuf.data(), 2*count, mpitype, 0, tag, MPI_COMM_WORLD);
 
 	return 0;
@@ -97,7 +95,8 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 
 	ScalarData<ldouble> psi(simparams);
 	long double f0, f1, kx, ky, k2;
-	long double *real_out, *r_buf;
+	long double *r_buf;
+	std::vector<long double> real_out;
 	fftwl_complex *c_buf, *rho_k;
 	long ind, ind2;
 	std::vector<std::complex<long double>> cdata;
@@ -128,7 +127,8 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	rho_k = fftwl_alloc_complex(alloc_local);
 	c_buf = fftwl_alloc_complex(alloc_local);
 	r_buf = fftwl_alloc_real(2*alloc_local);
-	real_out = new long double[local_n0*N1];
+	/* real_out = new long double[local_n0*N1]; */
+	real_out.resize(local_n0*N1);
 
 	// ==================================
 	// Create and execute plan
@@ -164,32 +164,34 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 			ky = j/f1;
 			k2 = kx*kx + ky*ky;
 			ind = c_ind(i, j, N1);
-			rho_k[ind][0] = c_buf[ind][0] / k2;
-			rho_k[ind][1] = c_buf[ind][1] / k2;
+			if ((i==0) && (j==0))
+			{
+				rho_k[ind][0] = 0;
+				rho_k[ind][1] = 0;
+			} else {
+				rho_k[ind][0] = c_buf[ind][0] / k2;
+				rho_k[ind][1] = c_buf[ind][1] / k2;
+			}
 			ind2 = row_major(i, j, N0);
 			cdata[ind2].real(rho_k[ind][0]);
 			cdata[ind2].imag(rho_k[ind][1]);
 		}
 	}
-	JTF_PRINT(Here?);
 
 	MPI_Send_complex(cdata, local_n0, local_0_start);
 
-	JTF_PRINT(There?);
 	// ==================================
 	// Create and execute plan
 	// ==================================
 	JTF_PRINTVAL_NOEND(alloc_local) << ", id: " << loopcomm.id << std::endl;
 	JTF_PRINTVAL_NOEND(r_buf)    << ", size: " << sizeof(long double)   << ", id: " << loopcomm.id << std::endl;
 	JTF_PRINTVAL_NOEND(c_buf)    << ", size: " << sizeof(fftwl_complex) << ", id: " << loopcomm.id << std::endl;
-	JTF_PRINTVAL_NOEND(real_out) << ", size: " << sizeof(long double)   << ", id: " << loopcomm.id << std::endl;
+	JTF_PRINTVAL_NOEND(real_out.data()) << ", size: " << sizeof(long double)   << ", id: " << loopcomm.id << std::endl;
 	JTF_PRINTVAL_NOEND(rho_k)    << ", size: " << sizeof(fftwl_complex) << ", id: " << loopcomm.id << std::endl;
-	JTF_PRINT(Or die trying);
 	fftwl_free(r_buf);
 	fftwl_free(rho_k);
 	fftwl_free(c_buf);
 	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
-	delete[] real_out;
 	return 0;
 
 	fftwl_free(c_buf);
@@ -230,11 +232,10 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	// Send Data
 	// ==================================
 	fftwl_send_local_size(local_n0, local_0_start);
-	MPI_Send(real_out, rho_x_size, MPI_LONG_DOUBLE, 0, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
+	MPI_Send(real_out.data(), rho_x_size, MPI_LONG_DOUBLE, 0, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 
 	fftwl_free(r_buf);
 	fftwl_free(rho_k);
-	delete[] real_out;
 
 	// ==================================
 	// Send wisdom back to master

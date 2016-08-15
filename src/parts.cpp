@@ -70,8 +70,6 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho, cons
 	int x_ind, y_ind, z_ind, e_x, e_y, e_z;
 
 	e_z = rho.lt_z_ind_e((z1+z0)/2, z_ind);
-	JTF_PRINTVAL(z_ind);
-	/* ScalarData rho(x_pts, y_pts, 1, x_edge_mag, y_edge_mag, 0); */
 	for (long long i=0; i < n_pts; i++)
 	{
 		if ((z0 <= z[i]) && (z[i] < z1))
@@ -80,15 +78,12 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho, cons
 			e_y = rho.lt_y_ind_e(y[i], y_ind);
 			if ((e_x==0) && (e_y==0))
 			{
-				/* JTF_PRINTVAL_NOEND(x_ind) << ", y_ind: " << y_ind << std::endl; */
 				rho.ind(x_ind, y_ind, z_ind)++;
 			}
 		}
 	}
 
 	rho *= _particle_charge;
-
-	JTF_PRINTVAL(rho.ind(44, 78, 0));
 
 	return 0;
 }

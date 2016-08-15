@@ -141,7 +141,8 @@ int master()
 		loopcomm.instruct(LOOP_GET_RHO);
 		rho = 0;
 		scalarcomm.recv_scalar_others_add(rho);
-		JTF_PRINTVAL_NOEND(rho.ind(44, 78, 0)) << " (master)" << std::endl;
+		rho = 0;
+		rho.ind(128/2, 128/2, 0) = 1;
 
 		// ==============================
 		// Get fields
@@ -160,23 +161,23 @@ int master()
 			MPI_Send(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 		}
 
-		/* cdata.resize(rho.x_pts, rho.y_pts/2+1); */
 		for (int id=1; id < loopcomm.p; id++)
 		{
 			MPI_Recv_complex(id, cdata.data);
 
 		}
+
+		JTF_PRINTVAL(rho.ind(64, 64, 0));
 		writer_s = new WriterSerial(simparams.filename);
 		writer_s->writedata(rho, "rho");
 		delete writer_s;
 
-		cdata.data[0].real(100);
 		writer_s = new WriterSerial(simparams.filename);
 		writer_s->writedata(cdata, "complex");
 		delete writer_s;
 
 		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
-		fftwl_export_wisdom_to_filename(wisdom_file);
+		/* fftwl_export_wisdom_to_filename(wisdom_file); */
 		loopcomm.instruct(LOOP_KILL);
 		return 0;
 

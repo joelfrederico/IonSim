@@ -23,7 +23,7 @@ class WriterSerial : public WriterBase
 		int writedata(long step, Field_Data &field);
 
 		template<typename T>
-		int writedata(const ScalarData<T> &buf, const std::string name) const
+		int writedata(ScalarData<T> &buf, const std::string name) const
 		{
 			std::vector<unsigned long> size = {buf.x_pts, buf.y_pts};
 			return writedata(buf.data, size, name);
@@ -45,7 +45,7 @@ class WriterSerial : public WriterBase
 				dbuf[i+bsize] = buf[i].imag();
 			}
 
-			return writedata(dbuf, size, name);
+			return writedata(dbuf, _size, name);
 
 		}
 
@@ -54,16 +54,27 @@ class WriterSerial : public WriterBase
 		{
 			herr_t status;
 			hid_t hdf5type;
+			std::vector<double> dbuf;
+			std::vector<double> fbuf;
+			void *mpi_buf;
 			// ==================================
 			// Pair type with HDF5 type
 			// ==================================
-			if (typeid(T) == typeid(long double))
+			if ((typeid(T) == typeid(long double)) || (typeid(T) == typeid(double)))
 			{
+				JTF_PRINT(Type is ldouble);
+				// Set data type
 				hdf5type = H5T_NATIVE_DOUBLE;
-			} else if (typeid(T) == typeid(double)) {
-				hdf5type = H5T_NATIVE_DOUBLE;
+
+				// Copy data to properly-typed buffer
+				dbuf.resize(buf.size());
+				std::copy(buf.begin(), buf.end(), dbuf.begin());
+				mpi_buf = dbuf.data();
 			} else if (typeid(T) == typeid(float)) {
 				hdf5type = H5T_NATIVE_FLOAT;
+				fbuf.resize(buf.size());
+				std::copy(buf.begin(), buf.end(), fbuf.begin());
+				mpi_buf = fbuf.data();
 			}
 
 			// ==================================
@@ -75,10 +86,8 @@ class WriterSerial : public WriterBase
 
 			DatasetAccess vdataset(file_id, name, size, hdf5type);
 
-			status = H5Dwrite(vdataset.dataset_id, hdf5type, vdataset.dataspace_id, vdataset.dataspace_id, H5P_DEFAULT, buf.data());
+			status = H5Dwrite(vdataset.dataset_id, hdf5type, vdataset.dataspace_id, vdataset.dataspace_id, H5P_DEFAULT, mpi_buf);
 
-			JTF_PRINTVAL(status);
-			
 			return 0;
 		}
 };

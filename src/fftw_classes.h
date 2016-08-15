@@ -26,7 +26,6 @@ int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 	
 	if (status.MPI_TAG == TAG_LDOUBLE_COMPLEX_VEC)
 	{
-		JTF_PRINT(Receiving long double);
 		mpitype = MPI_LONG_DOUBLE;
 	} else if (status.MPI_TAG == TAG_DOUBLE_COMPLEX_VEC) {
 		mpitype = MPI_DOUBLE;
@@ -35,7 +34,6 @@ int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 	}
 
 	MPI_Get_count(&status, mpitype, &count);
-	JTF_PRINT_NOEND(Receiving count: ) << count << std::endl;
 	dbuf.resize(count);
 	buf.resize(count/2);
 

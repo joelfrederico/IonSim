@@ -232,7 +232,6 @@ int slave()
 				// ==================================
 				psi = -rho;
 
-				JTF_PRINTVAL(psi.ind(44, 78, 0));
 				// ==================================
 				// Send psi to master
 				// ==================================
@@ -249,7 +248,7 @@ int slave()
 				JTF_PRINT(Starting sub);
 				psi_k = psifftw_base(simparams, loopcomm);
 
-				JTF_PRINT(Heyi);
+				JTF_PRINT(Sub done);
 
 				break;
 		}

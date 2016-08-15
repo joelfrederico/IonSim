@@ -25,9 +25,9 @@ int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
 	{
 		if (id != my_id)
 		{
-			std::cout << "Receiving " << n_pts << " from: " << id << std::endl;
+			/* std::cout << "Receiving " << n_pts << " from: " << id << std::endl; */
 			MPI_Recv(buf.data(), n_pts, MPI_LONG_DOUBLE, id, TAG_FIELD, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			std::cout << "Finished receiving from: " << id << std::endl;
+			/* std::cout << "Finished receiving from: " << id << std::endl; */
 
 			for (int ind=0; ind < n_pts; ind++)
 			{
@@ -35,8 +35,6 @@ int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
 			}
 		}
 	}
-
-	JTF_PRINTVAL(scalar_recv.ind(44, 78, 0));
 
 	return 0;
 }
@@ -56,11 +54,9 @@ int ScalarData_Comm::send_scalar(ScalarData<T> &scalar_send, int dest_id)
 {
 	int n_pts = scalar_send.n_pts();
 
-	JTF_PRINTVAL(scalar_send.ind(44, 78, 0));
-
-	std::cout << "Sending " << n_pts << " to: " << dest_id << std::endl;
+	/* std::cout << "Sending " << n_pts << " to: " << dest_id << std::endl; */
 	MPI_Send(scalar_send.data.data(), n_pts, MPI_LONG_DOUBLE, dest_id, TAG_FIELD, MPI_COMM_WORLD);
-	std::cout << "Finished sending to: " << dest_id << std::endl;
+	/* std::cout << "Finished sending to: " << dest_id << std::endl; */
 
 	return 0;
 }
