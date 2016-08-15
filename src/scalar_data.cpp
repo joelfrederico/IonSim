@@ -102,7 +102,7 @@ ScalarData<T>::ScalarData(const ScalarData &rhs) :
 }
 
 template<typename T>
-ScalarData<T>::ScalarData(int _x_pts, int _y_pts, int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
+ScalarData<T>::ScalarData(const unsigned int _x_pts, const unsigned int _y_pts, const unsigned int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
 	x_pts(_x_pts),
 	y_pts(_y_pts),
 	z_pts(_z_pts),
@@ -126,20 +126,21 @@ ScalarData<T>::ScalarData(const SimParams &simparams) :
 }
 
 template<typename T>
-long long ScalarData<T>::_index(int i, int j, int k) const
+unsigned long long ScalarData<T>::_index(const unsigned int i, const unsigned int j, const unsigned int k) const
 {
-	long long index = i + x_pts*(j + y_pts*k);
+	if ((i >= x_pts) || (j >= y_pts) || (k >= z_pts)) throw std::runtime_error("Index out of bounds!");
+	unsigned long long index = i + x_pts*(j + y_pts*k);
 	return index;
 }
 
 template<typename T>
-T &ScalarData<T>::ind(int i, int j, int k)
+T &ScalarData<T>::ind(const unsigned int i, const unsigned int j, const unsigned int k)
 {
 	return data[_index(i, j, k)];
 }
 
 template<typename T>
-T &ScalarData<T>::ind(long long ind)
+T &ScalarData<T>::ind(unsigned long long ind)
 {
 	return data[ind];
 }

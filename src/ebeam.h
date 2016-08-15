@@ -32,7 +32,6 @@ class Ebeam : public Parts
 		Ebeam(const SimParams &simparams, double sx, double sxp, double sy, double syp);
 		Ebeam(
 				const SimParams &simparams,
-				const double n_pts,
 				const double type,
 				ldouble_vec x_in,
  				ldouble_vec xp_in,

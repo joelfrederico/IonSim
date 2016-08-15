@@ -57,7 +57,8 @@ int master()
 	long long rho_size;
 	ScalarData<ldouble> rho(simparams);
 	ScalarData<ldouble> psi(simparams);
-	std::vector<std::complex<long double>> cdata;
+	/* std::vector<std::complex<long double>> cdata; */
+	ScalarData<std::complex<long double>> cdata(rho.x_pts, rho.y_pts/2+1, 1, 1, 1, 1);
 	Field_Data *field;
 	Field_Comm fieldcomm;
 	long long local_n0, local_0_start;
@@ -140,6 +141,7 @@ int master()
 		loopcomm.instruct(LOOP_GET_RHO);
 		rho = 0;
 		scalarcomm.recv_scalar_others_add(rho);
+		JTF_PRINTVAL_NOEND(rho.ind(44, 78, 0)) << " (master)" << std::endl;
 
 		// ==============================
 		// Get fields
@@ -158,16 +160,19 @@ int master()
 			MPI_Send(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 		}
 
-		cdata.resize(rho.x_pts, rho.y_pts/2+1);
+		/* cdata.resize(rho.x_pts, rho.y_pts/2+1); */
 		for (int id=1; id < loopcomm.p; id++)
 		{
-			MPI_Recv_complex(id, cdata);
+			MPI_Recv_complex(id, cdata.data);
 
 		}
-
-		cdata[0].real(100);
 		writer_s = new WriterSerial(simparams.filename);
-		writer_s->writedata(e_step, cdata, "complex");
+		writer_s->writedata(rho, "rho");
+		delete writer_s;
+
+		cdata.data[0].real(100);
+		writer_s = new WriterSerial(simparams.filename);
+		writer_s->writedata(cdata, "complex");
 		delete writer_s;
 
 		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);

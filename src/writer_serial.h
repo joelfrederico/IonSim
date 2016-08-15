@@ -23,17 +23,21 @@ class WriterSerial : public WriterBase
 		int writedata(long step, Field_Data &field);
 
 		template<typename T>
-		int writedata(const long step, const std::vector<std::complex<T>> &buf, std::string name) const
+		int writedata(const ScalarData<T> &buf, const std::string name) const
+		{
+			std::vector<unsigned long> size = {buf.x_pts, buf.y_pts};
+			return writedata(buf.data, size, name);
+		}
+
+		template<typename T, typename T2>
+		int writedata(const std::vector<std::complex<T>> &buf, const std::vector<T2> size, const std::string name) const
 		{
 			// ==================================
 			// Initialize all variables
 			// ==================================
 			typename std::vector<std::complex<T>>::size_type bsize = buf.size();
-			std::vector<typename std::vector<std::complex<T>>::size_type> size{bsize, 2};
-			hid_t hdf5type;
-			herr_t status;
+			std::vector<typename std::vector<std::complex<T>>::size_type> _size = {size[0], size[1], 2};
 			std::vector<double> dbuf;
-
 			dbuf.resize(2*bsize);
 			for (int i=0; i<bsize; i++)
 			{
@@ -41,6 +45,15 @@ class WriterSerial : public WriterBase
 				dbuf[i+bsize] = buf[i].imag();
 			}
 
+			return writedata(dbuf, size, name);
+
+		}
+
+		template<typename T, typename T2>
+		int writedata(const std::vector<T> &buf, const std::vector<T2> size, const std::string name) const
+		{
+			herr_t status;
+			hid_t hdf5type;
 			// ==================================
 			// Pair type with HDF5 type
 			// ==================================
@@ -58,11 +71,11 @@ class WriterSerial : public WriterBase
 			// ==================================
 			/* GroupStepAccess step_group(file_id, step); */
 			/* GroupAccess group(step_group.group_id, name); */
-			GroupAccess group(file_id, name);
+			/* GroupAccess group(file_id, name); */
 
-			DatasetAccess vdataset(group.loc_id, name, size, hdf5type);
+			DatasetAccess vdataset(file_id, name, size, hdf5type);
 
-			status = H5Dwrite(vdataset.dataset_id, hdf5type, vdataset.dataspace_id, vdataset.dataspace_id, H5P_DEFAULT, dbuf.data());
+			status = H5Dwrite(vdataset.dataset_id, hdf5type, vdataset.dataspace_id, vdataset.dataspace_id, H5P_DEFAULT, buf.data());
 
 			JTF_PRINTVAL(status);
 			

@@ -119,7 +119,6 @@ int Ebeam::_gen_bivariate_gaussian(Cov x_cov, Cov y_cov, Cov z_cov)
 
 Ebeam::Ebeam(
 		const SimParams &simparams,
-		const double n_pts,
 		const double type,
 		ldouble_vec x_in,
  		ldouble_vec xp_in,
@@ -229,7 +228,6 @@ Ebeam Ebeam::between(double z0, double z1)
 	// ==================================
 	return Ebeam(
 			(*this)._simparams,
-			x_out.size(),
 			(*this).type,
 			x_out,
 			xp_out,

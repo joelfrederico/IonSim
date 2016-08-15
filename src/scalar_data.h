@@ -27,7 +27,7 @@ class ScalarData
 		// ==================================
 		ScalarData(const ScalarData &rhs);
 		ScalarData(const SimParams &simparams);
-		ScalarData(int _x_pts, int _y_pts, int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag);
+		ScalarData(const unsigned int _x_pts, const unsigned int _y_pts, const unsigned int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag);
 
 		// ==================================
 		// Member data
@@ -36,9 +36,9 @@ class ScalarData
 		long double dydj;
 		long double dzdk;
 
-		const int x_pts;
-		const int y_pts;
-		const int z_pts;
+		const unsigned int x_pts;
+		const unsigned int y_pts;
+		const unsigned int z_pts;
 
 		const long double x_edge_mag;
 		const long double y_edge_mag;
@@ -55,10 +55,11 @@ class ScalarData
 		// ==================================
 		// Methods
 		// ==================================
-		long long _index(int i, int j, int k) const;
+		unsigned long long _index(const unsigned int i, const unsigned int j, const unsigned int k) const;
 
-		Tclass &ind(int i, int j, int k);
-		Tclass &ind(long long ind);
+		/* Tclass &ind(int i, int j, int k); */
+		Tclass &ind(const unsigned int i, const unsigned int j, const unsigned int k);
+		Tclass &ind(unsigned long long ind);
 
 		int lt_x_ind_e(const ldouble x, int &ind) const;
 		int lt_y_ind_e(const ldouble y, int &ind) const;

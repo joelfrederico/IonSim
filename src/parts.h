@@ -17,14 +17,14 @@ class Parts
 		// ==============================
 		// Constructors
 		// ==============================
-		Parts(double _mass, long long _n_pts, parttype_t _type);
+		Parts(double _mass, unsigned long long _n_pts, parttype_t _type);
 		Parts(const SimParams &simparams, parttype_t _type);
 
 		// ==============================
 		// Data members
 		// ==============================
 		const double mass;
-		const long long n_pts;
+		const unsigned long long n_pts;
 		const parttype_t type;
 
 		ldouble_vec x;
@@ -38,7 +38,7 @@ class Parts
 		// Data methods
 		// ==============================
 		template<typename T>
-		int get_rho_dz(const double z0, const double z1, ScalarData<T> rho, const SimParams &simparams) const;
+		int get_rho_dz(const double z0, const double z1, ScalarData<T> &rho, const SimParams &simparams) const;
 
 		template<typename T>
 		std::vector<ScalarData<T>> get_J();
