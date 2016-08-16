@@ -27,7 +27,7 @@ class WriterSerial : public WriterBase
 		int writedata(ScalarData<T> &buf, const std::string name) const
 		{
 			std::vector<unsigned long> size = {buf.x_pts, buf.y_pts};
-			return writedata(buf.data, size, name);
+			return writedata(buf.vdata(), size, name);
 		}
 
 		template<typename T, typename T2>
@@ -45,11 +45,16 @@ class WriterSerial : public WriterBase
 			{
 				for (int j=0; j<_size[1]; j++)
 				{
-					dbuf[2*(j + i*_size[1])]   = buf[ionsim::row_major(i, j, _size[1])].real();
-					dbuf[1+2*(j + i*_size[1])] = buf[ionsim::row_major(i, j, _size[1])].imag();
+					/* dbuf[2*(j + i*_size[1])]         = buf[ionsim::row_major(i, j, _size[1])].real(); */
+					/* dbuf[1+2*(j + i*_size[1])]       = buf[ionsim::row_major(i, j, _size[1])].imag(); */
+					dbuf[(i*_size[1] + j)*2 + 0]     = buf[ionsim::col_major(i, j, _size[0])].real();
+					dbuf[(i*_size[1] + j)*2 + 1]     = buf[ionsim::col_major(i, j, _size[0])].imag();
+					/* dbuf[i + _size[0]*(j*_size[1] + 0)] = buf[ionsim::col_major(i, j, _size[0])].real(); */
+					/* dbuf[i + _size[0]*(j*_size[1] + 1)] = buf[ionsim::col_major(i, j, _size[0])].imag(); */
+					/* dbuf[i + _size[0]*(j*_size[1] + 0)] = 0; */
+					/* dbuf[i + _size[0]*(j*_size[1] + 1)] = 0; */
 				}
 			}
-			/* dbuf[1] = 11; */
 
 			return writedata(dbuf, _size, name);
 

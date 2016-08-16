@@ -136,12 +136,13 @@ unsigned long long ScalarData<T>::_index(const unsigned int i, const unsigned in
 template<typename T>
 T &ScalarData<T>::ind(const unsigned int i, const unsigned int j, const unsigned int k)
 {
-	return data[_index(i, j, k)];
+	return ind(_index(i, j, k));
 }
 
 template<typename T>
 T &ScalarData<T>::ind(unsigned long long ind)
 {
+	if (ind > n_pts()) throw std::runtime_error("ScalarData index requested is too large.");
 	return data[ind];
 }
 
@@ -253,6 +254,13 @@ template<typename T>
 const ScalarData<T> ScalarData<T>::operator-(const ScalarData<T> &rhs)
 {
 	return ScalarData(*this) -= rhs;
+}
+
+
+template<typename T>
+std::vector<T> ScalarData<T>::vdata() const
+{
+	return data;
 }
 
 template class ScalarData<long double>;

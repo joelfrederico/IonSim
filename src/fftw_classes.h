@@ -7,50 +7,8 @@
 // ==================================
 // Functions for sending data
 // ==================================
-int psifftw_base(SimParams simparams, LoopComm loopcomm);
+int psifftw_base(LoopComm loopcomm);
 int fftwl_recv_local_size(long long &local_n0, long long &local_0_start, const int id);
-
-template<typename T>
-int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
-{
-	int count;
-	long long local_0_start_ll;
-	unsigned long i_nonlocal;
-	long ind;
-	MPI_Status status;
-	MPI_Datatype mpitype;
-	std::vector<T> dbuf;
-
-	/* JTF_PRINTVAL_NOEND(id) << " (receiving)" << std::endl; */
-	
-	MPI_Recv(&local_0_start_ll, 1, MPI_LONG_LONG, id, TAG_COMPLEX_VEC_START, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-	MPI_Probe(id, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-	
-	if (status.MPI_TAG == TAG_LDOUBLE_COMPLEX_VEC)
-	{
-		mpitype = MPI_LONG_DOUBLE;
-	} else if (status.MPI_TAG == TAG_DOUBLE_COMPLEX_VEC) {
-		mpitype = MPI_DOUBLE;
-	} else if (status.MPI_TAG == TAG_FLOAT_COMPLEX_VEC) {
-		mpitype = MPI_FLOAT;
-	}
-
-	MPI_Get_count(&status, mpitype, &count);
-	dbuf.resize(count);
-
-	MPI_Recv(dbuf.data(), count, mpitype, id, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-	for (long i=0; i<count/2; i++)
-	{
-		ind = i*2;
-		i_nonlocal = i + local_0_start_ll;
-		buf[i_nonlocal].real(dbuf[ind]);
-		buf[i_nonlocal].imag(dbuf[ind+1]);
-	}
-
-	return 0;
-}
 
 // ==================================
 // Classes: receiving and doing FFT

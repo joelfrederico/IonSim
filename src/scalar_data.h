@@ -14,6 +14,7 @@ class ScalarData
 		double mid_i;
 		double mid_j;
 		double mid_k;
+		std::vector<Tclass> data;
 
 		// ==================================
 		// Private methods
@@ -44,13 +45,13 @@ class ScalarData
 		const long double y_edge_mag;
 		const long double z_edge_mag;
 
-		std::vector<Tclass> data;
 		std::vector<long double> x_grid, y_grid, z_grid;
 
 		// ==================================
 		// Calculated data
 		// ==================================
 		long long n_pts() const;
+		std::vector<Tclass> vdata() const;
 
 		// ==================================
 		// Methods

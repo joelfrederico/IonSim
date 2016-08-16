@@ -112,7 +112,7 @@ am_ionsim_OBJECTS = faddeeva/Faddeeva.$(OBJEXT) \
 	field_comm.$(OBJEXT) field_data.$(OBJEXT) \
 	field_interp.$(OBJEXT) gsl_classes.$(OBJEXT) ions.$(OBJEXT) \
 	loop_comm.$(OBJEXT) main.$(OBJEXT) master.$(OBJEXT) \
-	parts.$(OBJEXT) scalar_data.$(OBJEXT) \
+	mpi_vec.$(OBJEXT) parts.$(OBJEXT) scalar_data.$(OBJEXT) \
 	scalar_data_comm.$(OBJEXT) simparams.$(OBJEXT) slave.$(OBJEXT) \
 	support_func.$(OBJEXT) writer_base.$(OBJEXT) \
 	writer_parallel.$(OBJEXT) writer_serial.$(OBJEXT)
@@ -426,6 +426,7 @@ ionsim_SOURCES = \
 		 loop_comm.cpp           \
 		 main.cpp                \
 		 master.cpp              \
+		 mpi_vec.cpp             \
 		 parts.cpp               \
 		 scalar_data.cpp         \
 		 scalar_data_comm.cpp    \
@@ -576,6 +577,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi_vec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scalar_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scalar_data_comm.Po@am__quote@

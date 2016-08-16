@@ -53,9 +53,11 @@ template<typename T>
 int ScalarData_Comm::send_scalar(ScalarData<T> &scalar_send, int dest_id)
 {
 	int n_pts = scalar_send.n_pts();
+	typename std::vector<T> vdata = scalar_send.vdata();
 
 	/* std::cout << "Sending " << n_pts << " to: " << dest_id << std::endl; */
-	MPI_Send(scalar_send.data.data(), n_pts, MPI_LONG_DOUBLE, dest_id, TAG_FIELD, MPI_COMM_WORLD);
+	if (vdata.size() != n_pts) throw std::runtime_error("Size to send does not match vector.");
+	MPI_Send(vdata.data(), n_pts, MPI_LONG_DOUBLE, dest_id, TAG_FIELD, MPI_COMM_WORLD);
 	/* std::cout << "Finished sending to: " << dest_id << std::endl; */
 
 	return 0;
