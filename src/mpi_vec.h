@@ -29,8 +29,21 @@ template<typename T>
 int MPI_Recv_Scalar_Complex(ScalarData<std::complex<T>> &cdata);
 
 template<typename T>
-int MPI_Send_Scalar_Real(T *r_buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
+int MPI_Send_Scalar_Real(const std::vector<T> &rdata, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
 
-int MPI_Send_Scalar_Complex(fftwl_complex *c_buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
+template<typename T>
+int MPI_Send_Scalar_Complex(const std::vector<std::complex<T>> cdata, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
+
+template<typename T>
+int MPI_Complex_div_k2(std::vector<std::complex<T>> &cdata, const T delx, const T dely, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
+
+
+// ==================================
+// Don't Need Instantiation
+// ==================================
+std::vector<long double> MPI_convert_real_vec(long double *r_buf, const ptrdiff_t local_n0, const ptrdiff_t N0, const ptrdiff_t N1);
+std::vector<std::complex<long double>> MPI_convert_complex_vec(fftwl_complex *c_buf, const ptrdiff_t local_n0, const ptrdiff_t N1);
+int MPI_convert_complex_buf(const std::vector<std::complex<long double>> cdata, fftwl_complex *c_buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N1);
+
 
 #endif

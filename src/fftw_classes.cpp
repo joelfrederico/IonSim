@@ -69,7 +69,7 @@ double f(unsigned long long i, unsigned long long j)
 
 	if (((i == 127) || (i == 128)) && ((j==127) || (j==128)))
 	{
-		valx = 1;
+		valx = 0.25;
 	} else {
 		valx = 0;
 	}
@@ -86,8 +86,12 @@ int psifftw_base(LoopComm loopcomm)
 	ptrdiff_t i_nonlocal;
 	fftwl_plan planforward, planreverse;
 	std::vector<std::complex<long double>> cdata;
-	std::vector<long double> rdata;
-	long ind, ind2, maxallowed, csize;
+	/* std::vector<long double> rdata; */
+	long ind, ind2;
+	long double delx, dely;
+	delx = dely = 0.05;
+	long double kx, ky, k2, fx, fy;
+	long double val;
 
 	alloc_local = fftwl_mpi_local_size_2d(N0, int(N1/2+1), loopcomm.slave_comm, &local_n0, &local_0_start);
 
@@ -108,48 +112,21 @@ int psifftw_base(LoopComm loopcomm)
 
 	fftwl_execute(planforward);
 
-	MPI_Send_Scalar_Complex(c_buf, local_n0, local_0_start, N0, N1);
+	cdata = MPI_convert_complex_vec(c_buf, local_n0, N1);
 
-	csize = local_n0*(N1/2+1);
-	cdata.resize(csize);
-	for (long i=0; i<csize; i++)
-	{
-		cdata[i].real(c_buf[i][0]);
-		cdata[i].imag(c_buf[i][1]);
-	}
+	MPI_Complex_div_k2(cdata, delx, dely, local_n0, local_0_start, N0, N1);
 
+	MPI_Send_Scalar_Complex(cdata, local_n0, local_0_start, N0, N1);
 
 	planreverse = fftwl_mpi_plan_dft_c2r_2d(N0, N1, c_buf, r_buf, loopcomm.slave_comm, FFTW_EXHAUSTIVE);
 
-	for (ptrdiff_t i=0; i<local_n0; i++)
-	{
-		i_nonlocal=i+local_0_start;
-		for(ptrdiff_t j=0; j<(N1/2+1); j++)
-		{
-			ind = i*(N1/2+1)+j;
-			if (ind > maxallowed) JTF_PRINT(Over max);
-			c_buf[ind][0] = cdata[ind].real();
-			c_buf[ind][1] = cdata[ind].imag();
-		}
-	}
+	MPI_convert_complex_buf(cdata, c_buf, local_n0, local_0_start, N1);
 
 	fftwl_execute(planreverse);
 
-	maxallowed = local_n0*N1;
-	rdata.resize(maxallowed);
-	for (ptrdiff_t i=0; i<local_n0; i++)
-	{
-		i_nonlocal = i+local_0_start;
-		for (ptrdiff_t j=0; j<N1; j++)
-		{
-			ind = i*(2*(N1/2+1))+j;
-			ind2 = i*N1+j;
-			rdata[ind2] = r_buf[ind] / (N0*N1);
-		}
-	}
+	auto rdata = MPI_convert_real_vec(r_buf, local_n0, N0, N1);
 
-	MPI_Send_local(local_n0, local_0_start, N0, N1);
-	MPI_Send_vector(rdata);
+	MPI_Send_Scalar_Real(rdata, local_n0, local_0_start, N0, N1);
 
 	fftwl_free(r_buf);
 	fftwl_free(c_buf);

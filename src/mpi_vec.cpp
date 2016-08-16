@@ -177,53 +177,120 @@ int MPI_Recv_Scalar_Complex(ScalarData<std::complex<T>> &cdata)
 }
 
 template<typename T>
-int MPI_Send_Scalar_Real(T &r_buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
+int MPI_Send_Scalar_Real(const std::vector<T> &rdata, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
 {
-	ptrdiff_t i_nonlocal;
-	std::vector<T> rdata;
-	long maxallowed, ind;
-	maxallowed = local_n0*N1;
-	rdata.resize(maxallowed);
-	for (ptrdiff_t i=0; i<local_n0; i++)
-	{
-		i_nonlocal=i+local_0_start;
-		for(ptrdiff_t j=0; j<N1; j++)
-		{
-			ind = i*N1+j;
-			if (ind > maxallowed) JTF_PRINT(Over max);
-
-			rdata[ind] = r_buf[ind];
-		}
-	}
-
 	MPI_Send_local(local_n0, local_0_start, N0, N1);
 	MPI_Send_vector(rdata);
 	return 0;
 }
 
-int MPI_Send_Scalar_Complex(fftwl_complex *c_buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
+std::vector<long double> MPI_convert_real_vec(long double *r_buf, const ptrdiff_t local_n0, const ptrdiff_t N0, const ptrdiff_t N1)
+{
+	long ind, ind2, maxallowed;
+	maxallowed = local_n0*N1;
+	std::vector<long double> rdata;
+
+	rdata.resize(maxallowed);
+	for (ptrdiff_t i=0; i<local_n0; i++)
+	{
+		for (ptrdiff_t j=0; j<N1; j++)
+		{
+			ind = i*(2*(N1/2+1))+j;
+			ind2 = i*N1+j;
+			rdata[ind2] = r_buf[ind] / (N0*N1);
+		}
+	}
+	return rdata;
+}
+
+std::vector<std::complex<long double>> MPI_convert_complex_vec(fftwl_complex *c_buf, ptrdiff_t local_n0, ptrdiff_t N1)
+{
+	typename std::vector<std::complex<long double>> cdata;
+	long csize;
+	
+	csize = local_n0*(N1/2+1);
+	cdata.resize(csize);
+	for (long i=0; i<csize; i++)
+	{
+		cdata[i].real(c_buf[i][0]);
+		cdata[i].imag(c_buf[i][1]);
+	}
+	return cdata;
+}
+
+template<typename T>
+int MPI_Send_Scalar_Complex(const std::vector<std::complex<T>> cdata, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
+{
+	MPI_Send_local(local_n0, local_0_start, N0, N1);
+	MPI_Send_complex(cdata);
+	return 0;
+}
+
+template<typename T>
+int MPI_Complex_div_k2(std::vector<std::complex<T>> &cdata, const T delx, const T dely, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
+{
+	T fx, fy, kx, ky, k2;
+	ptrdiff_t i_nonlocal;
+	long ind;
+
+	fx = delx*2;
+	fy = dely*2;
+	for (long i=0; i<local_n0; i++)
+	{
+		i_nonlocal = i+local_0_start;
+		if (i_nonlocal <= N0/2)
+		{
+			kx = i_nonlocal;
+		} else {
+			/* JTF_PRINT(HI); */
+			kx = i_nonlocal-N0;
+		}
+		kx /= fx;
+
+		for (long j=0; j<(N1/2+1); j++)
+		{
+			ind = i*(N1/2+1) + j;
+
+			ky = j;
+			ky /= fy;
+			
+			k2 = kx*kx + ky*ky;
+			if ((i_nonlocal == 0) && (j==0))
+			{
+				JTF_PRINTVAL(k2);
+				cdata[ind] = 0;
+			} else {
+				cdata[ind] /= k2;
+			}
+		}
+	}
+
+	return 0;
+}
+
+int MPI_convert_complex_buf(const std::vector<std::complex<long double>> cdata, fftwl_complex *c_buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N1)
 {
 	ptrdiff_t i_nonlocal;
-	std::vector<std::complex<long double>> cdata;
-	long maxallowed, ind;
-	maxallowed = local_n0*(N1/2+1);
-	cdata.resize(maxallowed);
+	long ind;
+	long maxallowed = cdata.size();
+
 	for (ptrdiff_t i=0; i<local_n0; i++)
 	{
 		i_nonlocal=i+local_0_start;
 		for(ptrdiff_t j=0; j<(N1/2+1); j++)
 		{
 			ind = i*(N1/2+1)+j;
-			if (ind > maxallowed) JTF_PRINT(Over max);
-			cdata[ind].real(c_buf[ind][0]);
-			cdata[ind].imag(c_buf[ind][1]);
+			if (ind >= maxallowed) JTF_PRINT(Over max);
+			c_buf[ind][0] = cdata[ind].real();
+			c_buf[ind][1] = cdata[ind].imag();
 		}
 	}
-
-	MPI_Send_local(local_n0, local_0_start, N0, N1);
-	MPI_Send_complex(cdata);
 	return 0;
 }
+
+// ==================================
+// Instantiation
+// ==================================
 
 template int MPI_Send_complex(const std::vector<std::complex<long double>> &buf);
 
@@ -231,4 +298,10 @@ template int MPI_Recv_complex(int id, std::vector<std::complex<long double>> &bu
 
 template int MPI_Recv_Scalar_Real(ScalarData<long double> &rdata);
 
+template int MPI_Send_Scalar_Real(const std::vector<long double> &rdata, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
+
+template int MPI_Send_Scalar_Complex(std::vector<std::complex<long double>> cdata, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
+
 template int MPI_Recv_Scalar_Complex(ScalarData<std::complex<long double>> &cdata);
+
+template int MPI_Complex_div_k2(std::vector<std::complex<long double>> &cdata, const long double delx, const long double dely, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
