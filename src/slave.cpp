@@ -248,7 +248,7 @@ int slave()
 				JTF_PRINT(Starting sub);
 				psi_k = psifftw_base(simparams, loopcomm);
 
-				JTF_PRINT(Sub done);
+				JTF_PRINT_NOEND(Sub done) << " (id: " << loopcomm.id << ")" << std::endl;
 
 				break;
 		}

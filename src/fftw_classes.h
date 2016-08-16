@@ -15,12 +15,15 @@ int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 {
 	int count;
 	long long local_0_start_ll;
+	unsigned long i_nonlocal;
 	long ind;
 	MPI_Status status;
 	MPI_Datatype mpitype;
 	std::vector<T> dbuf;
+
+	/* JTF_PRINTVAL_NOEND(id) << " (receiving)" << std::endl; */
 	
-	MPI_Recv(&local_0_start_ll, 1, MPI_LONG_LONG, 1, TAG_COMPLEX_VEC_START, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	MPI_Recv(&local_0_start_ll, 1, MPI_LONG_LONG, id, TAG_COMPLEX_VEC_START, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	MPI_Probe(id, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	
@@ -35,15 +38,15 @@ int MPI_Recv_complex(int id, std::vector<std::complex<T>> &buf)
 
 	MPI_Get_count(&status, mpitype, &count);
 	dbuf.resize(count);
-	buf.resize(count/2);
 
 	MPI_Recv(dbuf.data(), count, mpitype, id, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	for (long i=0; i<count/2; i++)
 	{
 		ind = i*2;
-		buf[i + local_0_start_ll].real(dbuf[ind]);
-		buf[i].imag(dbuf[ind+1]);
+		i_nonlocal = i + local_0_start_ll;
+		buf[i_nonlocal].real(dbuf[ind]);
+		buf[i_nonlocal].imag(dbuf[ind+1]);
 	}
 
 	return 0;

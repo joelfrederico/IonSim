@@ -5,6 +5,7 @@
 #include "parts.h"
 #include "field_data.h"
 #include <ionsim.h>
+#include "support_func.h"
 
 class WriterSerial : public WriterBase
 {
@@ -38,12 +39,17 @@ class WriterSerial : public WriterBase
 			typename std::vector<std::complex<T>>::size_type bsize = buf.size();
 			std::vector<typename std::vector<std::complex<T>>::size_type> _size = {size[0], size[1], 2};
 			std::vector<double> dbuf;
+
 			dbuf.resize(2*bsize);
-			for (int i=0; i<bsize; i++)
+			for (int i=0; i<_size[0]; i++)
 			{
-				dbuf[i] = buf[i].real();
-				dbuf[i+bsize] = buf[i].imag();
+				for (int j=0; j<_size[1]; j++)
+				{
+					dbuf[2*(j + i*_size[1])]   = buf[ionsim::row_major(i, j, _size[1])].real();
+					dbuf[1+2*(j + i*_size[1])] = buf[ionsim::row_major(i, j, _size[1])].imag();
+				}
 			}
+			/* dbuf[1] = 11; */
 
 			return writedata(dbuf, _size, name);
 
@@ -62,7 +68,6 @@ class WriterSerial : public WriterBase
 			// ==================================
 			if ((typeid(T) == typeid(long double)) || (typeid(T) == typeid(double)))
 			{
-				JTF_PRINT(Type is ldouble);
 				// Set data type
 				hdf5type = H5T_NATIVE_DOUBLE;
 
@@ -71,19 +76,18 @@ class WriterSerial : public WriterBase
 				std::copy(buf.begin(), buf.end(), dbuf.begin());
 				mpi_buf = dbuf.data();
 			} else if (typeid(T) == typeid(float)) {
+				// Set data type
 				hdf5type = H5T_NATIVE_FLOAT;
+
+				// Copy data to properly-typed buffer
 				fbuf.resize(buf.size());
 				std::copy(buf.begin(), buf.end(), fbuf.begin());
 				mpi_buf = fbuf.data();
 			}
 
 			// ==================================
-			// Access or create a new group
+			// Create dataset at root
 			// ==================================
-			/* GroupStepAccess step_group(file_id, step); */
-			/* GroupAccess group(step_group.group_id, name); */
-			/* GroupAccess group(file_id, name); */
-
 			DatasetAccess vdataset(file_id, name, size, hdf5type);
 
 			status = H5Dwrite(vdataset.dataset_id, hdf5type, vdataset.dataspace_id, vdataset.dataspace_id, H5P_DEFAULT, mpi_buf);

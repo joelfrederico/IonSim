@@ -35,6 +35,18 @@ namespace ionsim
 		std::transform(vec.begin(), vec.end(), temp.begin(), [&mean](const T &val) { return val - mean;});
 		return std::inner_product(vec.begin(), vec.end(), vec.begin(), 0) / vec.size();
 	}
+
+	template<typename T>
+	T col_major(const T i, const T j, const ptrdiff_t N0)
+	{
+		return i + N0*j;
+	}
+	
+	template<typename T>
+	T row_major(const T i, const T j, const ptrdiff_t N1)
+	{
+		return i*N1 + j;
+	}
 }
 
 #endif

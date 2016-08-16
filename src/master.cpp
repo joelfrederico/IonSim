@@ -54,6 +54,7 @@ int master()
 	// ==============================
 	// Initialize fields
 	// ==============================
+	long long i_nonlocal;
 	long long rho_size;
 	ScalarData<ldouble> rho(simparams);
 	ScalarData<ldouble> psi(simparams);
@@ -62,7 +63,7 @@ int master()
 	Field_Data *field;
 	Field_Comm fieldcomm;
 	long long local_n0, local_0_start;
-	long double *buf;
+	std::vector<long double> buf;
 
 	// ==============================
 	// Try to read FFT wisdom
@@ -142,7 +143,7 @@ int master()
 		rho = 0;
 		scalarcomm.recv_scalar_others_add(rho);
 		rho = 0;
-		rho.ind(128/2, 128/2, 0) = 1;
+		rho.ind(128/2, 128/2, e_step) = 1;
 
 		// ==============================
 		// Get fields
@@ -154,20 +155,27 @@ int master()
 
 			rho_size = local_n0*rho.y_pts;
 
-			// Get pointer to proper location in array
-			buf = (rho.data.data() + local_0_start);
+			buf.resize(rho_size);
+			for (unsigned long i=0; i<local_n0; i++)
+			{
+				i_nonlocal = i + local_0_start;
+				for (unsigned long j=0; j<rho.y_pts; j++)
+				{
+					buf[ionsim::row_major(i, j, rho.y_pts)] = rho.ind(i_nonlocal, j, e_step);
+				}
+			}
 
 			// Send rho
-			MPI_Send(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
+			MPI_Send(buf.data(), rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 		}
 
 		for (int id=1; id < loopcomm.p; id++)
 		{
 			MPI_Recv_complex(id, cdata.data);
-
 		}
 
-		JTF_PRINTVAL(rho.ind(64, 64, 0));
+		JTF_PRINT(Master here);
+
 		writer_s = new WriterSerial(simparams.filename);
 		writer_s->writedata(rho, "rho");
 		delete writer_s;
@@ -177,7 +185,7 @@ int master()
 		delete writer_s;
 
 		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
-		/* fftwl_export_wisdom_to_filename(wisdom_file); */
+		fftwl_export_wisdom_to_filename(wisdom_file);
 		loopcomm.instruct(LOOP_KILL);
 		return 0;
 
@@ -188,8 +196,9 @@ int master()
 			rho_size = local_n0*rho.y_pts;
 
 			// Receive psi
-			buf = (psi.data.data() + local_0_start);
-			MPI_Recv(buf, rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			/* buf = (psi.data.data() + local_0_start); */
+			buf.resize(rho_size);
+			MPI_Recv(buf.data(), rho_size, MPI_LONG_DOUBLE, id, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		}
 		// Receive wisdom and save
 		fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);

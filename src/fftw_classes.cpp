@@ -4,6 +4,7 @@
 #include "scalar_data.h"
 #include <fftw3-mpi.h>
 #include <mpi.h>
+#include "support_func.h"
 
 int fftwl_send_local_size(ptrdiff_t &local_n0, ptrdiff_t &local_0_start)
 {
@@ -28,6 +29,7 @@ int fftwl_recv_local_size(long long &local_n0, long long &local_0_start, const i
 template<typename T>
 int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0, ptrdiff_t local_0_start)
 {
+	LoopComm loopcomm;
 	typename std::vector<T> dbuf;
 	long ind;
 	int count;
@@ -36,6 +38,8 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0
 	long long local_0_start_ll = local_0_start;
 
 	count = buf.size();
+
+
 	dbuf.resize(2*count);
 	for (long i=0; i<count; i++)
 	{
@@ -43,8 +47,6 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0
 		dbuf[ind]   = buf[i].real();
 		dbuf[ind+1] = buf[i].imag();
 	}
-
-	dbuf[1] = 50;
 
 	if (typeid(T) == typeid(long double))
 	{
@@ -69,16 +71,6 @@ int MPI_Send_complex(const std::vector<std::complex<T>> &buf, ptrdiff_t local_n0
 
 long c_ind(const long i, const long j, const ptrdiff_t N1)
 {
-	return i*(N1/2+1) + j;
-}
-
-long column_major(const long i, const long j, const ptrdiff_t N0)
-{
-	return i + N0*j;
-}
-
-long row_major(const long i, const long j, const ptrdiff_t N1)
-{
 	return i*N1 + j;
 }
 
@@ -90,8 +82,10 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	fftwl_plan planforward, planreverse;
 	ptrdiff_t alloc_local, local_n0, local_0_start;
 	ldouble_vec rho_x;
+	ldouble val;
 	long long int rho_x_size;
 	long long int i, j;
+	unsigned long i_nonlocal;
 
 	ScalarData<ldouble> psi(simparams);
 	long double f0, f1, kx, ky, k2;
@@ -130,6 +124,14 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	/* real_out = new long double[local_n0*N1]; */
 	real_out.resize(local_n0*N1);
 
+	JTF_PRINTVAL_NOEND(alloc_local)   << ", id: "   << loopcomm.id           << std::endl;
+	JTF_PRINTVAL_NOEND(local_n0)      << ", id: "   << loopcomm.id           << std::endl;
+	JTF_PRINTVAL_NOEND(local_0_start) << ", id: "   << loopcomm.id           << std::endl;
+	JTF_PRINTVAL_NOEND(r_buf)         << ", size: " << sizeof(long double)   << ", id: "   << loopcomm.id << std::endl;
+	JTF_PRINTVAL_NOEND(c_buf)         << ", size: " << sizeof(fftwl_complex) << ", id: "   << loopcomm.id << std::endl;
+	/* JTF_PRINTVAL_NOEND(real_out.data()) << ", size: " << sizeof(long double)   << ", id: "   << loopcomm.id << std::endl; */
+	/* JTF_PRINTVAL_NOEND(rho_k)           << ", size: " << sizeof(fftwl_complex) << ", id: "   << loopcomm.id << std::endl; */
+
 	// ==================================
 	// Create and execute plan
 	// ==================================
@@ -139,11 +141,14 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	{
 		for (long j=0; j < N1; j++)
 		{
-			r_buf[i*(2*(N1/2+1))+j] = rho_x[i + N0*j];
+			val = rho_x[ionsim::row_major(i, j, N1)];
+			if (loopcomm.id == 7) JTF_PRINTVAL(i*(2*(N1/2+1))+j);
+			r_buf[i*(2*(N1/2+1))+j] = val;
+			if (val != 0) JTF_PRINTVAL(val);
 		}
 	}
 
-	fftwl_execute(planforward);
+	/* fftwl_execute(planforward); */
 
 	cdata.resize(local_n0*(N1/2+1));
 	// ==================================
@@ -153,18 +158,19 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	f1 = psi.dydj * 2 * N1;
 	for (long i=0; i < local_n0; i++)
 	{
-		if (i <= N0/2)
+		i_nonlocal = i + local_0_start;
+		if (i_nonlocal <= N0/2)
 		{
-			kx = i / f0;
+			kx = i_nonlocal / f0;
 		} else {
-			kx = (i-N0) / f0;
+			kx = (i_nonlocal-N0) / f0;
 		}
 		for (long j=0; j< N1/2+1; j++)
 		{
 			ky = j/f1;
 			k2 = kx*kx + ky*ky;
-			ind = c_ind(i, j, N1);
-			if ((i==0) && (j==0))
+			ind = c_ind(i, j, N1/2+1);
+			if ((i_nonlocal==0) && (j==0))
 			{
 				rho_k[ind][0] = 0;
 				rho_k[ind][1] = 0;
@@ -172,22 +178,16 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 				rho_k[ind][0] = c_buf[ind][0] / k2;
 				rho_k[ind][1] = c_buf[ind][1] / k2;
 			}
-			ind2 = row_major(i, j, N0);
+			ind2 = ionsim::row_major(i, j, N0);
 			cdata[ind2].real(rho_k[ind][0]);
 			cdata[ind2].imag(rho_k[ind][1]);
 		}
 	}
 
+	/* cdata[0].real(10); */
+	/* cdata[0].imag(-10); */
 	MPI_Send_complex(cdata, local_n0, local_0_start);
 
-	// ==================================
-	// Create and execute plan
-	// ==================================
-	JTF_PRINTVAL_NOEND(alloc_local) << ", id: " << loopcomm.id << std::endl;
-	JTF_PRINTVAL_NOEND(r_buf)    << ", size: " << sizeof(long double)   << ", id: " << loopcomm.id << std::endl;
-	JTF_PRINTVAL_NOEND(c_buf)    << ", size: " << sizeof(fftwl_complex) << ", id: " << loopcomm.id << std::endl;
-	JTF_PRINTVAL_NOEND(real_out.data()) << ", size: " << sizeof(long double)   << ", id: " << loopcomm.id << std::endl;
-	JTF_PRINTVAL_NOEND(rho_k)    << ", size: " << sizeof(fftwl_complex) << ", id: " << loopcomm.id << std::endl;
 	fftwl_free(r_buf);
 	fftwl_free(rho_k);
 	fftwl_free(c_buf);
@@ -197,6 +197,9 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	fftwl_free(c_buf);
 	fftwl_free(r_buf);
 
+	// ==================================
+	// Create and execute plan
+	// ==================================
 	alloc_local = fftwl_mpi_local_size_2d(N0, N1/2+1, loopcomm.slave_comm, &local_n0, &local_0_start);
 	c_buf = fftwl_alloc_complex(alloc_local);
 	r_buf = fftwl_alloc_real(2*alloc_local);
@@ -208,8 +211,8 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	{
 		for (long j=0; j<N1/2+1; j++)
 		{
-			c_buf[c_ind(i, j, N1)][0] = rho_k[row_major(i, j, N1)][0];
-			c_buf[c_ind(i, j, N1)][1] = rho_k[row_major(i, j, N1)][1];
+			c_buf[c_ind(i, j, N1/2+1)][0] = rho_k[ionsim::row_major(i, j, N1)][0];
+			c_buf[c_ind(i, j, N1/2+1)][1] = rho_k[ionsim::row_major(i, j, N1)][1];
 		}
 	}
 
@@ -222,7 +225,7 @@ int psifftw_base(SimParams simparams, LoopComm loopcomm)
 	{
 		for (long j=0; j<N1; j++)
 		{
-			real_out[column_major(i, j, local_n0)] = r_buf[row_major(i, j, N1)];
+			real_out[ionsim::col_major(i, j, local_n0)] = r_buf[ionsim::row_major(i, j, N1)];
 		}
 	}
 
