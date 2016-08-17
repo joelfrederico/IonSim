@@ -67,15 +67,15 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho, cons
 	int y_pts = simparams.n_field_y;
 	long double x_edge_mag = simparams.field_trans_wind;
 	long double y_edge_mag = simparams.field_trans_wind;
-	int x_ind, y_ind, z_ind, e_x, e_y, e_z;
+	unsigned long x_ind, y_ind, z_ind, e_x, e_y, e_z;
 
-	e_z = rho.lt_z_ind_e((z1+z0)/2, z_ind);
+	e_z = rho.lt_x_ind_e(3, (z1+z0)/2, z_ind);
 	for (long long i=0; i < n_pts; i++)
 	{
 		if ((z0 <= z[i]) && (z[i] < z1))
 		{
-			e_x = rho.lt_x_ind_e(x[i], x_ind);
-			e_y = rho.lt_y_ind_e(y[i], y_ind);
+			e_x = rho.lt_x_ind_e(1, x[i], x_ind);
+			e_y = rho.lt_x_ind_e(2, y[i], y_ind);
 			if ((e_x==0) && (e_y==0))
 			{
 				rho.ind(x_ind, y_ind, z_ind)++;

@@ -2,177 +2,164 @@
 #include <vector>
 #include <math.h>
 
+// ==================================
+// Private
+// ==================================
 template<typename T>
-bool ScalarData<T>::_samedim(const ScalarData &rhs) const
+bool ScalarData<T>::_samedim(const ScalarData<T> &rhs) const
 {
-	if ( ((*this).x_pts == rhs.x_pts) && ((*this).y_pts == rhs.y_pts) && ((*this).z_pts == rhs.z_pts) )
+	bool out = true;
+
+	// Must have same rank
+	if (_x_pts.size() != rhs._x_pts.size()) return false;
+
+	// Must have same dims
+	for (typename decltype(_x_pts)::size_type i=0; i<_x_pts.size(); i++)
 	{
-		return true;
-	} else {
-		return false;
+		if (_x_pts[i] != rhs._x_pts[i])
+		{
+			return false;
+		}
 	}
+	return true;
 }
 
 template<typename T>
-long long ScalarData<T>::n_pts() const
-{
-	return x_pts * y_pts * z_pts;
-}
-
-template<typename T>
-int ScalarData<T>::_init()
+int ScalarData<T>::_init(
+		const std::vector<typename std::vector<T>::size_type> x_pts,
+		const std::vector<long double> edge_mag
+	)
 {
 	// ==================================
-	// Initialize Scalar Field
+	// Check if rank makes sense
 	// ==================================
-	long long num_pts;
-	num_pts = n_pts();
-	data.resize(num_pts);
+	if (x_pts.size() != edge_mag.size()) throw std::runtime_error("Inconsistent rank!");
+
+	typename decltype(data)::size_type _n_pts = 1;
+
+	const typename decltype(x_pts)::size_type rank = x_pts.size();
 
 	// ==================================
-	// Initialize grid indices
+	// Save private members first
 	// ==================================
-	x_grid.resize(x_pts);
-	y_grid.resize(y_pts);
-	z_grid.resize(z_pts);
+	// Initialization parameters
+	_x_pts    = x_pts;
+	_edge_mag = edge_mag;
 
-	// ==================================
-	// Explicitly set fields to zero
-	// ==================================
-	for (long long i=0; i < num_pts; i++)
+	// Metadata parameters
+	mid.resize(rank);
+	_dxdi.resize(rank);
+	_grid.resize(rank);
+	for (typename decltype(x_pts)::size_type i=0; i<rank; i++)
 	{
-		data[i] = double(0);
+		if (x_pts[i] <= 1) throw std::runtime_error("Makes no sense having a dimension with no extent (x_pts=1).");
+		// Obtain product
+		_n_pts *= x_pts[i];
+		// Calculate midpoint
+		mid[i] = (x_pts[i]-1) / 2;
+		// Calculate differential length
+		_dxdi[i] = edge_mag[i] * 2 / (x_pts[i]-1);
+		// Calculate grid vector
+		_grid[i].resize(x_pts[i]);
+		for (typename decltype(x_pts)::value_type j=0; j<x_pts[i]; j++)
+		{
+			_grid[i][j] = (j-mid[i]) * _dxdi[i];
+		}
 	}
 
-	// ==================================
-	// Get differential lengths
-	// ==================================
-	dxdi = x_edge_mag * 2 / (x_pts-1);
-	dydj = y_edge_mag * 2 / (y_pts-1);
-	dzdk = z_edge_mag * 2 / (z_pts-1);
-
-	// ==================================
-	// Get midpoints
-	// ==================================
-	mid_i = (x_pts-1) / 2;
-	mid_j = (y_pts-1) / 2;
-	mid_k = (z_pts-1) / 2;
-
-	// ==================================
-	// Set grid indices
-	// ==================================
-	for (int i=0; i < x_pts; i++)
-	{
-		x_grid[i] = (i-mid_i) * dxdi;
-	}
-
-	for (int j=0; j < y_pts; j++)
-	{
-		y_grid[j] = (j-mid_j) * dydj;
-	}
-
-	for (int k=0; k < z_pts; k++)
-	{
-		z_grid[k] = (k-mid_k) * dzdk;
-	}
-
-	// ==================================
-	// In this case, z_grid must be set
-	// explicitly
-	// ==================================
-	if (z_pts == 1)
-	{
-		z_grid[0] = 0;
-	}
+	// Data storage
+	data = decltype(data)(_n_pts, 0);
 
 	return 0;
 }
 
+// ==================================
+// Public
+// ==================================
+
 template<typename T>
-ScalarData<T>::ScalarData(const ScalarData &rhs) : 
-	x_pts(rhs.x_pts),
-	y_pts(rhs.y_pts),
-	z_pts(rhs.z_pts),
-	x_edge_mag(rhs.x_edge_mag),
-	y_edge_mag(rhs.y_edge_mag),
-	z_edge_mag(rhs.z_edge_mag)
+ScalarData<T>::ScalarData()
 {
-	_init();
-	data = rhs.data;
+	decltype(_x_pts) x_pts;
+	decltype(_edge_mag) edge_mag;
+	_init(x_pts, edge_mag);
 }
 
 template<typename T>
-ScalarData<T>::ScalarData(const unsigned int _x_pts, const unsigned int _y_pts, const unsigned int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag) :
-	x_pts(_x_pts),
-	y_pts(_y_pts),
-	z_pts(_z_pts),
-	x_edge_mag(_x_edge_mag),
-	y_edge_mag(_y_edge_mag),
-	z_edge_mag(_z_edge_mag)
+ScalarData<T>::ScalarData(const SimParams &simparams)
 {
-	_init();
+	decltype(_x_pts) x_pts = {
+		simparams.n_field_x,
+		simparams.n_field_y,
+		simparams.n_field_z
+		};
+	decltype(_edge_mag) edge_mag = {
+		simparams.field_trans_wind,
+		simparams.field_trans_wind,
+		simparams.z_end
+		};
+	_init(x_pts, edge_mag);
 }
 
 template<typename T>
-ScalarData<T>::ScalarData(const SimParams &simparams) :
-	x_pts(simparams.n_field_x),
-	y_pts(simparams.n_field_y),
-	z_pts(simparams.n_field_z),
-	x_edge_mag(simparams.field_trans_wind),
-	y_edge_mag(simparams.field_trans_wind),
-	z_edge_mag(simparams.z_end)
+ScalarData<T>::ScalarData(const decltype(_x_pts) x_pts, const decltype(_edge_mag) edge_mag)
 {
-	_init();
+	_init(x_pts, edge_mag);
 }
 
 template<typename T>
-unsigned long long ScalarData<T>::_index(const unsigned int i, const unsigned int j, const unsigned int k) const
+auto ScalarData<T>::dxdi(const decltype(_dxdi)::size_type i) const -> typename decltype(_dxdi)::value_type
 {
-	if ((i >= x_pts) || (j >= y_pts) || (k >= z_pts)) throw std::runtime_error("Index out of bounds!");
-	unsigned long long index = i + x_pts*(j + y_pts*k);
-	return index;
+	return _dxdi[i];
 }
 
 template<typename T>
-T &ScalarData<T>::ind(const unsigned int i, const unsigned int j, const unsigned int k)
+auto ScalarData<T>::x_pts(const decltype(_x_pts)::size_type i) const -> typename decltype(_x_pts)::value_type
 {
-	return data[_index(i, j, k)];
+	return _x_pts[i];
 }
 
 template<typename T>
-T &ScalarData<T>::ind(unsigned long long ind)
+auto ScalarData<T>::n_pts() const -> typename decltype(data)::size_type
 {
-	return data[ind];
+	return data.size();
 }
 
-int getind_e(const ldouble x, const double delx, const double mid, const int n_pts, int &ind)
+template<typename T>
+auto ScalarData<T>::edge_mag(const decltype(_edge_mag)::size_type i) const -> typename decltype(_edge_mag)::value_type
 {
-	ind = floor(x/delx + mid);
-	if ( (0 < ind ) && (ind < n_pts-1))
+	return _edge_mag[i];
+}
+
+template<typename T>
+auto ScalarData<T>::grid(const decltype(_grid)::size_type i) const -> typename decltype(_grid)::value_type
+{
+	return _grid[i];
+}
+
+template<typename T>
+auto ScalarData<T>::vdata() const -> decltype(data)
+{
+	return data;
+}
+
+template<typename T>
+T &ScalarData<T>::ind(typename decltype(data)::size_type i)
+{
+	if (i >= data.size()) throw std::runtime_error("Index is too large for data vector.");
+	return data[i];
+}
+
+template<typename T>
+int ScalarData<T>::lt_x_ind_e(const typename decltype(_x_pts)::size_type i, const long double x, decltype(_x_pts)::value_type &ind) const
+{
+	ind = floor(x/dxdi(i) + mid[i]);
+	if ( (0 < ind ) && (ind < n_pts()-1))
 	{
 		return 0;
 	} else {
 		return -1;
 	}
-}
-
-template<typename T>
-int ScalarData<T>::lt_x_ind_e(const ldouble x, int &ind) const
-{
-	return getind_e(x, dxdi, mid_i, x_pts, ind);
-	/* return floor(x/dxdi + mid_i); */
-}
-
-template<typename T>
-int ScalarData<T>::lt_y_ind_e(const ldouble y, int &ind) const
-{
-	return getind_e(y, dydj, mid_j, y_pts, ind);
-}
-
-template<typename T>
-int ScalarData<T>::lt_z_ind_e(const ldouble z, int &ind) const
-{
-	return getind_e(z, dzdk, 0, z_pts, ind);
 }
 
 // ==================================
@@ -183,29 +170,32 @@ ScalarData<T> &ScalarData<T>::operator=(const ScalarData<T> &rhs)
 {
 	if (this != &rhs)
 	{
-		// Deallocate, allocate new space, copy values...
-		if (
-			(this->x_pts == rhs.x_pts) &
-			(this->y_pts == rhs.y_pts) &
-			(this->z_pts == rhs.z_pts) &
-			(this->x_edge_mag == rhs.x_edge_mag) &
-			(this->y_edge_mag == rhs.y_edge_mag) &
-			(this->z_edge_mag == rhs.z_edge_mag)
-		   )
+		for (typename decltype(_x_pts)::size_type i=0; i<_x_pts.size(); i++)
 		{
-			this->data = rhs.data;
-		} else {
-			throw std::runtime_error("Cannot copy fields of different sizes");
+			if (this->x_pts(i) != rhs.x_pts(i)) throw std::runtime_error("Cannot copy, fields different sizes.");
+			if (this->edge_mag(i) != rhs.edge_mag(i)) throw std::runtime_error("Cannot copy, field grids different.");
 		}
+		// Deallocate, allocate new space, copy values...
+		this->data = rhs.data;
 	}
     	return *this;
+}
+
+template<typename T>
+ScalarData<T> &ScalarData<T>::operator*=(const T rhs)
+{
+	for (typename decltype(data)::size_type i=0; i < n_pts(); i++)
+	{
+		this->data[i] *= rhs;
+	}
+	return *this;
 }
 
 template<typename T>
 ScalarData<T> ScalarData<T>::operator-() const
 {
 	ScalarData temp = *this;
-	for (int i=0; i < n_pts(); i++)
+	for (typename decltype(data)::size_type i=0; i < n_pts(); i++)
 	{
 		temp.data[i] *= -1;
 	}
@@ -218,7 +208,7 @@ ScalarData<T> &ScalarData<T>::operator+=(const ScalarData<T> &rhs)
 {
 	if ( this->_samedim(rhs) )
 	{
-		for (int i=0; i < n_pts(); i++)
+		for (typename decltype(data)::size_type i=0; i < n_pts(); i++)
 		{
 			this->data[i] += rhs.data[i];
 		}
@@ -233,7 +223,7 @@ ScalarData<T> &ScalarData<T>::operator-=(const ScalarData<T> &rhs)
 {
 	if ( this->_samedim(rhs) )
 	{
-		for (int i=0; i < n_pts(); i++)
+		for (typename decltype(data)::size_type i=0; i < n_pts(); i++)
 		{
 			this->data[i] -= rhs.data[i];
 		}

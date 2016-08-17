@@ -91,9 +91,9 @@ class SimParams
 		double field_trans_wind; 	// Transverse sim window
 		double radius; 			// ?
 		double z_end; 			// Longitudinal length of sim window
-		int n_field_x; 			// Number of points in x
-		int n_field_y; 			// Number of points in y
-		int n_field_z; 			// Number of points in z
+		unsigned int n_field_x;		// Number of points in x
+		unsigned int n_field_y;		// Number of points in y
+		unsigned int n_field_z;		// Number of points in z
 		bool ion_z_bool; 		// ?
 
 		// - Electron sim

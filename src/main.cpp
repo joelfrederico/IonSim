@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <gflags/gflags.h> // #include <google/gflags.h>
+#include <fftw3-mpi.h>
 
 const int INT_TAG = 1;
 
@@ -26,6 +27,7 @@ int main(int argc, char **argv)
 	// Initialize MPI
 	// ==============================
 	MPI_Init(&argc, &argv);
+	fftwl_mpi_init();
 
 	// ==============================
 	// Get the individual process ID.
@@ -45,6 +47,7 @@ int main(int argc, char **argv)
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
+	fftwl_mpi_cleanup();
 	MPI_Finalize();
 
 	if (verbose)
@@ -58,7 +61,6 @@ int main(int argc, char **argv)
 			printf("Slave %d finished\n", id);
 		}
 	}
-
 
 	return 0;
 }

@@ -89,6 +89,7 @@ const tag_t TAG_COMPLEX_VEC_START   = 350;
 const tag_t TAG_LDOUBLE_COMPLEX_VEC = 400;
 const tag_t TAG_DOUBLE_COMPLEX_VEC  = 500;
 const tag_t TAG_FLOAT_COMPLEX_VEC   = 600;
+const tag_t TAG_LONG_LONG           = 700;
 
 const int MASTER_RANK = 0;
 

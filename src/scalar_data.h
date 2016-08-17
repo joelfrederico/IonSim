@@ -11,59 +11,80 @@ class ScalarData
 		// ==================================
 		// Private data members
 		// ==================================
-		double mid_i;
-		double mid_j;
-		double mid_k;
+		// Initialization parameters
+		std::vector<std::vector<long double>::size_type> _x_pts;
+		std::vector<long double> 	                 _edge_mag;
+
+		// Metadata parameters
+		std::vector<double>      	      mid;
+		std::vector<long double> 	      _dxdi;
+		std::vector<std::vector<long double>> _grid;
+
+		// Data storage
+		std::vector<Tclass>      	      data;
 
 		// ==================================
 		// Private methods
 		// ==================================
-		bool _samedim(const ScalarData &rhs) const;
-		int _init();
+		bool _samedim(const ScalarData<Tclass> &rhs) const;
+
+		int _init(
+				const std::vector<typename std::vector<Tclass>::size_type> x_pts,
+				const std::vector<long double> edge_mag
+			);
+
 
 	public:
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
-		ScalarData(const ScalarData &rhs);
+		ScalarData();
 		ScalarData(const SimParams &simparams);
-		ScalarData(const unsigned int _x_pts, const unsigned int _y_pts, const unsigned int _z_pts, double _x_edge_mag, double _y_edge_mag, double _z_edge_mag);
-
-		// ==================================
-		// Member data
-		// ==================================
-		long double dxdi;
-		long double dydj;
-		long double dzdk;
-
-		const unsigned int x_pts;
-		const unsigned int y_pts;
-		const unsigned int z_pts;
-
-		const long double x_edge_mag;
-		const long double y_edge_mag;
-		const long double z_edge_mag;
-
-		std::vector<Tclass> data;
-		std::vector<long double> x_grid, y_grid, z_grid;
+		ScalarData(const decltype(_x_pts) x_pts, const decltype(_edge_mag) edge_mag);
 
 		// ==================================
 		// Calculated data
 		// ==================================
-		long long n_pts() const;
+		auto dxdi     (const decltype(_dxdi)::size_type i)     const -> typename decltype(_dxdi)::value_type;
+		auto x_pts    (const decltype(_x_pts)::size_type i)    const -> typename decltype(_x_pts)::value_type;
+		auto n_pts    () 				       const -> typename decltype(data)::size_type;
+		auto edge_mag (const decltype(_edge_mag)::size_type i) const -> typename decltype(_edge_mag)::value_type;
+		auto grid     (const decltype(_grid)::size_type i)     const -> typename decltype(_grid)::value_type;
+		auto vdata    ()  				       const -> decltype(data);
 
 		// ==================================
 		// Methods
 		// ==================================
-		unsigned long long _index(const unsigned int i, const unsigned int j, const unsigned int k) const;
+		void resize(const decltype(_x_pts) x_pts, const decltype(_edge_mag) edge_mag);
 
-		/* Tclass &ind(int i, int j, int k); */
-		Tclass &ind(const unsigned int i, const unsigned int j, const unsigned int k);
-		Tclass &ind(unsigned long long ind);
+		template<typename T, typename... T2>
+		auto _index(const T i, const T2 ... rest) const -> typename decltype(data)::size_type
+		{
+			auto size = sizeof...(rest);
+			typename decltype(_x_pts)::size_type ind;
+		
+			ind = _x_pts.size() - size - 1;
+		
+			if (i >= _x_pts[ind]) throw std::runtime_error("Index requested is too large in a dimension.");
+		
+			return i + _x_pts[ind] * _index(rest...);
+		}
 
-		int lt_x_ind_e(const ldouble x, int &ind) const;
-		int lt_y_ind_e(const ldouble y, int &ind) const;
-		int lt_z_ind_e(const ldouble z, int &ind) const;
+		auto _index(const typename decltype(data)::size_type i) const -> typename decltype(data)::size_type
+		{
+			return i;
+		}
+
+		template<typename... T2>
+		Tclass &ind(const T2 ...rest)
+		{
+			auto ind = _index(rest...);
+			return data[ind];
+		}
+
+		Tclass &ind(typename decltype(data)::size_type i);
+
+		int lt_x_ind_e(const typename decltype(_x_pts)::size_type i, const long double x, decltype(_x_pts)::value_type &ind) const;
 
 		// ==================================
 		// Operators
@@ -74,25 +95,23 @@ class ScalarData
 		ScalarData<Tclass> &operator+=(const ScalarData<Tclass> &rhs);
 		ScalarData<Tclass> &operator-=(const ScalarData<Tclass> &rhs);
 
-		template <class T>
-		ScalarData<Tclass> &operator=(const T rhs)
-		{
-			for (int i=0; i < n_pts(); i++)
-			{
-				this->data[i] = rhs;
-			}
-			return *this;
-		}
+		ScalarData<Tclass> &operator=(const Tclass rhs);
+		/* { */
+		/* 	for (int i=0; i < n_pts(); i++) */
+		/* 	{ */
+		/* 		this->data[i] = rhs; */
+		/* 	} */
+		/* 	return *this; */
+		/* } */
 
-		template <class T>
-		ScalarData<Tclass> &operator*=(const T rhs)
-		{
-			for (int i=0; i < n_pts(); i++)
-			{
-				this->data[i] *= rhs;
-			}
-			return *this;
-		}
+		ScalarData<Tclass> &operator*=(const Tclass rhs);
+		/* { */
+		/* 	for (int i=0; i < n_pts(); i++) */
+		/* 	{ */
+		/* 		this->data[i] *= rhs; */
+		/* 	} */
+		/* 	return *this; */
+		/* } */
 
 		const ScalarData<Tclass> operator+(const ScalarData<Tclass> &rhs);
 		const ScalarData<Tclass> operator-(const ScalarData<Tclass> &rhs);

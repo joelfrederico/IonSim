@@ -19,6 +19,7 @@ ionsim_SOURCES = \
 		 loop_comm.cpp           \
 		 main.cpp                \
 		 master.cpp              \
+		 mpi_vec.cpp             \
 		 parts.cpp               \
 		 scalar_data.cpp         \
 		 scalar_data_comm.cpp    \
