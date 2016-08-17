@@ -16,58 +16,65 @@
 #include <iomanip>
 #include <math.h>
 #include <sstream>
+#include "slave_loops.h"
 
 DECLARE_bool(verbose);
 
+/* -	LoopComm loopcomm; */
+/* - */
+/* -	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD); */
+/* - */
+/* -	psifftw_base(loopcomm); */
+/* - */
+/* -	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD); */
+/* -	return 0; */
+
 int slave()
 {
--	LoopComm loopcomm;
--
--	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
--
--	psifftw_base(loopcomm);
--
--	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
--	return 0;
--}
--
--int liess()
--{
+	// ==================================
+	// Initialize Variables
 	// ==================================
 	// FFTW variables
-	// ==================================
 	ptrdiff_t N0, N1;
--	/// ScalarData_Comm scalarcomm;
-+	ScalarData_Comm scalarcomm;
 
-	// ==================================
-	// Other variables
-	// ==================================
--	/// std::stringstream streamme;
--	/// std::string subgroup;
-+	std::stringstream streamme;
-+	std::string subgroup;
-	int buf, step_buf, substep_buf;
--	/// long double z0, z1;
-+	long double z0, z1;
-	bool loop_alive;
--	/// SimParams simparams_temp;
--	/// Field_Comm fieldcomm;
-+	SimParams simparams_temp;
-+	Field_Comm fieldcomm;
+	// Communication variables
 	LoopComm loopcomm;
+	int buf;
+
+	// Simulation metadata
+	SimParams simparams_temp;
+
+	// Loop variables
+	unsigned int step_buf, substep_buf;
+	bool loop_alive;
+
+	// Fields
+	std::vector<unsigned long> x_pts_real    = {256, 256};
+	std::vector<long double> edge_mag = {1, 1};
+	ScalarData<ldouble> rho(x_pts_real, edge_mag);
+	ScalarData<ldouble> psi(x_pts_real, edge_mag);
+	/* ScalarData<ldouble> psi(simparams); */
+	/* ScalarData<ldouble> rho(simparams); */
+
+	// Old-style fields
+	Field_Data *field;
+	Field_Data *ion_field;
+	
+	// IO variables
+
+	// Particle variables
+	Emit emit;
+
+	/* int buf, step_buf, substep_buf; */
 
 	// ==================================
 	// Receive starting gun
 	// ==================================
--	/// MPI_Recv(&buf, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
--	/// if (FLAGS_verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
-+	MPI_Recv(&buf, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-+	if (FLAGS_verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
+	MPI_Recv(&buf, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	if (FLAGS_verbose) printf("Slave %d says: **DUM DUM DUM DUM**\n", loopcomm.id);
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-+
 	// ==================================
 	// Initialize FFTW
 	// ==================================
@@ -75,84 +82,36 @@ int slave()
 	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
 
 	// ==================================
-	// Make simparams
+	// Receive simparams
 	// ==================================
--	// simparams_temp.bcast_receive();
-+	simparams_temp.bcast_receive();
+	simparams_temp.bcast_receive();
+	const SimParams simparams = simparams_temp;
 
 	// ==================================
-	// Recalculate to distribute
-	// simulation across nodes
+	// Set up old-style fields
 	// ==================================
-	/* simparams_temp.n_e    /= (loopcomm.p-1); */
-	/* simparams_temp.n_ions /= (loopcomm.p-1); */
-
--	/// const SimParams simparams = simparams_temp;
-+	const SimParams simparams = simparams_temp;
-
-	// ==================================
-	// Recalculate to distribute
-	// simulation across nodes
-	// ==================================
--	/* ScalarData<ldouble> psi(simparams); */
--	/* ScalarData<ldouble> rho(simparams); */
--	ScalarData<ldouble> psi(128, 128, 1, 1, 1, 1);
--	ScalarData<ldouble> rho(128, 128, 1, 1, 1, 1);
--	ScalarData<ldouble> psi_k(128, 65, 1, 1, 1, 1);
--
--	/* ScalarData<std::complex<ldouble>> psi_k(simparams); */
--
--	/// Field_Data *field;
--	/// Field_Data *ion_field;
--	/// field = new Field_Data(simparams);
--	/// ion_field = new Field_Data(simparams.n_field_x, simparams.n_field_y, 1, simparams.field_trans_wind, simparams.field_trans_wind, 0);
-+	ScalarData<ldouble> psi(simparams);
-+	ScalarData<ldouble> rho(simparams);
-+	ScalarData<std::complex<ldouble>> psi_k(simparams);
-+
-+	Field_Data *field;
-+	Field_Data *ion_field;
-+	field = new Field_Data(simparams);
-+	ion_field = new Field_Data(simparams.n_field_x, simparams.n_field_y, 1, simparams.field_trans_wind, simparams.field_trans_wind, 0);
-
-	// ==================================
-	// Write attributes
-	// ==================================
--	/// WriterParallel *writer_p;
-+	WriterParallel *writer_p;
+	field = new Field_Data(simparams);
+	ion_field = new Field_Data(simparams.n_field_x, simparams.n_field_y, 1, simparams.field_trans_wind, simparams.field_trans_wind, 0);
 
 	// ==================================
 	// Generate beam
 	// ==================================
-	/* double nb_0, sr; */
+	// Beam metadata
+	emit.set_emit_n(simparams.emit_n, simparams.E);
+	Plasma plas(simparams.n_p_cgs, simparams.m_ion_amu);
+	Match mat(plas, simparams.E, emit);
 
--	/// Emit emit;
--	/// emit.set_emit_n(simparams.emit_n, simparams.E);
--	/// Plasma plas(simparams.n_p_cgs, simparams.m_ion_amu);
--	/// Match mat(plas, simparams.E, emit);
-+	Emit emit;
-+	emit.set_emit_n(simparams.emit_n, simparams.E);
-+	Plasma plas(simparams.n_p_cgs, simparams.m_ion_amu);
-+	Match mat(plas, simparams.E, emit);
+	// Beam transverse
+	Beam x_beam(mat.beta(), mat.alpha(), emit);
+	Beam y_beam(mat.beta(), mat.alpha(), emit);
 
--	/// Beam x_beam(mat.beta(), mat.alpha(), emit);
--	/// Beam y_beam(mat.beta(), mat.alpha(), emit);
-+	Beam x_beam(mat.beta(), mat.alpha(), emit);
-+	Beam y_beam(mat.beta(), mat.alpha(), emit);
-
-	/* sr = ionsim::sr(simparams.emit_n, simparams.E, simparams.n_p_cgs, simparams.m_ion_amu); */
-	/* nb_0 = ionsim::nb_0(simparams.q_tot, simparams.sz, sr); */
-
--	/// Ebeam ebeam(simparams, x_beam, y_beam);
-+	Ebeam ebeam(simparams, x_beam, y_beam);
-	// Fix for having less charge per particle with more processors
-	/* ebeam.qpp /= (loopcomm.p-1); */
+	// Beam particles
+	Ebeam ebeam(simparams, x_beam, y_beam);
 
 	// ==================================
 	// Generate ions
 	// ==================================
--	/// Ions ions(&simparams, plas);
-+	Ions ions(&simparams, plas);
+	Ions ions(&simparams, plas);
 
 	// ==================================
 	// Slave loop
@@ -163,159 +122,81 @@ int slave()
 		loopcomm.instruct(&buf);
 		switch (buf)
 		{
+			// ==================================
+			// Set electron loop iteration
+			// ==================================
 			case LOOP_START_E_ITER:
 				loopcomm.recv_master(&step_buf);
 				break;
 
+			// ==================================
+			// Set ion loop iteration
+			// ==================================
 			case LOOP_START_I_ITER:
 				loopcomm.recv_master(&substep_buf);
 				break;
 
+			// ==================================
+			// Terminate Loop
+			// ==================================
 			case LOOP_KILL:
-				// ==================================
-				// Terminate Loop
-				// ==================================
 				loop_alive = false;
 				break;
 
+			// ==================================
+			// Write ions to file
+			// ==================================
 			case LOOP_DUMP_IONS:
-				// ==================================
-				// Write ions to file
-				// ==================================
--				/// writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
-+				writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
-
--				/// subgroup = "ions_steps";
--				/// streamme.str("");
--				/// streamme << "ions_" << std::setfill('0') << std::setw(4) << substep_buf;
-+				subgroup = "ions_steps";
-+				streamme.str("");
-+				streamme << "ions_" << std::setfill('0') << std::setw(4) << substep_buf;
-
--				/// (*writer_p).writedata_substep(step_buf, substep_buf, streamme.str(), subgroup, ions);
-+				(*writer_p).writedata_substep(step_buf, substep_buf, streamme.str(), subgroup, ions);
-
--				/// delete writer_p;
-+				delete writer_p;
+				SL_dump_ions(simparams, loopcomm, step_buf, substep_buf, ions);
 
 				break;
 
+			// ==================================
+			// Write electrons to file
+			// ==================================
 			case LOOP_DUMP_E:
-				// ==================================
-				// Write electrons to file
-				// ==================================
--				/// writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
-+				writer_p = new WriterParallel(simparams.filename, loopcomm.slave_comm);
-
--				/// (*writer_p).writedata(step_buf, "electrons", ebeam);
-+				(*writer_p).writedata(step_buf, "electrons", ebeam);
-
--				/// delete writer_p;
-+				delete writer_p;
+				SL_dump_electrons(simparams, loopcomm, step_buf, ebeam);
 
 				break;
 
+			// ==================================
+			// Push ions
+			// ==================================
 			case LOOP_PUSH_IONS:
-				// ==================================
-				// Push ions
-				// ==================================
--				/// switch (simparams.pushmethod)
--				/// {
--				/// 	case PUSH_RUNGE_KUTTA:
--				/// 		/* ions.push(nb_0, sr); */
--				/// 		break;
--				/// 	case PUSH_SIMPLE:
--				/// 		/* ions.push_simple(nb_0, sr); */
--				/// 		break;
--				/// 	case PUSH_FIELD:
--				/// 		ions.push_field(*field, substep_buf);
-+				switch (simparams.pushmethod)
-+				{
-+					case PUSH_RUNGE_KUTTA:
-+						/* ions.push(nb_0, sr); */
-+						break;
-+					case PUSH_SIMPLE:
-+						/* ions.push_simple(nb_0, sr); */
-+						break;
-+					case PUSH_FIELD:
-+						ions.push_field(*field, substep_buf);
-
--				/// 		break;
--				/// }
-+						break;
-+				}
+				SL_push_ions(simparams, substep_buf, field, ions);
 				break;
 
+			// ==================================
+			// Send field to Master
+			// ==================================
 			case LOOP_GET_EFIELD:
-				// ==================================
-				// Send E-field to Master
-				// ==================================
--				/// delete field;
--				/// field = new Field_Data(simparams);
-+				delete field;
-+				field = new Field_Data(simparams);
-
--				/// /* ebeam.field_Coulomb(*field); */
--				/// ebeam.field_Coulomb_sliced(*field);
--				/// fieldcomm.send_field(*field, 0);
-+				/* ebeam.field_Coulomb(*field); */
-+				ebeam.field_Coulomb_sliced(*field);
-+				fieldcomm.send_field(*field, 0);
+				SL_get_efield(simparams, ebeam, field);
 
 				break;
 
+			// ==================================
+			// Retrieve field from Master
+			// ==================================
 			case LOOP_SEND_EFIELD:
-				// ==================================
-				// Retrieve field from Master
-				// ==================================
--				/// delete field;
--				/// field = new Field_Data(simparams);
--				/// fieldcomm.recv_field_copy(*field, 0);
-+				delete field;
-+				field = new Field_Data(simparams);
-+				fieldcomm.recv_field_copy(*field, 0);
+				SL_send_efield(simparams, field);
+
 				break;
 
+			// ==================================
+			// Retrieve current ion field
+			// ==================================
 			case LOOP_GET_IFIELD:
-				// ==================================
-				// Retrieve current ion field
-				// ==================================
-				/* ions.field_Coulomb_sliced(*ion_field, substep_buf); */
-
--				/// fieldcomm.send_field(*ion_field, 0);
-+				fieldcomm.send_field(*ion_field, 0);
+				SL_get_ifield(ion_field);
 
 				break;
 
 			case LOOP_RESET_IFIELD:
--				/// delete ion_field;
--				/// ion_field = new Field_Data(simparams);
-+				delete ion_field;
-+				ion_field = new Field_Data(simparams);
+				delete ion_field;
+				ion_field = new Field_Data(simparams);
+
 				break;
 
 			case LOOP_GET_RHO:
-				// ==================================
-				// Histogram to find rho
-				// ==================================
--				/// z0 = step_buf * simparams.dz();
--				/// z1 = (step_buf+1) * simparams.dz();
--				/// ebeam.get_rho_dz(z0, z1, rho, simparams);
-+				z0 = step_buf * simparams.dz();
-+				z1 = (step_buf+1) * simparams.dz();
-+				ebeam.get_rho_dz(z0, z1, rho, simparams);
-
-				// ==================================
-				// Compute psi
-				// ==================================
--				/// psi = -rho;
-+				psi = -rho;
-
-				// ==================================
-				// Send psi to master
-				// ==================================
--				/// scalarcomm.send_scalar(psi, 0);
-+				scalarcomm.send_scalar(psi, 0);
 
 				break;
 
@@ -323,11 +204,9 @@ int slave()
 				// ==================================
 				// Prepare for FFT
 				// ==================================
-				/* N0 = simparams.x_pts; */
-				/* N1 = simparams.y_pts; */
 				JTF_PRINT(Starting sub);
--				psi_k = psifftw_base(loopcomm);
-+				psi_k = psifftw_base(simparams, loopcomm);
+				N0 = N1 = 256;
+				psifftw_base(loopcomm, N0, N1);
 
 				JTF_PRINT_NOEND(Sub done) << " (id: " << loopcomm.id << ")" << std::endl;
 
@@ -339,12 +218,7 @@ int slave()
 	// ==================================
 	// Clean up
 	// ==================================
--	/// delete field;
--	JTF_PRINT_NOEND(Beginning cleanup: ) << loopcomm.id << std::endl;
-+	delete field;
-	fftwl_mpi_cleanup();
--	JTF_PRINT_NOEND(Slave cleanup: ) << loopcomm.id << std::endl;
-+
+	delete field;
 
 	return 0;
 }

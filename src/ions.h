@@ -22,7 +22,7 @@ class Ions : public Parts
 
 		int push(double nb_0, double sig_r);
 		int push_simple(double nb_0, double sig_r);
-		int push_field(Field_Data &field, int z_step);
+		int push_field(const Field_Data &field, int z_step);
 		
 		/* double sr_macro() const; */
 		/* double np() const; */

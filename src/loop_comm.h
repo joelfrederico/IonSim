@@ -19,8 +19,8 @@ class LoopComm
 		int instruct(int *buf) const;
 		int instruct(const int buf) const;
 
-		int send_slaves(const int buf) const;
-		int recv_master(int *buf) const;
+		int send_slaves(const unsigned int buf) const;
+		int recv_master(unsigned int *buf) const;
 };
 
 #endif

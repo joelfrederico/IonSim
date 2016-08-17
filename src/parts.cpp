@@ -61,16 +61,12 @@ Parts::Parts(const SimParams &simparams, const parttype_t _type) : type(_type), 
 }
 
 template<typename T>
-int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho, const SimParams &simparams) const
+int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho) const
 {
-	int x_pts = simparams.n_field_x;
-	int y_pts = simparams.n_field_y;
-	long double x_edge_mag = simparams.field_trans_wind;
-	long double y_edge_mag = simparams.field_trans_wind;
 	unsigned long x_ind, y_ind, z_ind, e_x, e_y, e_z;
 
 	e_z = rho.lt_x_ind_e(3, (z1+z0)/2, z_ind);
-	for (long long i=0; i < n_pts; i++)
+	for (decltype(x)::size_type i=0; i < n_pts; i++)
 	{
 		if ((z0 <= z[i]) && (z[i] < z1))
 		{

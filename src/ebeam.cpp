@@ -358,7 +358,7 @@ int Ebeam::field_Coulomb(Field_Data &field)
 	return 0;
 }
 
-int Ebeam::field_Coulomb_sliced(Field_Data &field)
+int Ebeam::field_Coulomb_sliced(Field_Data &field) const
 {
 	double dx, dy;
 	double drsq, dr;

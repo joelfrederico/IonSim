@@ -35,33 +35,6 @@ double f(unsigned long long i, unsigned long long j)
 	valx = (valx-(256-1)/2);
 	valy = (valy-(256-1)/2);
 
-	/* if ((j == 127) || (j == 128)) */
-	/* { */
-	/* 	return 1; */
-	/* } else { */
-	/* 	return 0; */
-	/* } */
-
-	/* long double i_mag, i_min, i_max, j_mag, j_min, j_max, r2; */
-
-	/// return cos(valx/10)*cos(valy/10);
-
-	/// return 0.5*cos(valy/10)+0.5;
-
-	/// if ( (i % 4 == 0) || (j % 4 == 0))
-	/// {
-	/// 	return 1;
-	/// } else {
-	/// 	return 0;
-	/// }
-
-	/// if (valx*valx + valy*valy < 40)
-	/// {
-	/// 	return 1;
-	/// } else {
-	/// 	return 0;
-	/// }
-
 	if (((i == 127) || (i == 128)) && ((j==127) || (j==128)))
 	{
 		valx = 0.25;
@@ -73,21 +46,27 @@ double f(unsigned long long i, unsigned long long j)
 
 int psifftw_base(LoopComm loopcomm, ptrdiff_t N0, ptrdiff_t N1)
 {
-	N0 = 256;
-	N1 = 256;
+	// ==================================
+	// Initialize Variables
+	// ==================================
 	long double *r_buf;
 	fftwl_complex *c_buf;
-	ptrdiff_t alloc_local, local_n0, local_0_start;
-	ptrdiff_t i_nonlocal;
+	ptrdiff_t alloc_local, local_n0, local_0_start, i_nonlocal;
 	fftwl_plan planforward, planreverse;
 	std::vector<std::complex<long double>> cdata;
-	/* std::vector<long double> rdata; */
-	long ind, ind2;
+	long ind;
 	long double delx, dely;
 	delx = dely = 0.05;
-	long double kx, ky, k2, fx, fy;
-	long double val;
 
+	// ==================================
+	// Load parameters
+	// ==================================
+	N0 = 256;
+	N1 = 256;
+
+	// ==================================
+	// Set up FFT
+	// ==================================
 	alloc_local = fftwl_mpi_local_size_2d(N0, int(N1/2+1), loopcomm.slave_comm, &local_n0, &local_0_start);
 
 	c_buf = fftwl_alloc_complex(alloc_local);
@@ -95,6 +74,7 @@ int psifftw_base(LoopComm loopcomm, ptrdiff_t N0, ptrdiff_t N1)
 
 	planforward = fftwl_mpi_plan_dft_r2c_2d(N0, N1, r_buf, c_buf, loopcomm.slave_comm, FFTW_EXHAUSTIVE);
 
+	// Copy in data
 	for (ptrdiff_t i=0; i<local_n0; i++)
 	{
 		i_nonlocal = i+local_0_start;
@@ -105,26 +85,56 @@ int psifftw_base(LoopComm loopcomm, ptrdiff_t N0, ptrdiff_t N1)
 		}
 	}
 
+	// ==================================
+	// Perform FFT
+	// ==================================
 	fftwl_execute(planforward);
 
+	// ==================================
+	// Copy FFT results
+	// ==================================
 	cdata = MPI_convert_complex_vec(c_buf, local_n0, N1);
 
+	// ==================================
+	// Divide by k^2
+	// ==================================
 	MPI_Complex_div_k2(cdata, delx, dely, local_n0, local_0_start, N0, N1);
 
+	// ==================================
+	// Send divided results to master
+	// ==================================
 	MPI_Send_Scalar_Complex(cdata, local_n0, local_0_start, N0, N1);
 
+	// ==================================
+	// Set up IFFT
+	// ==================================
 	planreverse = fftwl_mpi_plan_dft_c2r_2d(N0, N1, c_buf, r_buf, loopcomm.slave_comm, FFTW_EXHAUSTIVE);
 
+	// Copy in data
 	MPI_convert_complex_buf(cdata, c_buf, local_n0, local_0_start, N1);
 
+	// ==================================
+	// Perform IFFT
+	// ==================================
 	fftwl_execute(planreverse);
 
+	// ==================================
+	// Copy IFFT results
+	// ==================================
 	auto rdata = MPI_convert_real_vec(r_buf, local_n0, N0, N1);
 
+	// ==================================
+	// Send results to master
+	// ==================================
 	MPI_Send_Scalar_Real(rdata, local_n0, local_0_start, N0, N1);
 
+	// ==================================
+	// Deallocate
+	// ==================================
 	fftwl_free(r_buf);
 	fftwl_free(c_buf);
+	fftwl_destroy_plan(planforward);
+	fftwl_destroy_plan(planreverse);
 
 	return 0;
 }

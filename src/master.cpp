@@ -18,13 +18,13 @@ DECLARE_bool(verbose);
 int master()
 {
 	// ==============================
-	// Initialize communication vars
+	// Initialize variables
 	// ==============================
+	// Communications variables
 	LoopComm loopcomm;
 	ScalarData_Comm scalarcomm;
-	// ==============================
-	// Initialize FFTW vars
-	// ==============================
+
+	// FFTW vars
 	const char *wisdom_file = ".fftw-wisdom";
 	
 	// ==============================
@@ -36,42 +36,18 @@ int master()
 		MPI_Send(&slave_id, 1, MPI_INT, slave_id, slave_id*2, MPI_COMM_WORLD);
 	}
 
-
-
 	MPI_Barrier(MPI_COMM_WORLD);
 
--	ScalarData<std::complex<long double>> cdata(256, 129, 1, 1, 1, 1);
--	ScalarData<long double> rdata(256, 256, 1, 1, 1, 1);
--	std::vector<std::complex<long double>> cbuf;
--	std::vector<long double> rbuf;
--	WriterSerial *writer_s;
--	ptrdiff_t local_n0, local_0_start, N0, N1;
--
--	if (fftwl_import_wisdom_from_filename(wisdom_file))
--	{
--		std::cout << "Wisdom imported successfully" << std::endl;
--	} else {
--		std::cout << "Wisdom not imported" << std::endl;
--	}
--
--	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
--
--	MPI_Recv_Scalar_Complex(cdata);
--	MPI_Recv_Scalar_Real(rdata);
--
--	writer_s = new WriterSerial("myfile.h5", true);
--	writer_s->writedata(cdata, "complex");
--	delete writer_s;
--
--	writer_s = new WriterSerial("myfile.h5");
--	writer_s->writedata(rdata, "rdata");
--	delete writer_s;
--
--	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
--	fftwl_export_wisdom_to_filename(wisdom_file);
--
--	return 0;
--}
+	// ==============================
+	// Load wisdom
+	// ==============================
+	if (fftwl_import_wisdom_from_filename(wisdom_file))
+	{
+		std::cout << "Wisdom imported successfully" << std::endl;
+	} else {
+		std::cout << "Wisdom not imported" << std::endl;
+	}
+	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
 
 	// ==============================
 	// Load from file
@@ -91,18 +67,6 @@ int master()
 	// ==============================
 	// Initialize fields
 	// ==============================
--	/// long long i_nonlocal;
--	/// long long rho_size;
--	/// ScalarData<ldouble> rho(simparams);
--	/// ScalarData<ldouble> psi(simparams);
--	/// /* std::vector<std::complex<long double>> cdata; */
--	/* ScalarData<std::complex<long double>> cdata(rho.x_pts, rho.y_pts/2+1, 1, 1, 1, 1); */
--	ScalarData<std::complex<long double>> cdata(128, 65, 1, 1, 1, 1);
--	ScalarData<std::complex<long double>> rho(128, 65, 1, 1, 1, 1);
--	/// Field_Data *field;
--	/// Field_Comm fieldcomm;
--	/// long long local_n0, local_0_start;
--	/// std::vector<long double> buf;
 +	long long i_nonlocal;
 +	long long rho_size;
 +	ScalarData<ldouble> rho(simparams);
@@ -114,21 +78,6 @@ int master()
 +	long long local_n0, local_0_start;
 +	std::vector<long double> buf;
 
-	// ==============================
-	// Try to read FFT wisdom
-	// ==============================
-	fftwl_mpi_init();
-	if (fftwl_import_wisdom_from_filename(wisdom_file))
-	{
-		std::cout << "Wisdom imported successfully" << std::endl;
-	} else {
-		std::cout << "Wisdom not imported" << std::endl;
-	}
-
-	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
-
--	JTF_PRINT(Sent wisdom);
--
 	// ==============================
 	// Send simparams everywhere
 	// ==============================

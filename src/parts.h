@@ -38,7 +38,7 @@ class Parts
 		// Data methods
 		// ==============================
 		template<typename T>
-		int get_rho_dz(const double z0, const double z1, ScalarData<T> &rho, const SimParams &simparams) const;
+		int get_rho_dz(const double z0, const double z1, ScalarData<T> &rho) const;
 
 		template<typename T>
 		std::vector<ScalarData<T>> get_J();

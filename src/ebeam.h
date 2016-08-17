@@ -60,7 +60,7 @@ class Ebeam : public Parts
 
 		int field_BE(Field_Data &field);
 		int field_Coulomb(Field_Data &field);
-		int field_Coulomb_sliced(Field_Data &field);
+		int field_Coulomb_sliced(Field_Data &field) const;
 
 		bool verbose();
 };

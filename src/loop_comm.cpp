@@ -67,7 +67,7 @@ int LoopComm::instruct(const int buf) const
 	return 0;
 }
 
-int LoopComm::send_slaves(const int buf) const
+int LoopComm::send_slaves(const unsigned int buf) const
 {
 	if (id != 0) return -1;
 
@@ -75,17 +75,17 @@ int LoopComm::send_slaves(const int buf) const
 
 	for (int i=1; i < p; i++)
 	{
-		MPI_Send(&temp, 1, MPI_INT, i, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
+		MPI_Send(&temp, 1, MPI_UNSIGNED, i, TAG_LOOP_MESSAGE, MPI_COMM_WORLD);
 	}
 
 	return 0;
 }
 
-int LoopComm::recv_master(int *buf) const
+int LoopComm::recv_master(unsigned int *buf) const
 {
 	if (id == 0) return -1;
 
-	MPI_Recv(buf, 1, MPI_INT, MASTER_RANK, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	MPI_Recv(buf, 1, MPI_UNSIGNED, MASTER_RANK, TAG_LOOP_MESSAGE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	return 0;
 }

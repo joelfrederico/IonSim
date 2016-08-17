@@ -37,6 +37,7 @@ int MPI_Send_Scalar_Complex(const std::vector<std::complex<T>> cdata, const ptrd
 template<typename T>
 int MPI_Complex_div_k2(std::vector<std::complex<T>> &cdata, const T delx, const T dely, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
 
+int SolvePoisson();
 
 // ==================================
 // Don't Need Instantiation

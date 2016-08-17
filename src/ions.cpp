@@ -203,7 +203,7 @@ int Ions::push_simple(double nb_0, double sig_r)
 	return 0;
 }
 
-int Ions::push_field(Field_Data &field, int z_step)
+int Ions::push_field(const Field_Data &field, int z_step)
 {
 	const double dt = _simparams->dt();
 	const double dz = _simparams->dz();

@@ -2,6 +2,7 @@
 #include "loop_comm.h"
 #include "scalar_data.h"
 #include <fftw3-mpi.h>
+#include "writer_serial.h"
 
 int MPI_Send_local(const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
 {
@@ -285,6 +286,37 @@ int MPI_convert_complex_buf(const std::vector<std::complex<long double>> cdata, 
 			c_buf[ind][1] = cdata[ind].imag();
 		}
 	}
+	return 0;
+}
+
+int SolvePoisson()
+{
+	std::vector<unsigned long> x_pts_complex = {256, 129};
+	std::vector<unsigned long> x_pts_real    = {256, 256};
+	std::vector<long double> edge_mag        = {1, 1};
+
+	ScalarData<std::complex<long double>> cdata(x_pts_complex, edge_mag);
+	ScalarData<long double> rdata(x_pts_real, edge_mag);
+	std::vector<std::complex<long double>> cbuf;
+	std::vector<long double> rbuf;
+	WriterSerial *writer_s;
+	ptrdiff_t local_n0, local_0_start, N0, N1;
+
+
+	MPI_Recv_Scalar_Complex(cdata);
+	MPI_Recv_Scalar_Real(rdata);
+
+	writer_s = new WriterSerial("myfile.h5", true);
+	writer_s->writedata(cdata, "complex");
+	delete writer_s;
+
+	writer_s = new WriterSerial("myfile.h5");
+	writer_s->writedata(rdata, "rdata");
+	delete writer_s;
+
+	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
+	fftwl_export_wisdom_to_filename(wisdom_file);
+
 	return 0;
 }
 
