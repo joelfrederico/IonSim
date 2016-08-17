@@ -19,12 +19,14 @@ ionsim_SOURCES = \
 		 loop_comm.cpp           \
 		 main.cpp                \
 		 master.cpp              \
+		 master_loop.cpp         \
 		 mpi_vec.cpp             \
 		 parts.cpp               \
 		 scalar_data.cpp         \
 		 scalar_data_comm.cpp    \
 		 simparams.cpp           \
 		 slave.cpp               \
+		 slave_loops.cpp         \
 		 support_func.cpp        \
 		 writer_base.cpp         \
 		 writer_parallel.cpp     \

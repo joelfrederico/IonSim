@@ -112,8 +112,9 @@ am_ionsim_OBJECTS = faddeeva/Faddeeva.$(OBJEXT) \
 	field_comm.$(OBJEXT) field_data.$(OBJEXT) \
 	field_interp.$(OBJEXT) gsl_classes.$(OBJEXT) ions.$(OBJEXT) \
 	loop_comm.$(OBJEXT) main.$(OBJEXT) master.$(OBJEXT) \
-	mpi_vec.$(OBJEXT) parts.$(OBJEXT) scalar_data.$(OBJEXT) \
-	scalar_data_comm.$(OBJEXT) simparams.$(OBJEXT) slave.$(OBJEXT) \
+	master_loop.$(OBJEXT) mpi_vec.$(OBJEXT) parts.$(OBJEXT) \
+	scalar_data.$(OBJEXT) scalar_data_comm.$(OBJEXT) \
+	simparams.$(OBJEXT) slave.$(OBJEXT) slave_loops.$(OBJEXT) \
 	support_func.$(OBJEXT) writer_base.$(OBJEXT) \
 	writer_parallel.$(OBJEXT) writer_serial.$(OBJEXT)
 ionsim_OBJECTS = $(am_ionsim_OBJECTS)
@@ -426,12 +427,14 @@ ionsim_SOURCES = \
 		 loop_comm.cpp           \
 		 main.cpp                \
 		 master.cpp              \
+		 master_loop.cpp         \
 		 mpi_vec.cpp             \
 		 parts.cpp               \
 		 scalar_data.cpp         \
 		 scalar_data_comm.cpp    \
 		 simparams.cpp           \
 		 slave.cpp               \
+		 slave_loops.cpp         \
 		 support_func.cpp        \
 		 writer_base.cpp         \
 		 writer_parallel.cpp     \
@@ -577,12 +580,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master_loop.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi_vec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scalar_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scalar_data_comm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simparams.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slave.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slave_loops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_base.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_parallel.Po@am__quote@

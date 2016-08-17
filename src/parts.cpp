@@ -84,4 +84,4 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho) cons
 	return 0;
 }
 
-template int Parts::get_rho_dz(const double z0, const double z1, ScalarData<ldouble> &rho, const SimParams &simparams) const;
+template int Parts::get_rho_dz(const double z0, const double z1, ScalarData<ldouble> &rho) const;

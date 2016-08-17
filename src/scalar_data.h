@@ -89,7 +89,7 @@ class ScalarData
 		// ==================================
 		// Operators
 		// ==================================
-		ScalarData<Tclass> &operator=(const ScalarData<Tclass> &rhs);
+		/* ScalarData<Tclass> &operator=(const ScalarData<Tclass> &rhs); */
 		ScalarData<Tclass> operator-() const;
 
 		ScalarData<Tclass> &operator+=(const ScalarData<Tclass> &rhs);

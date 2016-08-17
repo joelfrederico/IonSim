@@ -165,20 +165,30 @@ int ScalarData<T>::lt_x_ind_e(const typename decltype(_x_pts)::size_type i, cons
 // ==================================
 // Operators
 // ==================================
+/* template<typename T> */
+/* ScalarData<T> &ScalarData<T>::operator=(const ScalarData<T> &rhs) */
+/* { */
+/* 	if (this != &rhs) */
+/* 	{ */
+/* 		for (typename decltype(_x_pts)::size_type i=0; i<_x_pts.size(); i++) */
+/* 		{ */
+/* 			if (this->x_pts(i) != rhs.x_pts(i)) throw std::runtime_error("Cannot copy, fields different sizes."); */
+/* 			if (this->edge_mag(i) != rhs.edge_mag(i)) throw std::runtime_error("Cannot copy, field grids different."); */
+/* 		} */
+/* 		// Deallocate, allocate new space, copy values... */
+/* 		this->data = rhs.data; */
+/* 	} */
+/*     	return *this; */
+/* } */
+
 template<typename T>
-ScalarData<T> &ScalarData<T>::operator=(const ScalarData<T> &rhs)
+ScalarData<T> &ScalarData<T>::operator=(const T rhs)
 {
-	if (this != &rhs)
+	for (int i=0; i < n_pts(); i++)
 	{
-		for (typename decltype(_x_pts)::size_type i=0; i<_x_pts.size(); i++)
-		{
-			if (this->x_pts(i) != rhs.x_pts(i)) throw std::runtime_error("Cannot copy, fields different sizes.");
-			if (this->edge_mag(i) != rhs.edge_mag(i)) throw std::runtime_error("Cannot copy, field grids different.");
-		}
-		// Deallocate, allocate new space, copy values...
-		this->data = rhs.data;
+		this->data[i] = rhs;
 	}
-    	return *this;
+	return *this;
 }
 
 template<typename T>

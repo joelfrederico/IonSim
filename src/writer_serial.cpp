@@ -44,7 +44,7 @@ int WriterSerial::overwrite_file_serial()
 	return 0;
 }
 
-int WriterSerial::writedata(long step, const std::string &group_str, const std::string &dataset_str, const Parts &parts)
+int WriterSerial::writedata(const long step, const std::string &group_str, const std::string &dataset_str, const Parts &parts)
 {
 	// ==================================
 	// Initialize all variables
@@ -142,7 +142,7 @@ hid_t _write_grid(hid_t loc_id, std::string attr_name, double *attr_array, const
 	return status;
 }
 
-int write_data(GroupAccess *group, Field_Data *field, double *buf, std::string dataset_str)
+int write_data(GroupAccess *group, const Field_Data *field, double *buf, std::string dataset_str)
 {
 	// ==================================
 	// Initialize all variables
@@ -194,7 +194,7 @@ int write_data(GroupAccess *group, Field_Data *field, double *buf, std::string d
 	return 0;
 }
 
-int WriterSerial::writedata(long step, Field_Data &field)
+int WriterSerial::writedata(const long step, const Field_Data &field)
 {
 	// ==================================
 	// Initialize all variables
