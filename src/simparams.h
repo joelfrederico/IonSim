@@ -30,6 +30,8 @@ void getdata(pugi::xml_node node, std::string key, bool verbose, T &out)
 			out = text.as_int();
 		} else if (typeid(out) == typeid(bool)) {
 			out = text.as_bool();
+		} else if (typeid(out) == typeid(unsigned int)) {
+			out = text.as_uint();
 		} else {
 			throw std::runtime_error("Type not matched");
 		}
@@ -75,7 +77,12 @@ class SimParams
 			} else if (typeid(send) == typeid(bool)) {
 				int buf_bool = send;
 				MPI_Bcast(&buf_bool, 1, MPI_INT, 0, MPI_COMM_WORLD);
-			} else return -1;
+			} else if (typeid(send) == typeid(unsigned int)) {
+				MPI_Bcast(&buf, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+			} else {
+				throw std::runtime_error("Type not handled by bcast_send_wrap.");
+				return -1;
+			}
 			return 0;
 		}
 

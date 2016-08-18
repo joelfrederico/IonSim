@@ -90,19 +90,9 @@ class ScalarData
 		// Operators
 		// ==================================
 		/* ScalarData<Tclass> &operator=(const ScalarData<Tclass> &rhs); */
-		ScalarData<Tclass> operator-() const;
-
 		ScalarData<Tclass> &operator+=(const ScalarData<Tclass> &rhs);
 		ScalarData<Tclass> &operator-=(const ScalarData<Tclass> &rhs);
-
 		ScalarData<Tclass> &operator=(const Tclass rhs);
-		/* { */
-		/* 	for (int i=0; i < n_pts(); i++) */
-		/* 	{ */
-		/* 		this->data[i] = rhs; */
-		/* 	} */
-		/* 	return *this; */
-		/* } */
 
 		ScalarData<Tclass> &operator*=(const Tclass rhs);
 		/* { */
@@ -115,6 +105,7 @@ class ScalarData
 
 		const ScalarData<Tclass> operator+(const ScalarData<Tclass> &rhs);
 		const ScalarData<Tclass> operator-(const ScalarData<Tclass> &rhs);
+		ScalarData<Tclass> operator-() const;
 
 		template <class T>
 		const ScalarData<Tclass> operator*(const T rhs)

@@ -69,7 +69,7 @@ int Field_Comm::recv_field_others_add(Field_Data &field_recv)
 	return 0;
 }
 
-int Field_Comm::recv_field_copy(Field_Data &field_recv, int sender_id)
+int Field_Comm::recv_field_copy(Field_Data &field_recv, const int sender_id)
 {
 	MPI_Status status;
 	double *Exbuf;
@@ -118,7 +118,7 @@ int Field_Comm::recv_field_copy(Field_Data &field_recv, int sender_id)
 	return 0;
 }
 
-int Field_Comm::send_field(Field_Data &field_send, int dest_id)
+int Field_Comm::send_field(const Field_Data &field_send, const int dest_id)
 {
 	/* std::cout << "Sending " << field_send.n_pts << " to: " << dest_id << std::endl; */
 	MPI_Send(field_send.Ex_data, field_send.n_pts, MPI_DOUBLE, dest_id, TAG_FIELD, MPI_COMM_WORLD);

@@ -203,9 +203,9 @@ int SimParams::bcast_receive()
 	MPI_Bcast(&zdist            , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&n_steps          , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&pushmethod       , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_x        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_y        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
-	MPI_Bcast(&n_field_z        , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_x        , 1 , MPI_UNSIGNED  , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_y        , 1 , MPI_UNSIGNED  , 0 , MPI_COMM_WORLD);
+	MPI_Bcast(&n_field_z        , 1 , MPI_UNSIGNED  , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&field_trans_wind , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&z_end            , 1 , MPI_DOUBLE    , 0 , MPI_COMM_WORLD);
 	MPI_Bcast(&push_electrons   , 1 , MPI_INT       , 0 , MPI_COMM_WORLD);

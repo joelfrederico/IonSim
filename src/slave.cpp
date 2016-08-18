@@ -78,7 +78,6 @@ int slave()
 	// ==================================
 	// Initialize FFTW
 	// ==================================
-	fftwl_mpi_init();
 	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
 
 	// ==================================
@@ -127,6 +126,7 @@ int slave()
 			// ==================================
 			case LOOP_START_E_ITER:
 				loopcomm.recv_master(&step_buf);
+
 				break;
 
 			// ==================================

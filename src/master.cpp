@@ -29,9 +29,6 @@ int master()
 	// FFTW vars
 	const char *wisdom_file = ".fftw-wisdom";
 
-	// Fields
-	Field_Data *field;
-	
 	// ==============================
 	// Starting gun
 	// ==============================
@@ -54,6 +51,7 @@ int master()
 	}
 	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
 
+
 	// ==============================
 	// Load from file
 	// ==============================
@@ -63,18 +61,16 @@ int master()
 		simparams_try = new SimParams(FLAGS_file);
 	} catch (...) {
 		loopcomm.instruct(LOOP_KILL);
-		return 0;
+		throw;
 	}
 
 	const SimParams simparams = *simparams_try;
 	delete simparams_try;
 
 	// ==============================
-	// Initialize fields
+	// Initialize fields based on simparams
 	// ==============================
 	ScalarData<ldouble> rho(simparams);
-	/* ScalarData<ldouble> psi(simparams); */
-	/* /1* std::vector<std::complex<long double>> cdata; *1/ */
 
 	// ==============================
 	// Send simparams everywhere
@@ -94,7 +90,7 @@ int master()
 		// ==============================
 		// Allocate for this loop
 		// ==============================
-		field     = new Field_Data(simparams);
+		Field_Data field(simparams);
 		printf("Step: %d\n", e_step);
 
 		// ==============================
@@ -107,7 +103,7 @@ int master()
 		// Get fields from slaves
 		// ==============================
 		loopcomm.instruct(LOOP_GET_EFIELD);
-		fieldcomm.recv_field_others_add(*field);
+		fieldcomm.recv_field_others_add(field);
 
 		// ==============================
 		// Write electrons
@@ -125,7 +121,7 @@ int master()
 		loopcomm.instruct(LOOP_SEND_EFIELD);
 		for (int id=1; id < loopcomm.p; id++)
 		{
-			fieldcomm.send_field(*field, id);
+			fieldcomm.send_field(field, id);
 		}
 
 		// ==============================
@@ -133,7 +129,9 @@ int master()
 		// ==============================
 		loopcomm.instruct(LOOP_GET_RHO);
 		rho = 0;
-		scalarcomm.recv_scalar_others_add(rho);
+		/* scalarcomm.recv_scalar_others_add(rho); */
+
+		break;
 
 		// ==============================
 		// Get fields
@@ -172,11 +170,6 @@ int master()
 
 		}
 		*/
-
-		// ==============================
-		// Deallocate for this loop
-		// ==============================
-		delete field;
 	}
 
 	loopcomm.instruct(LOOP_KILL);

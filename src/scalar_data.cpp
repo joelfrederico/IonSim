@@ -35,8 +35,11 @@ int ScalarData<T>::_init(
 	// ==================================
 	if (x_pts.size() != edge_mag.size()) throw std::runtime_error("Inconsistent rank!");
 
+	// ==================================
+	// Initialize variables
+	// ==================================
+	std::string err_str;
 	typename decltype(data)::size_type _n_pts = 1;
-
 	const typename decltype(x_pts)::size_type rank = x_pts.size();
 
 	// ==================================
@@ -52,7 +55,11 @@ int ScalarData<T>::_init(
 	_grid.resize(rank);
 	for (typename decltype(x_pts)::size_type i=0; i<rank; i++)
 	{
-		if (x_pts[i] <= 1) throw std::runtime_error("Makes no sense having a dimension with no extent (x_pts=1).");
+		if (x_pts[i] <= 1)
+		{
+			err_str = "Makes no sense having a dimension with no extent (x_pts=1).\nDimension: " + std::to_string(i+1) + ", Requested: " + std::to_string(x_pts[i]);
+			throw std::runtime_error(err_str);
+		}
 		// Obtain product
 		_n_pts *= x_pts[i];
 		// Calculate midpoint
