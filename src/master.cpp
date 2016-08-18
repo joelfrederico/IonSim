@@ -15,6 +15,7 @@
 
 DECLARE_string(file);
 DECLARE_bool(verbose);
+DECLARE_string(wisdom_file);
 
 int master()
 {
@@ -27,7 +28,7 @@ int master()
 	Field_Comm fieldcomm;
 
 	// FFTW vars
-	const char *wisdom_file = ".fftw-wisdom";
+	const std::string wisdom_file = FLAGS_wisdom_file;
 
 	// ==============================
 	// Starting gun
@@ -43,7 +44,7 @@ int master()
 	// ==============================
 	// Load wisdom
 	// ==============================
-	if (fftwl_import_wisdom_from_filename(wisdom_file))
+	if (fftwl_import_wisdom_from_filename(wisdom_file.c_str()))
 	{
 		std::cout << "Wisdom imported successfully" << std::endl;
 	} else {
@@ -71,6 +72,7 @@ int master()
 	// Initialize fields based on simparams
 	// ==============================
 	ScalarData<ldouble> rho(simparams);
+	ScalarData<ldouble> psi(simparams);
 
 	// ==============================
 	// Send simparams everywhere
@@ -129,10 +131,15 @@ int master()
 		// ==============================
 		loopcomm.instruct(LOOP_GET_RHO);
 		rho = 0;
-		/* scalarcomm.recv_scalar_others_add(rho); */
+		scalarcomm.recv_scalar_others_add(rho);
+
+		// ==============================
+		// Calculate psi
+		// ==============================
+		loopcomm.instruct(LOOP_GET_FIELDS);
+		ML_SolvePoisson(simparams, wisdom_file, rho, psi);
 
 		break;
-
 		// ==============================
 		// Get fields
 		// ==============================

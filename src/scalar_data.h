@@ -45,12 +45,14 @@ class ScalarData
 		// ==================================
 		// Calculated data
 		// ==================================
-		auto dxdi     (const decltype(_dxdi)::size_type i)     const -> typename decltype(_dxdi)::value_type;
-		auto x_pts    (const decltype(_x_pts)::size_type i)    const -> typename decltype(_x_pts)::value_type;
-		auto n_pts    () 				       const -> typename decltype(data)::size_type;
-		auto edge_mag (const decltype(_edge_mag)::size_type i) const -> typename decltype(_edge_mag)::value_type;
-		auto grid     (const decltype(_grid)::size_type i)     const -> typename decltype(_grid)::value_type;
-		auto vdata    ()  				       const -> decltype(data);
+		auto dxdi     	  (const decltype(_dxdi)::size_type i)     const -> typename decltype(_dxdi)::value_type;
+		auto x_pts    	  (const decltype(_x_pts)::size_type i)    const -> typename decltype(_x_pts)::value_type;
+		auto x_pts_vec	  ()                                       const -> decltype(_x_pts);
+		auto n_pts    	  () 				           const -> typename decltype(data)::size_type;
+		auto edge_mag     (const decltype(_edge_mag)::size_type i) const -> typename decltype(_edge_mag)::value_type;
+		auto edge_mag_vec ()                                       const -> decltype(_edge_mag);
+		auto grid     	  (const decltype(_grid)::size_type i)     const -> typename decltype(_grid)::value_type;
+		auto vdata    	  ()  				       const -> decltype(data);
 
 		// ==================================
 		// Methods

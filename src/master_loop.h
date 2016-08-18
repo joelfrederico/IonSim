@@ -16,4 +16,7 @@ int ML_write_scalar(const SimParams &simparams, const ScalarData<T> &rho)
 	writer_s.writedata(rho, "rho");
 }
 
+template<typename T>
+int ML_SolvePoisson(const SimParams &simparams, const std::string wisdom_file, const ScalarData<T> &rho, ScalarData<T> &psi);
+
 #endif

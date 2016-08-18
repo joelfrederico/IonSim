@@ -16,6 +16,8 @@ ScalarData_Comm::ScalarData_Comm()
 template<typename T>
 int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
 {
+	MPI_Status status;
+	int count;
 	int n_pts = scalar_recv.n_pts();
 
 	std::vector<long double> buf;
@@ -26,7 +28,13 @@ int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
 		if (id != my_id)
 		{
 			/* std::cout << "Receiving " << n_pts << " from: " << id << std::endl; */
+
+			MPI_Probe(id, TAG_FIELD, MPI_COMM_WORLD, &status);
+			MPI_Get_count(&status, MPI_LONG_DOUBLE, &count);
+			if (count != n_pts) throw std::runtime_error("Receiving size does not match sending size.");
+
 			MPI_Recv(buf.data(), n_pts, MPI_LONG_DOUBLE, id, TAG_FIELD, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
 			/* std::cout << "Finished receiving from: " << id << std::endl; */
 
 			for (typename decltype(scalar_recv.vdata())::size_type ind=0; ind < n_pts; ind++)

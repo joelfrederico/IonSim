@@ -20,15 +20,6 @@
 
 DECLARE_bool(verbose);
 
-/* -	LoopComm loopcomm; */
-/* - */
-/* -	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD); */
-/* - */
-/* -	psifftw_base(loopcomm); */
-/* - */
-/* -	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD); */
-/* -	return 0; */
-
 int slave()
 {
 	// ==================================
@@ -47,14 +38,6 @@ int slave()
 	// Loop variables
 	unsigned int step_buf, substep_buf;
 	bool loop_alive;
-
-	// Fields
-	std::vector<unsigned long> x_pts_real    = {256, 256};
-	std::vector<long double> edge_mag = {1, 1};
-	ScalarData<ldouble> rho(x_pts_real, edge_mag);
-	ScalarData<ldouble> psi(x_pts_real, edge_mag);
-	/* ScalarData<ldouble> psi(simparams); */
-	/* ScalarData<ldouble> rho(simparams); */
 
 	// Old-style fields
 	Field_Data *field;
@@ -87,10 +70,12 @@ int slave()
 	const SimParams simparams = simparams_temp;
 
 	// ==================================
-	// Set up old-style fields
+	// Set up fields
 	// ==================================
 	field = new Field_Data(simparams);
 	ion_field = new Field_Data(simparams.n_field_x, simparams.n_field_y, 1, simparams.field_trans_wind, simparams.field_trans_wind, 0);
+	ScalarData<ldouble> rho(simparams);
+	ScalarData<ldouble> psi(simparams);
 
 	// ==================================
 	// Generate beam
@@ -197,6 +182,7 @@ int slave()
 				break;
 
 			case LOOP_GET_RHO:
+				SL_get_rho(step_buf, substep_buf, simparams, rho, ebeam);
 
 				break;
 

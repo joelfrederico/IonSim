@@ -8,30 +8,6 @@
 #include "field_data.h"
 #include "field_comm.h"
 
-template<typename T>
-int SL_get_rho(const unsigned int step_buf, const unsigned int substep_buf, const SimParams &simparams, ScalarData<T> &rho, const Ebeam &ebeam)
-{
-	// ==================================
-	// Initialize variables
-	// ==================================
-	ScalarData_Comm scalarcomm;
-	long double z0, z1;
-
-	// ==================================
-	// Histogram to find rho
-	// ==================================
-	z0 = step_buf * simparams.dz();
-	z1 = (step_buf+1) * simparams.dz();
-	ebeam.get_rho_dz(z0, z1, rho, simparams);
-
-	// ==================================
-	// Send rho to master
-	// ==================================
-	scalarcomm.send_scalar(rho, 0);
-
-	return 0;
-}
-
 int SL_dump_ions(const SimParams &simparams, const LoopComm loopcomm, const unsigned int &step_buf, const unsigned int &substep_buf, const Ions &ions)
 {
 	// ==================================

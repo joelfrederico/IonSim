@@ -58,33 +58,33 @@ int ML_loop_get_efields(const LoopComm &loopcomm, const unsigned int e_step, con
 	return 0;
 }
 
-int ML_SolvePoisson(const char *wisdom_file)
+template<typename T>
+int ML_SolvePoisson(const SimParams &simparams, const std::string wisdom_file, const ScalarData<T> &rho, ScalarData<T> &psi)
 {
-	std::vector<unsigned long> x_pts_complex = {256, 129};
-	std::vector<unsigned long> x_pts_real    = {256, 256};
-	std::vector<long double> edge_mag        = {1, 1};
+	decltype(rho.x_pts_vec()) x_pts_complex = rho.x_pts_vec();
+	x_pts_complex[1] = x_pts_complex[1]/2 + 1;
+	auto edge_mag_complex = rho.edge_mag_vec();
 
-	ScalarData<std::complex<long double>> cdata(x_pts_complex, edge_mag);
-	ScalarData<long double> rdata(x_pts_real, edge_mag);
-	std::vector<std::complex<long double>> cbuf;
-	std::vector<long double> rbuf;
-	WriterSerial *writer_s;
-	ptrdiff_t local_n0, local_0_start, N0, N1;
-
+	ScalarData<std::complex<long double>> cdata(x_pts_complex, edge_mag_complex);
+	auto rdata = rho;
 
 	MPI_Recv_Scalar_Complex(cdata);
 	MPI_Recv_Scalar_Real(rdata);
 
-	writer_s = new WriterSerial("myfile.h5", true);
-	writer_s->writedata(cdata, "complex");
-	delete writer_s;
+	{
+		WriterSerial writer_s(simparams.filename);
+		writer_s.writedata(cdata, "complex");
+	}
 
-	writer_s = new WriterSerial("myfile.h5");
-	writer_s->writedata(rdata, "rdata");
-	delete writer_s;
+	{
+		WriterSerial writer_s(simparams.filename);
+		writer_s.writedata(rdata, "rdata");
+	}
 
 	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
-	fftwl_export_wisdom_to_filename(wisdom_file);
+	fftwl_export_wisdom_to_filename(wisdom_file.c_str());
 
 	return 0;
 }
+
+template int ML_SolvePoisson(const SimParams &simparams, const std::string wisdom_file, const ScalarData<long double> &rho, ScalarData<long double> &psi);

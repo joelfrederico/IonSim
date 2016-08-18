@@ -127,6 +127,12 @@ auto ScalarData<T>::x_pts(const decltype(_x_pts)::size_type i) const -> typename
 }
 
 template<typename T>
+auto ScalarData<T>::x_pts_vec() const -> decltype(_x_pts)
+{
+	return _x_pts;
+}
+
+template<typename T>
 auto ScalarData<T>::n_pts() const -> typename decltype(data)::size_type
 {
 	return data.size();
@@ -136,6 +142,12 @@ template<typename T>
 auto ScalarData<T>::edge_mag(const decltype(_edge_mag)::size_type i) const -> typename decltype(_edge_mag)::value_type
 {
 	return _edge_mag[i];
+}
+
+template<typename T>
+auto ScalarData<T>::edge_mag_vec() const -> decltype(_edge_mag)
+{
+	return _edge_mag;
 }
 
 template<typename T>
