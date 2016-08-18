@@ -65,13 +65,13 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho) cons
 {
 	unsigned long x_ind, y_ind, z_ind, e_x, e_y, e_z;
 
-	e_z = rho.lt_x_ind_e(3, (z1+z0)/2, z_ind);
+	e_z = rho.lt_x_ind_e(2, (z1+z0)/2, z_ind);
 	for (decltype(x)::size_type i=0; i < n_pts; i++)
 	{
 		if ((z0 <= z[i]) && (z[i] < z1))
 		{
-			e_x = rho.lt_x_ind_e(1, x[i], x_ind);
-			e_y = rho.lt_x_ind_e(2, y[i], y_ind);
+			e_x = rho.lt_x_ind_e(0, x[i], x_ind);
+			e_y = rho.lt_x_ind_e(1, y[i], y_ind);
 			if ((e_x==0) && (e_y==0))
 			{
 				rho.ind(x_ind, y_ind, z_ind)++;
@@ -79,7 +79,11 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho) cons
 		}
 	}
 
-	rho *= _particle_charge;
+	auto rho_vec = rho.vdata();
+	auto sum = ionsim::sum_vec(rho_vec);
+	JTF_PRINT_NOEND(Parts hist sum: ) << sum << std::endl;
+	
+	/* rho *= _particle_charge; */
 
 	return 0;
 }

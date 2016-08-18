@@ -173,7 +173,7 @@ template<typename T>
 int ScalarData<T>::lt_x_ind_e(const typename decltype(_x_pts)::size_type i, const long double x, decltype(_x_pts)::value_type &ind) const
 {
 	ind = floor(x/dxdi(i) + mid[i]);
-	if ( (0 < ind ) && (ind < n_pts()-1))
+	if ( (0 < ind ) && (ind < x_pts(i)-1))
 	{
 		return 0;
 	} else {

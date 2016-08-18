@@ -23,6 +23,10 @@ int SL_get_rho(const unsigned int step_buf, const unsigned int substep_buf, cons
 	z1 = (step_buf+1) * simparams.dz();
 	ebeam.get_rho_dz(z0, z1, rho_local);
 
+	auto rho_vec = rho_local.vdata();
+	auto sum = ionsim::sum_vec(rho_vec);
+	JTF_PRINT_NOEND(Slave loop: ) << sum << std::endl;
+
 	// ==================================
 	// Send rho to master
 	// ==================================

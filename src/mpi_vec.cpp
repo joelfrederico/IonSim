@@ -26,6 +26,15 @@ int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<T> &buf)
 		tbuf = buf.vdata().data() + local_0_start;
 		MPI_Send(tbuf, local_n0*N1, mpi_type, id, TAG_MASTER_SLAVE, MPI_COMM_WORLD);
 	}
+
+	auto data = buf.vdata();
+	typename decltype(data)::value_type sum = 0;
+	for (auto it=data.begin(); it != data.end(); it++)
+	{
+		sum += *it;
+	}
+	JTF_PRINT_NOEND(Sum of sent: ) << sum << std::endl;
+
 	return 0;
 }
 template int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<long double> &buf);
@@ -48,6 +57,17 @@ int MPI_Slave_Recv_buf_from_Scalar_real(T *buf, const ptrdiff_t local_n0, const 
 	if (count != local_n0*N1) throw std::runtime_error("Receiving incommensurate number of counts!");
 
 	MPI_Recv(buf, local_n0*N1, mpitype, 0, TAG_MASTER_SLAVE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+	T sum = 0;
+	std::vector<ptrdiff_t> x_pts = {local_n0, N1};
+	for (ptrdiff_t i=0; i<local_n0; i++)
+	{
+		for (ptrdiff_t j=0; j<N1; j++)
+		{
+			sum += buf[ionsim::row_major(x_pts, i, j)];
+		}
+	}
+	JTF_PRINTVAL(sum);
 	return 0;
 }
 template int MPI_Slave_Recv_buf_from_Scalar_real(long double *buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);

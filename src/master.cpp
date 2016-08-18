@@ -132,6 +132,14 @@ int master()
 		loopcomm.instruct(LOOP_GET_RHO);
 		rho = 0;
 		scalarcomm.recv_scalar_others_add(rho);
+		auto rho_data = rho.vdata();
+		decltype(rho_data)::value_type sum = 0;
+		for (auto it=rho_data.begin(); it != rho_data.end(); it++)
+		{
+			sum += *it;
+		}
+		JTF_PRINT_NOEND(Main loop rho: ) << sum << std::endl;
+
 
 		// ========================================
 		// Calculate psi

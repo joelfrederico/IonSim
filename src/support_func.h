@@ -36,22 +36,10 @@ namespace ionsim
 		return std::inner_product(vec.begin(), vec.end(), vec.begin(), 0) / vec.size();
 	}
 
-	/* template<typename T> */
-	/* T col_major(const T i, const T j, const ptrdiff_t N0) */
-	/* { */
-	/* 	return i + N0*j; */
-	/* } */
-
 	template<typename Tclass>
 	auto row_major(const std::vector<Tclass> _x_pts, const typename decltype(_x_pts)::value_type i) -> typename decltype(_x_pts)::value_type
 	{
 		return i;
-	}
-
-	template<typename Tclass>
-	auto row_major(const std::vector<Tclass> _x_pts) -> typename decltype(_x_pts)::value_type
-	{
-		return 1;
 	}
 
 	template<typename Tclass, typename... T2>
@@ -59,16 +47,12 @@ namespace ionsim
 	{
 		auto size = sizeof...(rest);
 		typename decltype(_x_pts)::size_type i_dim;
-		typename decltype(_x_pts)::value_type f;
+		Tclass f;
 	
 		i_dim = _x_pts.size() - size - 1;
-		/* ind = size; */
 	
-		if (i >= _x_pts[i_dim]) throw std::runtime_error("Index requested is too large in a dimension.");
+		if (i >= _x_pts[i_dim]) throw std::runtime_error("Index requested (" + std::to_string(i) + ") is too large in a dimension (" + std::to_string(i_dim) + ", max " + std::to_string(_x_pts[i_dim]) + ".");
 	
-		// Column-major
-		/* return i + _x_pts[ind] * _index(rest...); */
-
 		// Row-major
 		f = 1;
 		for (decltype(size) ii=i_dim+1; ii < _x_pts.size(); ii++)
@@ -77,13 +61,6 @@ namespace ionsim
 		}
 		return i * f + row_major(_x_pts, rest...);
 	}
-
-	
-	/* template<typename T> */
-	/* T row_major(const T i, const T j, const ptrdiff_t N1) */
-	/* { */
-	/* 	return i*N1 + j; */
-	/* } */
 
 	template<typename T>
 	MPI_Datatype convert_typeid_to_mpi()
@@ -100,6 +77,17 @@ namespace ionsim
 			throw std::runtime_error("Type not handled!");
 		}
 		return mpi_type;
+	}
+
+	template<typename T>
+	T sum_vec(std::vector<T> vec)
+	{
+		T sum = 0;
+		for (auto it=vec.begin(); it != vec.end(); it++)
+		{
+			sum += *it;
+		}
+		return sum;
 	}
 }
 

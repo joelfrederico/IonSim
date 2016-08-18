@@ -35,12 +35,25 @@ double f(unsigned long long i, unsigned long long j)
 	valx = (valx-(256-1)/2);
 	valy = (valy-(256-1)/2);
 
-	if (((i == 127) || (i == 128)) && ((j==127) || (j==128)))
-	{
-		valx = 0.25;
-	} else {
-		valx = 0;
+	switch(2) {
+		case 1:
+			if (((i == 127) || (i == 128)) && ((j==127) || (j==128)))
+			{
+				valx = 0.25;
+			} else {
+				valx = 0;
+			}
+
+			break;
+		case 2:
+			if (((i == 10) || (i == 11)) && ((j==100) || (j==101)))
+			{
+				valx = 0.25;
+			} else {
+				valx = 0;
+			}
 	}
+
 	return valx;
 }
 
@@ -79,16 +92,16 @@ int psifftw_base(const SimParams &simparams, const LoopComm loopcomm)
 	// Receive Data
 	MPI_Slave_Recv_buf_from_Scalar_real(r_buf, local_n0, local_0_start, N0, N1);
 
-	// Copy in data
-	for (ptrdiff_t i=0; i<local_n0; i++)
-	{
-		i_nonlocal = i+local_0_start;
-		for (ptrdiff_t j=0; j<N1; j++)
-		{
-			ind = i*(N1+2)+j;
-			r_buf[ind] = f(i_nonlocal, j);
-		}
-	}
+	// 4 pixels for Green's Function testing
+	/* for (ptrdiff_t i=0; i<local_n0; i++) */
+	/* { */
+	/* 	i_nonlocal = i+local_0_start; */
+	/* 	for (ptrdiff_t j=0; j<N1; j++) */
+	/* 	{ */
+	/* 		ind = i*(N1+2)+j; */
+	/* 		r_buf[ind] = f(i_nonlocal, j); */
+	/* 	} */
+	/* } */
 
 	// ========================================
 	// Perform FFT
@@ -103,7 +116,7 @@ int psifftw_base(const SimParams &simparams, const LoopComm loopcomm)
 	// ========================================
 	// Divide by k^2
 	// ========================================
-	MPI_Complex_div_k2(cdata, delx, dely, local_n0, local_0_start, N0, N1);
+	/* MPI_Complex_div_k2(cdata, delx, dely, local_n0, local_0_start, N0, N1); */
 
 	// ========================================
 	// Send divided results to master
