@@ -222,6 +222,13 @@ int MPI_Recv_Scalar_Complex(ScalarData<std::complex<T>> &cdata)
 			}
 		}
 	}
+
+	auto j = i_nonlocal;
+	i_nonlocal = 1;
+	j=0;
+
+	JTF_PRINTVAL(cdata.ind(i_nonlocal, j).real());
+	JTF_PRINTVAL(cdata.ind(i_nonlocal, j).imag());
 	return 0;
 }
 
@@ -307,8 +314,21 @@ int MPI_Complex_div_k2(std::vector<std::complex<T>> &cdata, const T delx, const 
 			{
 				cdata[ind] = 0;
 			} else {
-				cdata[ind] = k2;
+				cdata[ind] /= k2;
 			}
+
+			/* if ((i_nonlocal == 1) && (j == 0)) */
+			/* { */
+			/* 	JTF_PRINTVAL(local_0_start); */
+			/* 	JTF_PRINTVAL(i_nonlocal); */
+			/* 	JTF_PRINTVAL(j); */
+			/* 	JTF_PRINTVAL(ind); */
+			/* 	JTF_PRINTVAL(N0); */
+			/* 	JTF_PRINTVAL(N1); */
+			/* 	JTF_PRINTVAL(N1/2+1); */
+			/* 	cdata[ind].real(100); */
+			/* 	cdata[ind].imag(200); */
+			/* } */
 		}
 	}
 

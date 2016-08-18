@@ -7,7 +7,7 @@
 // ==================================
 // Functions for sending data
 // ==================================
-int psifftw_base(LoopComm loopcomm, ptrdiff_t N0, ptrdiff_t N1);
+int psifftw_base(const SimParams &simparams, const LoopComm loopcomm);
 int fftwl_recv_local_size(long long &local_n0, long long &local_0_start, const int id);
 
 // ==================================

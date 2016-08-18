@@ -44,11 +44,12 @@ double f(unsigned long long i, unsigned long long j)
 	return valx;
 }
 
-int psifftw_base(LoopComm loopcomm, ptrdiff_t N0, ptrdiff_t N1)
+int psifftw_base(const SimParams &simparams, const LoopComm loopcomm)
 {
 	// ========================================
 	// Initialize Variables
 	// ========================================
+	ptrdiff_t N0, N1;
 	long double *r_buf;
 	fftwl_complex *c_buf;
 	ptrdiff_t alloc_local, local_n0, local_0_start, i_nonlocal;
@@ -56,13 +57,14 @@ int psifftw_base(LoopComm loopcomm, ptrdiff_t N0, ptrdiff_t N1)
 	std::vector<std::complex<long double>> cdata;
 	long ind;
 	long double delx, dely;
-	delx = dely = 0.05;
+	/* delx = dely = 0.05; */
+	delx = dely = 100;
 
 	// ========================================
 	// Load parameters
 	// ========================================
-	N0 = 256;
-	N1 = 256;
+	N0 = simparams.n_field_x;
+	N1 = simparams.n_field_y;
 
 	// ========================================
 	// Set up FFT

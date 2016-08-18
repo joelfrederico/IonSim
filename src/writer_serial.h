@@ -39,14 +39,16 @@ class WriterSerial : public WriterBase
 			typename std::vector<std::complex<T>>::size_type bsize = buf.size();
 			std::vector<typename std::vector<std::complex<T>>::size_type> _size = {size[0], size[1], 2};
 			std::vector<double> dbuf;
+			decltype(bsize) base_ind;
 
 			dbuf.resize(2*bsize);
-			for (int i=0; i<_size[0]; i++)
+			for (decltype(bsize) i=0; i<_size[0]; i++)
 			{
-				for (int j=0; j<_size[1]; j++)
+				for (decltype(bsize) j=0; j<_size[1]; j++)
 				{
-					dbuf[(i*_size[1] + j)*2 + 0]     = buf[ionsim::col_major(i, j, _size[0])].real();
-					dbuf[(i*_size[1] + j)*2 + 1]     = buf[ionsim::col_major(i, j, _size[0])].imag();
+					base_ind = (i*size[1] + j);
+					dbuf[base_ind*2 + 0]     = buf[base_ind].real();
+					dbuf[base_ind*2 + 1]     = buf[base_ind].imag();
 				}
 			}
 

@@ -3,6 +3,7 @@
 
 #include "consts.h"
 #include "simparams.h"
+#include "support_func.h"
 
 template<typename Tclass>
 class ScalarData
@@ -59,34 +60,34 @@ class ScalarData
 		// ==================================
 		void resize(const decltype(_x_pts) x_pts, const decltype(_edge_mag) edge_mag);
 
-		template<typename T, typename... T2>
-		auto _index(T i, T2 ... rest) const -> typename decltype(data)::size_type
-		{
-			auto size = sizeof...(rest);
-			typename decltype(_x_pts)::size_type i_dim;
-			typename decltype(_x_pts)::value_type f;
+		/* template<typename T, typename... T2> */
+		/* auto _index(T i, T2 ... rest) const -> typename decltype(data)::size_type */
+		/* { */
+		/* 	auto size = sizeof...(rest); */
+		/* 	typename decltype(_x_pts)::size_type i_dim; */
+		/* 	typename decltype(_x_pts)::value_type f; */
 		
-			i_dim = _x_pts.size() - size - 1;
-			/* ind = size; */
+		/* 	i_dim = _x_pts.size() - size - 1; */
+		/* 	/1* ind = size; *1/ */
 		
-			if (i >= x_pts(i_dim)) throw std::runtime_error("Index requested is too large in a dimension.");
+		/* 	if (i >= x_pts(i_dim)) throw std::runtime_error("Index requested is too large in a dimension."); */
 		
-			// Column-major
-			/* return i + _x_pts[ind] * _index(rest...); */
+		/* 	// Column-major */
+		/* 	/1* return i + _x_pts[ind] * _index(rest...); *1/ */
 
-			// Row-major
-			f = 1;
-			for (decltype(size) ii=i_dim+1; ii < _x_pts.size(); ii++)
-			{
-				f *= x_pts(ii);
-			}
-			return i * f + _index(rest...);
-		}
+		/* 	// Row-major */
+		/* 	f = 1; */
+		/* 	for (decltype(size) ii=i_dim+1; ii < _x_pts.size(); ii++) */
+		/* 	{ */
+		/* 		f *= x_pts(ii); */
+		/* 	} */
+		/* 	return i * f + _index(rest...); */
+		/* } */
 
-		auto _index(const typename decltype(data)::size_type i) const -> typename decltype(data)::size_type
-		{
-			return i;
-		}
+		/* auto _index(const typename decltype(data)::size_type i) const -> typename decltype(data)::size_type */
+		/* { */
+		/* 	return i; */
+		/* } */
 
 		template<typename... T2>
 		Tclass &ind(const T2 ...rest)
@@ -97,7 +98,8 @@ class ScalarData
 			{
 				throw std::runtime_error("Requested " + std::to_string(size) + " indices, " + std::to_string(max) + " available");
 			}
-			auto ind = _index(rest...);
+			/* auto ind = _index(rest...); */
+			auto ind = ionsim::row_major(_x_pts, rest...);
 			return data[ind];
 		}
 
