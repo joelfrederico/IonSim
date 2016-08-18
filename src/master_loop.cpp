@@ -3,6 +3,7 @@
 #include "consts.h"
 #include "fftw_classes.h"
 #include "mpi_vec.h"
+#include "scalar_data_comm.h"
 
 int ML_overwrite_file(const SimParams &simparams)
 {
@@ -59,32 +60,48 @@ int ML_loop_get_efields(const LoopComm &loopcomm, const unsigned int e_step, con
 }
 
 template<typename T>
-int ML_SolvePoisson(const SimParams &simparams, const std::string wisdom_file, const ScalarData<T> &rho, ScalarData<T> &psi)
+int ML_SolvePoisson(const SimParams &simparams, const unsigned int e_step, const std::string wisdom_file, ScalarData<T> &rho, ScalarData<T> &psi)
 {
-	decltype(rho.x_pts_vec()) x_pts_complex = rho.x_pts_vec();
-	x_pts_complex[1] = x_pts_complex[1]/2 + 1;
-	auto edge_mag_complex = rho.edge_mag_vec();
+	typename decltype(rho.x_pts_vec())::value_type e_step_proper = e_step;
+	// ========================================
+	// Create 2D arrays
+	// ========================================
+	auto rho_x_pts_vec    = rho.x_pts_vec();
+	auto rho_edge_mag_vec = rho.edge_mag_vec();
 
-	ScalarData<std::complex<long double>> cdata(x_pts_complex, edge_mag_complex);
-	auto rdata = rho;
+	decltype(rho_x_pts_vec)    rho2d_x_pts        = {rho_x_pts_vec[0], rho_x_pts_vec[1]};
+	decltype(rho_edge_mag_vec) rho2d_edge_mag_vec = {rho_edge_mag_vec[0], rho_edge_mag_vec[1]};
+	ScalarData<T> rho2d(rho2d_x_pts, rho2d_edge_mag_vec);
+	ScalarData<T> psi2d(rho2d_x_pts, rho2d_edge_mag_vec);
+	auto rho2d_out(rho2d);
+
+	auto x_pts_complex = rho2d_x_pts;
+	x_pts_complex[1] = x_pts_complex[1]/2 + 1;
+	ScalarData<std::complex<long double>> cdata(x_pts_complex, rho2d_edge_mag_vec);
+
+	// ========================================
+	// Copy data
+	// ========================================
+	for (typename decltype(rho_x_pts_vec)::value_type i=0; i<rho_x_pts_vec[0]; i++)
+	{
+		for (typename decltype(rho_x_pts_vec)::value_type j=0; j<rho_x_pts_vec[1]; j++)
+		{
+			rho2d.ind(i, j) = rho.ind(i, j, e_step_proper);
+		}
+	}
+
+	MPI_Master_Send_Scalar_real_to_buf(rho2d);
 
 	MPI_Recv_Scalar_Complex(cdata);
-	MPI_Recv_Scalar_Real(rdata);
-
+	MPI_Recv_Scalar_Real(rho2d_out);
 	{
 		WriterSerial writer_s(simparams.filename);
-		writer_s.writedata(cdata, "complex");
+		writer_s.writedata(cdata,     "complex");
+		writer_s.writedata(rho2d,     "rdata_in");
+		writer_s.writedata(rho2d_out, "rdata");
 	}
-
-	{
-		WriterSerial writer_s(simparams.filename);
-		writer_s.writedata(rdata, "rdata");
-	}
-
-	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
-	fftwl_export_wisdom_to_filename(wisdom_file.c_str());
 
 	return 0;
 }
 
-template int ML_SolvePoisson(const SimParams &simparams, const std::string wisdom_file, const ScalarData<long double> &rho, ScalarData<long double> &psi);
+template int ML_SolvePoisson(const SimParams &simparams, const unsigned int e_step, const std::string wisdom_file, ScalarData<long double> &rho, ScalarData<long double> &psi);

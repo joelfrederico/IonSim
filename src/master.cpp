@@ -19,9 +19,9 @@ DECLARE_string(wisdom_file);
 
 int master()
 {
-	// ==============================
+	// ========================================
 	// Initialize variables
-	// ==============================
+	// ========================================
 	// Communications variables
 	LoopComm loopcomm;
 	ScalarData_Comm scalarcomm;
@@ -30,9 +30,9 @@ int master()
 	// FFTW vars
 	const std::string wisdom_file = FLAGS_wisdom_file;
 
-	// ==============================
+	// ========================================
 	// Starting gun
-	// ==============================
+	// ========================================
 	if (FLAGS_verbose) printf("Master says: I am the MASTER!\n");
 	for (int slave_id=1; slave_id < loopcomm.p; slave_id++)
 	{
@@ -41,9 +41,9 @@ int master()
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	// ==============================
+	// ========================================
 	// Load wisdom
-	// ==============================
+	// ========================================
 	if (fftwl_import_wisdom_from_filename(wisdom_file.c_str()))
 	{
 		std::cout << "Wisdom imported successfully" << std::endl;
@@ -53,9 +53,9 @@ int master()
 	fftwl_mpi_broadcast_wisdom(MPI_COMM_WORLD);
 
 
-	// ==============================
+	// ========================================
 	// Load from file
-	// ==============================
+	// ========================================
 	SimParams *simparams_try;
 	try
 	{
@@ -68,102 +68,101 @@ int master()
 	const SimParams simparams = *simparams_try;
 	delete simparams_try;
 
-	// ==============================
+	// ========================================
 	// Initialize fields based on simparams
-	// ==============================
+	// ========================================
 	ScalarData<ldouble> rho(simparams);
 	ScalarData<ldouble> psi(simparams);
 
-	// ==============================
+	// ========================================
 	// Send simparams everywhere
-	// ==============================
+	// ========================================
 	simparams.bcast_send();
 
-	// ==============================
+	// ========================================
 	// Overwrite current file
-	// ==============================
+	// ========================================
 	ML_overwrite_file(simparams);
 
-	// ==============================
+	// ========================================
 	// Loop over electron evolution
-	// ==============================
+	// ========================================
 	for (unsigned int e_step=0; e_step < simparams.n_steps; e_step++)
 	{
-		// ==============================
+		// ========================================
 		// Allocate for this loop
-		// ==============================
+		// ========================================
 		Field_Data field(simparams);
 		printf("Step: %d\n", e_step);
 
-		// ==============================
+		// ========================================
 		// Setup slave for e loop
-		// ==============================
+		// ========================================
 		loopcomm.instruct(LOOP_START_E_ITER);
 		loopcomm.send_slaves(e_step);
 
-		// ==============================
+		// ========================================
 		// Get fields from slaves
-		// ==============================
+		// ========================================
 		loopcomm.instruct(LOOP_GET_EFIELD);
 		fieldcomm.recv_field_others_add(field);
 
-		// ==============================
+		// ========================================
 		// Write electrons
-		// ==============================
+		// ========================================
 		loopcomm.instruct(LOOP_DUMP_E);
 
-		// ==============================
+		// ========================================
 		// Write total field
-		// ==============================
+		// ========================================
 		ML_write_field(simparams, e_step, field);
 
-		// ==============================
+		// ========================================
 		// Push field to slaves
-		// ==============================
+		// ========================================
 		loopcomm.instruct(LOOP_SEND_EFIELD);
 		for (int id=1; id < loopcomm.p; id++)
 		{
 			fieldcomm.send_field(field, id);
 		}
 
-		// ==============================
+		// ========================================
 		// Get rho
-		// ==============================
+		// ========================================
 		loopcomm.instruct(LOOP_GET_RHO);
 		rho = 0;
 		scalarcomm.recv_scalar_others_add(rho);
 
-		// ==============================
+		// ========================================
 		// Calculate psi
-		// ==============================
+		// ========================================
 		loopcomm.instruct(LOOP_GET_FIELDS);
-		ML_SolvePoisson(simparams, wisdom_file, rho, psi);
+		ML_SolvePoisson(simparams, e_step, wisdom_file, rho, psi);
 
-		break;
-		// ==============================
+		// ========================================
 		// Get fields
-		// ==============================
+		// ========================================
 
 		/*
-		// ==============================
+		// ========================================
 		// Integrate ion motion
-		// ==============================
+		// ========================================
 		for (int z_step=0; z_step < simparams.n_field_z; z_step++)
 		{
-			// ==============================
+			// ========================================
 			// Setup slave for e loop
-			// ==============================
+			// ========================================
 			loopcomm.instruct(LOOP_START_E_ITER);
 			loopcomm.send_slaves(z_step);
 
-			// ==============================
+			// ========================================
 			// Record ions
-			// ==============================
+			// ========================================
 			loopcomm.instruct(LOOP_DUMP_IONS);
 
-			// ==============================
+			// ========================================
 			// Get current ion field
-			// ==============================
+			// ========================================
 			loopcomm.instruct(LOOP_GET_IFIELD);
 			loopcomm.recv_ion_field_others_add(*ion_field);
 
@@ -178,6 +177,10 @@ int master()
 		}
 		*/
 	}
+
+	loopcomm.instruct(LOOP_GET_WISDOM);
+	fftwl_mpi_gather_wisdom(MPI_COMM_WORLD);
+	fftwl_export_wisdom_to_filename(wisdom_file.c_str());
 
 	loopcomm.instruct(LOOP_KILL);
 

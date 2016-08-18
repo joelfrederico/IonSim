@@ -24,22 +24,22 @@ int main(int argc, char **argv)
 	int id, c;
 	bool verbose = FLAGS_verbose;
 	
-	// ==============================
+	// ========================================
 	// Initialize MPI
-	// ==============================
+	// ========================================
 	MPI_Init(&argc, &argv);
 	fftwl_mpi_init();
 
-	// ==============================
+	// ========================================
 	// Get the individual process ID.
-	// ==============================
+	// ========================================
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
 	if (verbose && id==0) printf("OpenMPI v%d.%d.%d\n", OMPI_MAJOR_VERSION, OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
 
-	// ==============================
+	// ========================================
 	// Simulate things
-	// ==============================
+	// ========================================
 	if (id == 0) {
 		master();
 	} else {

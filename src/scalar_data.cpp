@@ -33,7 +33,7 @@ int ScalarData<T>::_init(
 	// ==================================
 	// Check if rank makes sense
 	// ==================================
-	if (x_pts.size() != edge_mag.size()) throw std::runtime_error("Inconsistent rank!");
+	if (x_pts.size() != edge_mag.size()) throw std::runtime_error("Inconsistent rank between # of points and # of edges!");
 
 	// ==================================
 	// Initialize variables

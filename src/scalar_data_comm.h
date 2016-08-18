@@ -21,6 +21,9 @@ class ScalarData_Comm
 
 		template<typename T>
 		int send_scalar(ScalarData<T> &scalar_send, int dest_id);
+
+		template<typename T>
+		int bcast_scalar(ScalarData<T> &scalar_bcast);
 };
 
 #endif

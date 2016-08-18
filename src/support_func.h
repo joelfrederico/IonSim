@@ -47,6 +47,23 @@ namespace ionsim
 	{
 		return i*N1 + j;
 	}
+
+	template<typename T>
+	MPI_Datatype convert_typeid_to_mpi()
+	{
+		MPI_Datatype mpi_type;
+		if (typeid(T) == typeid(long double))
+		{
+			mpi_type = MPI_LONG_DOUBLE;
+		} else if (typeid(T) == typeid(unsigned int)) {
+			mpi_type = MPI_UNSIGNED;
+		} else if (typeid(T) == typeid(int)) {
+			mpi_type = MPI_INT;
+		} else {
+			throw std::runtime_error("Type not handled!");
+		}
+		return mpi_type;
+	}
 }
 
 #endif

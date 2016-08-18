@@ -51,4 +51,5 @@ namespace ionsim
 	{
 		return q_tot / (pow(2*M_PI, 1.5) * sz * sr * sr);
 	}
+
 }

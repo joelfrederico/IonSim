@@ -10,9 +10,9 @@
 #include <vector>
 #include <complex>
 
-// ==================================
+// ========================================
 // Define types
-// ==================================
+// ========================================
 typedef long double ldouble;
 typedef long long llong;
 typedef std::vector<ldouble> ldouble_vec;
@@ -23,9 +23,9 @@ typedef int parttype_t;
 typedef std::complex<double> complex_double;
 typedef int zdist_t;
 
-// ==================================
+// ========================================
 // Define classes
-// ==================================
+// ========================================
 const pushmethod_t PUSH_RUNGE_KUTTA = 1;
 const pushmethod_t PUSH_SIMPLE      = 2;
 const pushmethod_t PUSH_FIELD       = 3;
@@ -42,9 +42,9 @@ class PushMethod
 		const std::string name;
 };
 
-// ==================================
+// ========================================
 // Loop flags
-// ==================================
+// ========================================
 const zdist_t Z_DIST_FLAT  = 0;
 const zdist_t Z_DIST_GAUSS = 1;
 
@@ -59,9 +59,9 @@ class zDist
 		const std::string name;
 };
 
-// ==================================
+// ========================================
 // Loop flags
-// ==================================
+// ========================================
 
 const loopflag_t LOOP_KILL         = 1;
 const loopflag_t LOOP_DUMP_IONS    = 2;
@@ -78,10 +78,11 @@ const loopflag_t LOOP_GET_RHO      = 12;
 const loopflag_t LOOP_START_E_ITER = 13;
 const loopflag_t LOOP_START_I_ITER = 14;
 const loopflag_t LOOP_GET_FIELDS   = 15;
+const loopflag_t LOOP_GET_WISDOM   = 16;
 
-// ==================================
+// ========================================
 // MPI tags
-// ==================================
+// ========================================
 const tag_t TAG_LOOP_INSTRUCT       = 100;
 const tag_t TAG_LOOP_MESSAGE        = 200;
 const tag_t TAG_FIELD               = 300;
@@ -90,23 +91,24 @@ const tag_t TAG_LDOUBLE_COMPLEX_VEC = 400;
 const tag_t TAG_DOUBLE_COMPLEX_VEC  = 500;
 const tag_t TAG_FLOAT_COMPLEX_VEC   = 600;
 const tag_t TAG_LONG_LONG           = 700;
+const tag_t TAG_MASTER_SLAVE        = 800;
 
 const int MASTER_RANK = 0;
 
-// ==================================
+// ========================================
 // Science stuff
-// ==================================
+// ========================================
 const double ELECTRON_REST_ENERGY = GSL_CONST_MKSA_MASS_ELECTRON * GSL_CONST_MKSA_SPEED_OF_LIGHT * GSL_CONST_MKSA_SPEED_OF_LIGHT;
 
-// ==================================
+// ========================================
 // Particle types
-// ==================================
+// ========================================
 const parttype_t PARTS_E   = 2;
 const parttype_t PARTS_ION = 1;
 
-// ==================================
+// ========================================
 // HDF5 consts
-// ==================================
+// ========================================
 // Number of entries to write at once
 // because HDF5 crashes if you try to
 // do too much all at once.

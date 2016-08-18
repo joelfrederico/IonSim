@@ -8,7 +8,7 @@
 #include "scalar_data_comm.h"
 
 template<typename T>
-int SL_get_rho(const unsigned int step_buf, const unsigned int substep_buf, const SimParams &simparams, ScalarData<T> &rho, const Ebeam &ebeam)
+int SL_get_rho(const unsigned int step_buf, const unsigned int substep_buf, const SimParams &simparams, ScalarData<T> &rho_local, const Ebeam &ebeam, ScalarData<T> &rho_nonlocal)
 {
 	// ==================================
 	// Initialize variables
@@ -21,12 +21,12 @@ int SL_get_rho(const unsigned int step_buf, const unsigned int substep_buf, cons
 	// ==================================
 	z0 = step_buf * simparams.dz();
 	z1 = (step_buf+1) * simparams.dz();
-	ebeam.get_rho_dz(z0, z1, rho);
+	ebeam.get_rho_dz(z0, z1, rho_local);
 
 	// ==================================
 	// Send rho to master
 	// ==================================
-	scalarcomm.send_scalar(rho, 0);
+	scalarcomm.send_scalar(rho_local, 0);
 
 	return 0;
 }

@@ -60,16 +60,27 @@ class ScalarData
 		void resize(const decltype(_x_pts) x_pts, const decltype(_edge_mag) edge_mag);
 
 		template<typename T, typename... T2>
-		auto _index(const T i, const T2 ... rest) const -> typename decltype(data)::size_type
+		auto _index(T i, T2 ... rest) const -> typename decltype(data)::size_type
 		{
 			auto size = sizeof...(rest);
-			typename decltype(_x_pts)::size_type ind;
+			typename decltype(_x_pts)::size_type i_dim;
+			typename decltype(_x_pts)::value_type f;
 		
-			ind = _x_pts.size() - size - 1;
+			i_dim = _x_pts.size() - size - 1;
+			/* ind = size; */
 		
-			if (i >= _x_pts[ind]) throw std::runtime_error("Index requested is too large in a dimension.");
+			if (i >= x_pts(i_dim)) throw std::runtime_error("Index requested is too large in a dimension.");
 		
-			return i + _x_pts[ind] * _index(rest...);
+			// Column-major
+			/* return i + _x_pts[ind] * _index(rest...); */
+
+			// Row-major
+			f = 1;
+			for (decltype(size) ii=i_dim+1; ii < _x_pts.size(); ii++)
+			{
+				f *= x_pts(ii);
+			}
+			return i * f + _index(rest...);
 		}
 
 		auto _index(const typename decltype(data)::size_type i) const -> typename decltype(data)::size_type
@@ -80,6 +91,12 @@ class ScalarData
 		template<typename... T2>
 		Tclass &ind(const T2 ...rest)
 		{
+			auto size = sizeof...(rest);
+			auto max = _x_pts.size();
+			if (size > max)
+			{
+				throw std::runtime_error("Requested " + std::to_string(size) + " indices, " + std::to_string(max) + " available");
+			}
 			auto ind = _index(rest...);
 			return data[ind];
 		}

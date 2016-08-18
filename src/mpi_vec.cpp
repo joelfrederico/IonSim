@@ -3,6 +3,54 @@
 #include "scalar_data.h"
 #include <fftw3-mpi.h>
 #include "writer_serial.h"
+#include "support_func.h"
+
+// ========================================
+// Master: Master(scalar<real>)->Slave(cbuf)
+// ========================================
+template<typename T>
+int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<T> &buf)
+{
+	LoopComm loopcomm;
+	MPI_Datatype mpi_type;
+	ptrdiff_t local_n0, local_0_start, N0, N1;
+	T *tbuf;
+
+	JTF_PRINT_NOEND(Rank: ) << buf.x_pts_vec().size() << std::endl;;
+
+	mpi_type = ionsim::convert_typeid_to_mpi<T>();
+
+	for (int id=1; id<loopcomm.p; id++)
+	{
+		MPI_Recv_local(id, local_n0, local_0_start, N0, N1);
+		tbuf = buf.vdata().data() + local_0_start;
+		MPI_Send(tbuf, local_n0*N1, mpi_type, id, TAG_MASTER_SLAVE, MPI_COMM_WORLD);
+	}
+	return 0;
+}
+template int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<long double> &buf);
+
+// ========================================
+// Slave: Master(scalar<real>)->Slave(cbuf)
+// ========================================
+template<typename T>
+int MPI_Slave_Recv_buf_from_Scalar_real(T *buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
+{
+	MPI_Status status;
+	auto mpitype = ionsim::convert_typeid_to_mpi<T>();
+	int count;
+
+	MPI_Send_local(local_n0, local_0_start, N0, N1);
+
+	MPI_Probe(0, TAG_MASTER_SLAVE, MPI_COMM_WORLD, &status);
+	MPI_Get_count(&status, mpitype, &count);
+
+	if (count != local_n0*N1) throw std::runtime_error("Receiving incommensurate number of counts!");
+
+	MPI_Recv(buf, local_n0*N1, mpitype, 0, TAG_MASTER_SLAVE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	return 0;
+}
+template int MPI_Slave_Recv_buf_from_Scalar_real(long double *buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
 
 int MPI_Send_local(const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1)
 {
@@ -146,7 +194,7 @@ int MPI_Recv_Scalar_Real(ScalarData<T> &rdata)
 			i_nonlocal = i+local_0_start;
 			for (decltype(i_nonlocal) j=0; j<N1; j++)
 			{
-				rdata.ind(i_nonlocal, j, decltype(i_nonlocal)(0)) = rbuf[i*N1+j];
+				rdata.ind(i_nonlocal, j) = rbuf[i*N1+j];
 			}
 		}
 	}
@@ -170,7 +218,7 @@ int MPI_Recv_Scalar_Complex(ScalarData<std::complex<T>> &cdata)
 			i_nonlocal = i + local_0_start;
 			for (decltype(i_nonlocal) j=0; j<(N1/2+1); j++)
 			{
-				cdata.ind(i_nonlocal, j, decltype(i_nonlocal)(0)) = cbuf[i*(N1/2+1)+j];
+				cdata.ind(i_nonlocal, j) = cbuf[i*(N1/2+1)+j];
 			}
 		}
 	}
@@ -243,7 +291,6 @@ int MPI_Complex_div_k2(std::vector<std::complex<T>> &cdata, const T delx, const 
 		{
 			kx = i_nonlocal;
 		} else {
-			/* JTF_PRINT(HI); */
 			kx = i_nonlocal-N0;
 		}
 		kx /= fx;
@@ -258,10 +305,9 @@ int MPI_Complex_div_k2(std::vector<std::complex<T>> &cdata, const T delx, const 
 			k2 = kx*kx + ky*ky;
 			if ((i_nonlocal == 0) && (j==0))
 			{
-				JTF_PRINTVAL(k2);
 				cdata[ind] = 0;
 			} else {
-				cdata[ind] /= k2;
+				cdata[ind] = k2;
 			}
 		}
 	}
@@ -290,9 +336,9 @@ int MPI_convert_complex_buf(const std::vector<std::complex<long double>> cdata, 
 }
 
 
-// ==================================
+// ========================================
 // Instantiation
-// ==================================
+// ========================================
 
 template int MPI_Send_complex(const std::vector<std::complex<long double>> &buf);
 
