@@ -14,7 +14,7 @@ ScalarData_Comm::ScalarData_Comm()
 }
 
 template<typename T>
-int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
+int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv) const
 {
 	MPI_Status status;
 	int count;
@@ -46,9 +46,10 @@ int ScalarData_Comm::recv_scalar_others_add(ScalarData<T> &scalar_recv)
 
 	return 0;
 }
+template int ScalarData_Comm::recv_scalar_others_add(ScalarData<ldouble> &scalar_recv) const;
 
 template<typename T>
-int ScalarData_Comm::recv_scalar_copy(ScalarData<T> &scalar_recv, int sender_id)
+int ScalarData_Comm::recv_scalar_copy(ScalarData<T> &scalar_recv, const int sender_id) const
 {
 	auto n_pts = scalar_recv.n_pts();
 
@@ -58,7 +59,7 @@ int ScalarData_Comm::recv_scalar_copy(ScalarData<T> &scalar_recv, int sender_id)
 }
 
 template<typename T>
-int ScalarData_Comm::bcast_scalar(ScalarData<T> &scalar_bcast)
+int ScalarData_Comm::bcast_scalar(const ScalarData<T> &scalar_bcast) const
 {
 	MPI_Datatype mpi_type;
 	unsigned long n_pts = scalar_bcast.n_pts();
@@ -79,9 +80,10 @@ int ScalarData_Comm::bcast_scalar(ScalarData<T> &scalar_bcast)
 
 	return 0;
 }
+template int ScalarData_Comm::bcast_scalar(const ScalarData<long double> &scalar_bcast) const;
 
 template<typename T>
-int ScalarData_Comm::send_scalar(ScalarData<T> &scalar_send, int dest_id)
+int ScalarData_Comm::send_scalar(const ScalarData<T> &scalar_send, const int dest_id) const
 {
 	int n_pts = scalar_send.n_pts();
 	auto vdata = scalar_send.vdata();
@@ -93,7 +95,4 @@ int ScalarData_Comm::send_scalar(ScalarData<T> &scalar_send, int dest_id)
 
 	return 0;
 }
-
-template int ScalarData_Comm::send_scalar(ScalarData<ldouble> &scalar_send, int dest_id);
-template int ScalarData_Comm::recv_scalar_others_add(ScalarData<ldouble> &scalar_recv);
-template int ScalarData_Comm::bcast_scalar(ScalarData<long double> &scalar_bcast);
+template int ScalarData_Comm::send_scalar(const ScalarData<ldouble> &scalar_send, const int dest_id) const;

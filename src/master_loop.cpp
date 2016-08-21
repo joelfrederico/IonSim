@@ -90,6 +90,10 @@ int ML_SolvePoisson(const SimParams &simparams, const unsigned int e_step, const
 		}
 	}
 
+	auto rho_vec = rho2d.vdata();
+	auto sum = ionsim::sum_vec(rho_vec);
+	JTF_PRINT_NOEND(Rho2d: ) << sum << std::endl;
+
 	MPI_Master_Send_Scalar_real_to_buf(rho2d);
 
 	MPI_Recv_Scalar_Complex(cdata);

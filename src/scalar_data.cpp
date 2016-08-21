@@ -26,7 +26,7 @@ bool ScalarData<T>::_samedim(const ScalarData<T> &rhs) const
 
 template<typename T>
 int ScalarData<T>::_init(
-		const std::vector<typename std::vector<T>::size_type> x_pts,
+		const std::vector<typename decltype(data)::size_type> x_pts,
 		const std::vector<long double> edge_mag
 	)
 {

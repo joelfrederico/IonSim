@@ -30,12 +30,13 @@ class ScalarData
 		bool _samedim(const ScalarData<Tclass> &rhs) const;
 
 		int _init(
-				const std::vector<typename std::vector<Tclass>::size_type> x_pts,
+				const std::vector<typename decltype(data)::size_type> x_pts,
 				const std::vector<long double> edge_mag
 			);
 
 
 	public:
+		typedef Tclass data_type;
 		// ==================================
 		// Constructors, Destructor
 		// ==================================
@@ -53,7 +54,7 @@ class ScalarData
 		auto edge_mag     (const decltype(_edge_mag)::size_type i) const -> typename decltype(_edge_mag)::value_type;
 		auto edge_mag_vec ()                                       const -> decltype(_edge_mag);
 		auto grid     	  (const decltype(_grid)::size_type i)     const -> typename decltype(_grid)::value_type;
-		auto vdata    	  ()  				       const -> decltype(data);
+		auto vdata    	  ()  				           const -> decltype(data);
 
 		// ==================================
 		// Methods
@@ -98,9 +99,7 @@ class ScalarData
 			{
 				throw std::runtime_error("Requested " + std::to_string(size) + " indices, " + std::to_string(max) + " available");
 			}
-			/* auto ind = _index(rest...); */
-			auto ind = ionsim::row_major(_x_pts, rest...);
-			return data[ind];
+			return data[ionsim::row_major(_x_pts, rest...)];
 		}
 
 		Tclass &ind(typename decltype(data)::size_type i);

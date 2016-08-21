@@ -7,7 +7,7 @@
 #include <fftw3-mpi.h>
 
 template<typename T>
-int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<T> &buf);
+int MPI_Master_Send_Scalar_real_to_buf(ScalarData<T> &buf);
 
 template<typename T>
 int MPI_Slave_Recv_buf_from_Scalar_real(T *buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);

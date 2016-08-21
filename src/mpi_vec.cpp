@@ -9,35 +9,47 @@
 // Master: Master(scalar<real>)->Slave(cbuf)
 // ========================================
 template<typename T>
-int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<T> &buf)
+int MPI_Master_Send_Scalar_real_to_buf(ScalarData<T> &buf)
 {
 	LoopComm loopcomm;
 	MPI_Datatype mpi_type;
-	ptrdiff_t local_n0, local_0_start, N0, N1;
-	T *tbuf;
-
-	JTF_PRINT_NOEND(Rank: ) << buf.x_pts_vec().size() << std::endl;;
+	ptrdiff_t local_n0, local_0_start, N0, N1, i_nonlocal;
+	std::vector<T> tbuf;
+	auto x_pts = buf.x_pts_vec();
 
 	mpi_type = ionsim::convert_typeid_to_mpi<T>();
 
+	T tsum = 0;
 	for (int id=1; id<loopcomm.p; id++)
 	{
 		MPI_Recv_local(id, local_n0, local_0_start, N0, N1);
-		tbuf = buf.vdata().data() + local_0_start;
-		MPI_Send(tbuf, local_n0*N1, mpi_type, id, TAG_MASTER_SLAVE, MPI_COMM_WORLD);
-	}
 
-	auto data = buf.vdata();
-	typename decltype(data)::value_type sum = 0;
-	for (auto it=data.begin(); it != data.end(); it++)
-	{
-		sum += *it;
+		auto size = local_n0*N1;
+		tbuf.resize(size);
+		x_pts[0] = local_n0;
+
+		for (ptrdiff_t i=0; i<local_n0; i++)
+		{
+			i_nonlocal = i+local_0_start;
+			for (ptrdiff_t j=0; j<N1; j++)
+			{
+				tbuf[ionsim::row_major(x_pts, i, j)] = buf.ind(i_nonlocal, j);
+			}
+		}
+
+		MPI_Send(tbuf.data(), size, mpi_type, id, TAG_MASTER_SLAVE, MPI_COMM_WORLD);
+
+		for (int i=0; i<size; i++)
+		{
+			tsum += tbuf[i];
+		}
 	}
-	JTF_PRINT_NOEND(Sum of sent: ) << sum << std::endl;
+	JTF_PRINT_NOEND(Master tbuf sum: ) << tsum << std::endl;
+	JTF_PRINTVAL(local_0_start);
 
 	return 0;
 }
-template int MPI_Master_Send_Scalar_real_to_buf(const ScalarData<long double> &buf);
+template int MPI_Master_Send_Scalar_real_to_buf(ScalarData<long double> &buf);
 
 // ========================================
 // Slave: Master(scalar<real>)->Slave(cbuf)
@@ -58,6 +70,8 @@ int MPI_Slave_Recv_buf_from_Scalar_real(T *buf, const ptrdiff_t local_n0, const 
 
 	MPI_Recv(buf, local_n0*N1, mpitype, 0, TAG_MASTER_SLAVE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
+	JTF_PRINTVAL(buf[0]);
+
 	T sum = 0;
 	std::vector<ptrdiff_t> x_pts = {local_n0, N1};
 	for (ptrdiff_t i=0; i<local_n0; i++)
@@ -67,7 +81,7 @@ int MPI_Slave_Recv_buf_from_Scalar_real(T *buf, const ptrdiff_t local_n0, const 
 			sum += buf[ionsim::row_major(x_pts, i, j)];
 		}
 	}
-	JTF_PRINTVAL(sum);
+	JTF_PRINT_NOEND(Sum of received: ) << sum << std::endl;
 	return 0;
 }
 template int MPI_Slave_Recv_buf_from_Scalar_real(long double *buf, const ptrdiff_t local_n0, const ptrdiff_t local_0_start, const ptrdiff_t N0, const ptrdiff_t N1);
@@ -243,12 +257,12 @@ int MPI_Recv_Scalar_Complex(ScalarData<std::complex<T>> &cdata)
 		}
 	}
 
-	auto j = i_nonlocal;
-	i_nonlocal = 1;
-	j=0;
+	/* auto j = i_nonlocal; */
+	/* i_nonlocal = 1; */
+	/* j=0; */
+	/* JTF_PRINTVAL(cdata.ind(i_nonlocal, j).real()); */
+	/* JTF_PRINTVAL(cdata.ind(i_nonlocal, j).imag()); */
 
-	JTF_PRINTVAL(cdata.ind(i_nonlocal, j).real());
-	JTF_PRINTVAL(cdata.ind(i_nonlocal, j).imag());
 	return 0;
 }
 

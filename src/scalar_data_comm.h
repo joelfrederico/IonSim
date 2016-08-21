@@ -14,16 +14,16 @@ class ScalarData_Comm
 		ScalarData_Comm();
 
 		template<typename T>
-		int recv_scalar_others_add(ScalarData<T> &scalar_recv);
+		int recv_scalar_others_add(ScalarData<T> &scalar_recv) const;
 
 		template<typename T>
-		int recv_scalar_copy(ScalarData<T> &scalar_recv, int sender_id);
+		int recv_scalar_copy(ScalarData<T> &scalar_recv, const int sender_id) const ;
 
 		template<typename T>
-		int send_scalar(ScalarData<T> &scalar_send, int dest_id);
+		int send_scalar(const ScalarData<T> &scalar_send, const int dest_id) const ;
 
 		template<typename T>
-		int bcast_scalar(ScalarData<T> &scalar_bcast);
+		int bcast_scalar(const ScalarData<T> &scalar_bcast) const;
 };
 
 #endif

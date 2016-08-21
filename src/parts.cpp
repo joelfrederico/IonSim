@@ -79,9 +79,9 @@ int Parts::get_rho_dz(const double z0, const double z1, ScalarData<T> &rho) cons
 		}
 	}
 
-	auto rho_vec = rho.vdata();
-	auto sum = ionsim::sum_vec(rho_vec);
-	JTF_PRINT_NOEND(Parts hist sum: ) << sum << std::endl;
+	/* auto rho_vec = rho.vdata(); */
+	/* auto sum = ionsim::sum_vec(rho_vec); */
+	/* JTF_PRINT_NOEND(Parts hist sum: ) << sum << std::endl; */
 	
 	/* rho *= _particle_charge; */
 

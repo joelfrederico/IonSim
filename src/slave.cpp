@@ -191,10 +191,10 @@ int slave()
 				// ========================================
 				// Prepare for FFT
 				// ========================================
-				JTF_PRINT_NOEND(Starting sub) << " (id: " << loopcomm.id << ")" << std::endl;
+				/* JTF_PRINT_NOEND(Starting sub) << " (id: " << loopcomm.id << ")" << std::endl; */
 				psifftw_base(simparams, loopcomm);
 
-				JTF_PRINT_NOEND(Sub done) << "     (id: " << loopcomm.id << ")" << std::endl;
+				/* JTF_PRINT_NOEND(Sub done) << "     (id: " << loopcomm.id << ")" << std::endl; */
 
 				break;
 			case LOOP_GET_WISDOM:
